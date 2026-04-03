@@ -64,6 +64,20 @@ export default function TermsPage() {
             <h2 className="text-white font-semibold text-base mb-3">11. Contact</h2>
             <p>Questions about these Terms? Contact us at <a href="mailto:support@chartaalba.com" className="text-white hover:underline">support@chartaalba.com</a>.</p>
           </section>
+
+          <section id="points">
+            <h2 className="text-white font-semibold text-base mb-3">12. Charta Alba Points</h2>
+            <div className="space-y-3">
+              <p><strong className="text-white/80">No monetary value.</strong> Charta Alba Points (&quot;Points&quot;) are a virtual engagement feature only. Points have no monetary value, cannot be redeemed for cash or cash equivalents, and do not constitute a financial instrument, security, or currency of any kind.</p>
+              <p><strong className="text-white/80">Non-transferable.</strong> Points are personal to your account. You may not sell, gift, transfer, or assign Points to any other user. Any attempted transfer is void.</p>
+              <p><strong className="text-white/80">Expiry.</strong> Points expire if your account is inactive for 12 consecutive months. &quot;Inactive&quot; means no login, post, comment, or purchase during that period. We will send an email reminder 30 days before expiry. Expired Points cannot be restored.</p>
+              <p><strong className="text-white/80">Purchases.</strong> Purchased Points are subject to a 48-hour refund window, provided the Points have not been spent. After 48 hours or once any Points are used, purchases are final. Refunds are processed to the original payment method within 5–10 business days.</p>
+              <p><strong className="text-white/80">Platform feature, not a financial product.</strong> The Points system is a platform engagement mechanism. It is not a loyalty programme subject to consumer credit regulation, a virtual currency subject to money transmission law, or a deposit product. Charta Alba is not a financial institution.</p>
+              <p><strong className="text-white/80">Modification of point values.</strong> We reserve the right to modify earn rates, spend costs, and package prices. We will provide at least 30 days&apos; notice before reducing the value of already-earned Points or increasing spend costs. New earning rules may be introduced without notice.</p>
+              <p><strong className="text-white/80">Revocation for ToS violations.</strong> Points may be forfeited without compensation if your account is suspended or terminated for violations of these Terms, including but not limited to: manipulation of the earning system, self-voting, use of automated accounts, or any fraudulent activity.</p>
+              <p><strong className="text-white/80">Account closure.</strong> Upon account deletion, all Points are permanently forfeited. There is no cash equivalent for outstanding Points at closure.</p>
+            </div>
+          </section>
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/8 flex flex-wrap gap-4 text-sm">

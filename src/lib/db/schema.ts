@@ -7,6 +7,8 @@ import {
   primaryKey,
   unique,
   boolean,
+  jsonb,
+  date,
 } from "drizzle-orm/pg-core";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 
@@ -21,6 +23,8 @@ export const users = pgTable("users", {
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
   passwordHash: text("password_hash"),
+  role: text("role").notNull().default("user"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
 });
 
 export const accounts = pgTable(
@@ -117,6 +121,12 @@ export const profiles = pgTable("profiles", {
   emailNewFollower: boolean("email_new_follower").notNull().default(false),
   emailReply: boolean("email_reply").notNull().default(false),
   emailBreakthrough: boolean("email_breakthrough").notNull().default(false),
+  // Billing
+  stripeCustomerId: text("stripe_customer_id"),
+  // Points / engagement
+  loginStreak: integer("login_streak").notNull().default(0),
+  lastLoginDate: date("last_login_date"),
+  pointFeatures: jsonb("point_features"),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
 });
 
@@ -394,4 +404,87 @@ export const circlePosts = pgTable("circle_posts", {
   paperId: text("paper_id").references(() => papers.id, { onDelete: "set null" }),
   videoId: uuid("video_id").references(() => videos.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+});
+
+// ── Public API platform ────────────────────────────────────────────────────
+
+export const apiKeys = pgTable("api_keys", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  keyHash: text("key_hash").notNull().unique(),
+  keyPrefix: text("key_prefix").notNull(),
+  tier: text("tier").notNull().default("free"),
+  requestsThisMonth: integer("requests_this_month").notNull().default(0),
+  requestsToday: integer("requests_today").notNull().default(0),
+  lastUsedAt: timestamp("last_used_at", { withTimezone: true, mode: "string" }),
+  lastResetDate: date("last_reset_date"),
+  isActive: boolean("is_active").notNull().default(true),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+});
+
+export const apiUsageLogs = pgTable("api_usage_logs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  apiKeyId: uuid("api_key_id")
+    .notNull()
+    .references(() => apiKeys.id, { onDelete: "cascade" }),
+  endpoint: text("endpoint").notNull(),
+  responseTimeMs: integer("response_time_ms"),
+  statusCode: integer("status_code").notNull(),
+  ipAddress: text("ip_address"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+});
+
+export const apiPlans = pgTable("api_plans", {
+  tier: text("tier").primaryKey(),
+  monthlyRequests: integer("monthly_requests").notNull(),
+  dailyRequests: integer("daily_requests").notNull(),
+  resultsPerCall: integer("results_per_call").notNull(),
+  priceMonthly: integer("price_monthly").notNull(),
+  priceAnnual: integer("price_annual").notNull(),
+  features: jsonb("features"),
+});
+
+// ── Points system ──────────────────────────────────────────────────────────
+
+export const pointsLedger = pgTable("points_ledger", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  amount: integer("amount").notNull(),
+  transactionType: text("transaction_type").notNull(),
+  referenceId: text("reference_id"),
+  description: text("description").notNull(),
+  ipAddress: text("ip_address"),
+  isFlagged: boolean("is_flagged").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+});
+
+export const pointPurchases = pgTable("point_purchases", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  pointsAmount: integer("points_amount").notNull(),
+  priceUsd: integer("price_usd").notNull(),
+  stripeSessionId: text("stripe_session_id"),
+  stripePaymentId: text("stripe_payment_id"),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+});
+
+export const pointRules = pgTable("point_rules", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  actionType: text("action_type").notNull().unique(),
+  pointsAwarded: integer("points_awarded").notNull(),
+  dailyLimit: integer("daily_limit"),
+  weeklyLimit: integer("weekly_limit"),
+  oneTime: boolean("one_time").notNull().default(false),
+  description: text("description").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
 });

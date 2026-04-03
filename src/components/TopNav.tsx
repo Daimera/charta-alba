@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useCallback, useTransition } from "react";
+import { useCallback, useTransition, useEffect, useState } from "react";
 
 export function TopNav() {
   const pathname = usePathname();
@@ -11,6 +11,15 @@ export function TopNav() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
   const [, startTransition] = useTransition();
+  const [pointsBalance, setPointsBalance] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!session?.user) { setPointsBalance(null); return; }
+    fetch("/api/points/balance")
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: { balance?: number } | null) => d?.balance != null && setPointsBalance(d.balance))
+      .catch(() => undefined);
+  }, [session?.user]);
 
   const handleSearch = useCallback(
     (value: string) => {
@@ -96,9 +105,21 @@ export function TopNav() {
 
       {/* Auth */}
       {session?.user ? (
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Points balance */}
+          <Link
+            href="/points"
+            className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/15 transition-colors"
+            title="Your points"
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 9l10 13L22 9z" /></svg>
+            <span className="text-xs font-semibold tabular-nums">
+              {pointsBalance != null ? pointsBalance.toLocaleString() : "—"}
+            </span>
+          </Link>
         <Link
           href="/settings"
-          className="flex items-center gap-2 shrink-0"
+          className="flex items-center"
           title="Settings"
         >
           {session.user.image ? (
@@ -114,6 +135,7 @@ export function TopNav() {
             </span>
           )}
         </Link>
+        </div>
       ) : (
         <Link
           href="/auth/signin"

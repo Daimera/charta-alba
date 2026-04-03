@@ -25,12 +25,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/auth/signin",
   },
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user?.id) token.sub = user.id;
+      // Fetch role from DB on first sign-in (token won't have it yet)
+      if (token.sub && !token.role) {
+        const [dbUser] = await db
+          .select({ role: users.role })
+          .from(users)
+          .where(eq(users.id, token.sub))
+          .limit(1);
+        token.role = dbUser?.role ?? "user";
+      }
       return token;
     },
     session({ session, token }) {
       if (token.sub) session.user.id = token.sub;
+      if (token.role) session.user.role = token.role as string;
       return session;
     },
   },

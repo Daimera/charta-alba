@@ -10,8 +10,9 @@ export function Footer() {
         <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           {[
             { href: "/help", label: "Help" },
-            { href: "/privacy", label: "Privacy Policy" },
-            { href: "/terms", label: "Terms of Service" },
+            { href: "/developers", label: "Developers" },
+            { href: "/privacy", label: "Privacy" },
+            { href: "/terms", label: "Terms" },
             { href: "mailto:support@chartaalba.com", label: "Contact" },
           ].map(({ href, label }) => (
             <Link
