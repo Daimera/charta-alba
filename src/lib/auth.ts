@@ -27,20 +27,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user?.id) token.sub = user.id;
-      // Fetch role from DB on first sign-in (token won't have it yet)
+      // Fetch role + isFounder from DB on first sign-in (token won't have them yet)
       if (token.sub && !token.role) {
         const [dbUser] = await db
-          .select({ role: users.role })
+          .select({ role: users.role, isFounder: users.isFounder })
           .from(users)
           .where(eq(users.id, token.sub))
           .limit(1);
         token.role = dbUser?.role ?? "user";
+        token.isFounder = dbUser?.isFounder ?? false;
       }
       return token;
     },
     session({ session, token }) {
       if (token.sub) session.user.id = token.sub;
       if (token.role) session.user.role = token.role as string;
+      session.user.isFounder = (token.isFounder ?? false) as boolean;
       return session;
     },
   },

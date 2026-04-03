@@ -25,6 +25,17 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"),
   role: text("role").notNull().default("user"),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+  // Founder / god-mode fields
+  isFounder: boolean("is_founder").notNull().default(false),
+  founderSince: timestamp("founder_since", { withTimezone: true, mode: "string" }),
+  founderTotpSecret: text("founder_totp_secret"),         // AES-256-GCM encrypted
+  founderBackupCodes: text("founder_backup_codes").array(), // bcrypt-hashed
+  founderLastVerified: timestamp("founder_last_verified", { withTimezone: true, mode: "string" }),
+  founderIpWhitelist: text("founder_ip_whitelist").array(),
+  founderTotpAttempts: integer("founder_totp_attempts").notNull().default(0),
+  founderLockedUntil: timestamp("founder_locked_until", { withTimezone: true, mode: "string" }),
+  lastTotpCodeHash: text("last_totp_code_hash"),
+  lastTotpUsedAt: timestamp("last_totp_used_at", { withTimezone: true, mode: "string" }),
 });
 
 export const accounts = pgTable(
@@ -487,4 +498,44 @@ export const pointRules = pgTable("point_rules", {
   oneTime: boolean("one_time").notNull().default(false),
   description: text("description").notNull(),
   isActive: boolean("is_active").notNull().default(true),
+});
+
+// ── Founder / God-mode tables ──────────────────────────────────────────────────
+
+export const auditLog = pgTable("audit_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  actionType: text("action_type").notNull(),
+  targetType: text("target_type"),
+  targetId: text("target_id"),
+  detail: jsonb("detail"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  totpVerified: boolean("totp_verified").notNull().default(false),
+  verificationLevel: integer("verification_level").notNull().default(1),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+});
+
+export const founderApiKey = pgTable("founder_api_key", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  keyHash: text("key_hash").notNull().unique(),
+  keyPrefix: text("key_prefix").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+  lastUsedAt: timestamp("last_used_at", { withTimezone: true, mode: "string" }),
+  isActive: boolean("is_active").notNull().default(true),
+});
+
+export const systemConfig = pgTable("system_config", {
+  key: text("key").primaryKey(),
+  value: jsonb("value").notNull(),
+  description: text("description"),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow(),
+  updatedBy: text("updated_by").references((): AnyPgColumn => users.id, { onDelete: "set null" }),
+});
+
+export const featureFlags = pgTable("feature_flags", {
+  key: text("key").primaryKey(),
+  enabled: boolean("enabled").notNull().default(false),
+  description: text("description"),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow(),
+  updatedBy: text("updated_by").references((): AnyPgColumn => users.id, { onDelete: "set null" }),
 });
