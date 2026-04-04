@@ -9,6 +9,7 @@ import {
   boolean,
   jsonb,
   date,
+  real,
 } from "drizzle-orm/pg-core";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 
@@ -36,6 +37,9 @@ export const users = pgTable("users", {
   founderLockedUntil: timestamp("founder_locked_until", { withTimezone: true, mode: "string" }),
   lastTotpCodeHash: text("last_totp_code_hash"),
   lastTotpUsedAt: timestamp("last_totp_used_at", { withTimezone: true, mode: "string" }),
+  // Account lockout
+  failedLoginCount: integer("failed_login_count").notNull().default(0),
+  lockedUntil: timestamp("locked_until", { withTimezone: true, mode: "string" }),
 });
 
 export const accounts = pgTable(
@@ -138,6 +142,15 @@ export const profiles = pgTable("profiles", {
   loginStreak: integer("login_streak").notNull().default(0),
   lastLoginDate: date("last_login_date"),
   pointFeatures: jsonb("point_features"),
+  // Analytics privacy
+  shareLocationWithCreators: boolean("share_location_with_creators").notNull().default(true),
+  // i18n
+  preferredLanguage: text("preferred_language").notNull().default("en"),
+  // Compliance
+  ccpaDoNotSell:                 boolean("ccpa_do_not_sell").notNull().default(false),
+  analyticsOptOut:               boolean("analytics_opt_out").notNull().default(false),
+  accessibilityReducedMotion:    boolean("accessibility_reduced_motion").notNull().default(false),
+  accessibilityHighContrast:     boolean("accessibility_high_contrast").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
 });
 
@@ -339,6 +352,20 @@ export const loginSessions = pgTable("login_sessions", {
     .references(() => users.id, { onDelete: "cascade" }),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
+  // Geo
+  country:     text("country"),
+  countryCode: text("country_code"),
+  region:      text("region"),
+  city:        text("city"),
+  timezone:    text("timezone"),
+  latitude:    real("latitude"),
+  longitude:   real("longitude"),
+  // Device
+  deviceType: text("device_type"),
+  browser:    text("browser"),
+  os:         text("os"),
+  // Security
+  isSuspicious: boolean("is_suspicious").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
 });
 
@@ -539,3 +566,64 @@ export const featureFlags = pgTable("feature_flags", {
   updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow(),
   updatedBy: text("updated_by").references((): AnyPgColumn => users.id, { onDelete: "set null" }),
 });
+
+// ── Analytics tables ────────────────────────────────────────────────────────
+
+export const profileViews = pgTable("profile_views", {
+  id:            uuid("id").primaryKey().defaultRandom(),
+  profileUserId: text("profile_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  viewerUserId:  text("viewer_user_id").references((): AnyPgColumn => users.id, { onDelete: "set null" }),
+  viewerIp:      text("viewer_ip"),
+  country:       text("country"),
+  countryCode:   text("country_code"),
+  region:        text("region"),
+  city:          text("city"),
+  deviceType:    text("device_type"),
+  browser:       text("browser"),
+  referrerUrl:   text("referrer_url"),
+  viewedAt:      timestamp("viewed_at", { withTimezone: true, mode: "string" }).defaultNow(),
+});
+
+export const contentViews = pgTable("content_views", {
+  id:           uuid("id").primaryKey().defaultRandom(),
+  contentType:  text("content_type").notNull(),  // 'paper' | 'video' | 'card'
+  contentId:    text("content_id").notNull(),
+  viewerUserId: text("viewer_user_id").references((): AnyPgColumn => users.id, { onDelete: "set null" }),
+  viewerIp:     text("viewer_ip"),
+  country:      text("country"),
+  countryCode:  text("country_code"),
+  city:         text("city"),
+  deviceType:   text("device_type"),
+  viewedAt:     timestamp("viewed_at", { withTimezone: true, mode: "string" }).defaultNow(),
+});
+
+// ── Compliance & i18n ──────────────────────────────────────────────────────
+
+export const privacyRequests = pgTable("privacy_requests", {
+  id:             uuid("id").primaryKey().defaultRandom(),
+  userId:         text("user_id").references(() => users.id, { onDelete: "set null" }),
+  requestType:    text("request_type").notNull(),
+  status:         text("status").notNull().default("pending"),
+  submittedAt:    timestamp("submitted_at", { withTimezone: true, mode: "string" }).defaultNow(),
+  completedAt:    timestamp("completed_at", { withTimezone: true, mode: "string" }),
+  notes:          text("notes"),
+  requesterEmail: text("requester_email"),
+  ipAddress:      text("ip_address"),
+});
+
+export const translations = pgTable(
+  "translations",
+  {
+    id:                  uuid("id").primaryKey().defaultRandom(),
+    contentType:         text("content_type").notNull().default("card"),
+    contentId:           uuid("content_id").notNull(),
+    languageCode:        text("language_code").notNull(),
+    translatedHeadline:  text("translated_headline"),
+    translatedHook:      text("translated_hook"),
+    translatedBody:      text("translated_body"),
+    translatedTldr:      text("translated_tldr"),
+    createdAt:           timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+    lastUsedAt:          timestamp("last_used_at", { withTimezone: true, mode: "string" }).defaultNow(),
+  },
+  (t) => [unique("translations_content_lang_unique").on(t.contentType, t.contentId, t.languageCode)],
+);

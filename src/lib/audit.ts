@@ -1,7 +1,21 @@
 /**
- * Audit logging for founder actions.
+ * Audit logging for founder actions and security events.
  * All inserts are fire-and-forget (non-blocking) unless you need to await.
  * The audit_log table has a DB-level immutability trigger — rows are never modified.
+ *
+ * Security action types:
+ *  auth_failed              — failed credential login
+ *  auth_locked              — account locked after too many failures
+ *  rate_limited             — IP rate-limited on an endpoint
+ *  forbidden_access         — 403 on a protected resource
+ *  founder_access_attempt   — non-founder attempted to access /founder/*
+ *  api_key_new_ip           — API key used from a new IP/country
+ *
+ * Founder action types:
+ *  founder_totp_verified, founder_totp_failed, founder_locked,
+ *  founder_user_suspended, founder_user_restored, founder_password_reset,
+ *  founder_role_changed, founder_points_awarded, founder_config_updated,
+ *  founder_api_key_generated, founder_api_key_rotated, founder_emergency_lock
  */
 
 import { db } from "@/lib/db";

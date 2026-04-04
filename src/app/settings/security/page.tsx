@@ -8,8 +8,16 @@ import { PasswordStrengthField, isPasswordValid } from "@/components/PasswordStr
 
 interface LoginSession {
   id: string;
-  ipAddress: string | null;
-  userAgent: string | null;
+  ipMasked: string;
+  country: string | null;
+  countryCode: string | null;
+  city: string | null;
+  flag: string;
+  deviceType: string | null;
+  browser: string | null;
+  os: string | null;
+  isSuspicious: boolean;
+  isCurrent: boolean;
   createdAt: string | null;
 }
 
@@ -139,7 +147,7 @@ export default function SecurityPage() {
       </Card>
 
       {/* Login history */}
-      <Card title="Login history" description="Your last 5 sign-in events.">
+      <Card title="Login history" description="Your last 10 sign-in events.">
         {sessionsLoading ? (
           <div className="w-4 h-4 border-2 border-white/15 border-t-white/40 rounded-full animate-spin" />
         ) : sessions.length === 0 ? (
@@ -147,14 +155,43 @@ export default function SecurityPage() {
         ) : (
           <div className="space-y-2">
             {sessions.map((s) => (
-              <div key={s.id} className="flex items-start justify-between p-3 rounded-lg bg-white/4 border border-white/8">
-                <div>
-                  <p className="text-white/70 text-xs font-mono">{s.ipAddress ?? "Unknown IP"}</p>
-                  <p className="text-white/30 text-xs mt-0.5 truncate max-w-xs">{s.userAgent ?? "Unknown device"}</p>
+              <div
+                key={s.id}
+                className={`p-3 rounded-lg border ${
+                  s.isSuspicious
+                    ? "bg-red-500/6 border-red-500/20"
+                    : "bg-white/4 border-white/8"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-2 min-w-0">
+                    <span className="text-base shrink-0 mt-0.5">{s.flag || "🌍"}</span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-white/80 text-xs font-medium">
+                          {[s.city, s.country].filter(Boolean).join(", ") || "Unknown location"}
+                        </span>
+                        {s.isCurrent && (
+                          <span className="text-xs text-green-400 bg-green-500/10 border border-green-500/20 px-1.5 py-0.5 rounded-full leading-none">
+                            This device
+                          </span>
+                        )}
+                        {s.isSuspicious && (
+                          <span className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 px-1.5 py-0.5 rounded-full leading-none">
+                            Suspicious
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-white/35 text-xs mt-0.5">
+                        {[s.browser, s.os, s.deviceType].filter(Boolean).join(" · ") || "Unknown device"}
+                      </p>
+                      <p className="text-white/20 text-xs font-mono mt-0.5">{s.ipMasked || "—"}</p>
+                    </div>
+                  </div>
+                  <p className="text-white/30 text-xs shrink-0">
+                    {s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"}
+                  </p>
                 </div>
-                <p className="text-white/30 text-xs shrink-0 ml-3">
-                  {s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "—"}
-                </p>
               </div>
             ))}
           </div>

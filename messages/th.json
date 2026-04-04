@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "หน้าแรก",
+    "top": "ยอดนิยม",
+    "digest": "สรุป",
+    "collections": "คอลเลกชัน",
+    "settings": "การตั้งค่า",
+    "signIn": "เข้าสู่ระบบ",
+    "signOut": "ออกจากระบบ"
+  },
+  "feed": {
+    "like": "ถูกใจ",
+    "bookmark": "บันทึก",
+    "share": "แชร์",
+    "translate": "แปล",
+    "askAI": "ถาม AI",
+    "readPaper": "อ่านบทความ",
+    "loading": "กำลังโหลดบทความ…",
+    "empty": "ยังไม่มีบทความ โปรดกลับมาใหม่",
+    "error": "โหลดฟีดไม่สำเร็จ",
+    "noMore": "คุณเห็นทุกอย่างแล้วสำหรับตอนนี้"
+  },
+  "card": {
+    "tldr": "สรุป",
+    "authors": "ผู้เขียน",
+    "categories": "หมวดหมู่",
+    "published": "เผยแพร่",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "เข้าสู่ระบบ Charta Alba",
+    "signUpTitle": "สร้างบัญชีของคุณ",
+    "email": "ที่อยู่อีเมล",
+    "password": "รหัสผ่าน",
+    "confirmPassword": "ยืนยันรหัสผ่าน",
+    "displayName": "ชื่อที่แสดง",
+    "continueWithGoogle": "ดำเนินการต่อด้วย Google",
+    "orContinueWith": "หรือดำเนินการต่อด้วย",
+    "forgotPassword": "ลืมรหัสผ่าน?",
+    "noAccount": "ยังไม่มีบัญชี?",
+    "haveAccount": "มีบัญชีอยู่แล้ว?",
+    "signUp": "ลงทะเบียน",
+    "signIn": "เข้าสู่ระบบ",
+    "invalidCredentials": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "accountLocked": "บัญชีถูกล็อกเนื่องจากพยายามเข้าสู่ระบบผิดหลายครั้ง โปรดลองอีกครั้งใน 30 นาที",
+    "emailRequired": "จำเป็นต้องระบุอีเมล",
+    "passwordRequired": "จำเป็นต้องระบุรหัสผ่าน"
+  },
+  "settings": {
+    "title": "การตั้งค่า",
+    "profile": "โปรไฟล์",
+    "account": "บัญชี",
+    "privacy": "ความเป็นส่วนตัว",
+    "notifications": "การแจ้งเตือน",
+    "security": "ความปลอดภัย",
+    "save": "บันทึกการเปลี่ยนแปลง",
+    "saved": "บันทึกการเปลี่ยนแปลงแล้ว",
+    "error": "บันทึกไม่สำเร็จ"
+  },
+  "common": {
+    "loading": "กำลังโหลด…",
+    "error": "เกิดข้อผิดพลาด",
+    "retry": "ลองอีกครั้ง",
+    "cancel": "ยกเลิก",
+    "confirm": "ยืนยัน",
+    "delete": "ลบ",
+    "edit": "แก้ไข",
+    "save": "บันทึก",
+    "close": "ปิด",
+    "back": "กลับ",
+    "next": "ถัดไป",
+    "submit": "ส่ง"
+  }
+}

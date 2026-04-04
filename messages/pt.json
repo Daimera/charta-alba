@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Início",
+    "top": "Tendências",
+    "digest": "Resumo",
+    "collections": "Coleções",
+    "settings": "Configurações",
+    "signIn": "Entrar",
+    "signOut": "Sair"
+  },
+  "feed": {
+    "like": "Curtir",
+    "bookmark": "Salvar",
+    "share": "Compartilhar",
+    "translate": "Traduzir",
+    "askAI": "Perguntar à IA",
+    "readPaper": "Ler artigo",
+    "loading": "Carregando artigos…",
+    "empty": "Ainda sem artigos. Volte em breve.",
+    "error": "Falha ao carregar o feed",
+    "noMore": "Você viu tudo por enquanto"
+  },
+  "card": {
+    "tldr": "Resumo",
+    "authors": "Autores",
+    "categories": "Categorias",
+    "published": "Publicado",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "Entrar no Charta Alba",
+    "signUpTitle": "Criar sua conta",
+    "email": "Endereço de e-mail",
+    "password": "Senha",
+    "confirmPassword": "Confirmar senha",
+    "displayName": "Nome de exibição",
+    "continueWithGoogle": "Continuar com o Google",
+    "orContinueWith": "ou continuar com",
+    "forgotPassword": "Esqueceu a senha?",
+    "noAccount": "Não tem conta?",
+    "haveAccount": "Já tem conta?",
+    "signUp": "Cadastrar",
+    "signIn": "Entrar",
+    "invalidCredentials": "E-mail ou senha incorretos",
+    "accountLocked": "Conta bloqueada por muitas tentativas falhas. Tente novamente em 30 minutos.",
+    "emailRequired": "O e-mail é obrigatório",
+    "passwordRequired": "A senha é obrigatória"
+  },
+  "settings": {
+    "title": "Configurações",
+    "profile": "Perfil",
+    "account": "Conta",
+    "privacy": "Privacidade",
+    "notifications": "Notificações",
+    "security": "Segurança",
+    "save": "Salvar alterações",
+    "saved": "Alterações salvas",
+    "error": "Falha ao salvar"
+  },
+  "common": {
+    "loading": "Carregando…",
+    "error": "Algo deu errado",
+    "retry": "Tentar novamente",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "save": "Salvar",
+    "close": "Fechar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "submit": "Enviar"
+  }
+}

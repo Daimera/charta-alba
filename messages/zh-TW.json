@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "首頁",
+    "top": "熱門",
+    "digest": "摘要",
+    "collections": "收藏",
+    "settings": "設定",
+    "signIn": "登入",
+    "signOut": "登出"
+  },
+  "feed": {
+    "like": "按讚",
+    "bookmark": "收藏",
+    "share": "分享",
+    "translate": "翻譯",
+    "askAI": "詢問AI",
+    "readPaper": "閱讀論文",
+    "loading": "正在載入論文…",
+    "empty": "暫無論文，請稍後再來。",
+    "error": "載入失敗",
+    "noMore": "暫時已全部看完"
+  },
+  "card": {
+    "tldr": "摘要",
+    "authors": "作者",
+    "categories": "分類",
+    "published": "發布於",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "登入 Charta Alba",
+    "signUpTitle": "建立您的帳號",
+    "email": "電子郵件地址",
+    "password": "密碼",
+    "confirmPassword": "確認密碼",
+    "displayName": "顯示名稱",
+    "continueWithGoogle": "使用 Google 繼續",
+    "orContinueWith": "或繼續使用",
+    "forgotPassword": "忘記密碼？",
+    "noAccount": "還沒有帳號？",
+    "haveAccount": "已有帳號？",
+    "signUp": "註冊",
+    "signIn": "登入",
+    "invalidCredentials": "電子郵件或密碼不正確",
+    "accountLocked": "由於多次登入失敗，帳號已被鎖定。請30分鐘後再試。",
+    "emailRequired": "電子郵件不能為空",
+    "passwordRequired": "密碼不能為空"
+  },
+  "settings": {
+    "title": "設定",
+    "profile": "個人資料",
+    "account": "帳號",
+    "privacy": "隱私",
+    "notifications": "通知",
+    "security": "安全",
+    "save": "儲存變更",
+    "saved": "變更已儲存",
+    "error": "儲存失敗"
+  },
+  "common": {
+    "loading": "載入中…",
+    "error": "發生了一點問題",
+    "retry": "重試",
+    "cancel": "取消",
+    "confirm": "確認",
+    "delete": "刪除",
+    "edit": "編輯",
+    "save": "儲存",
+    "close": "關閉",
+    "back": "返回",
+    "next": "下一步",
+    "submit": "提交"
+  }
+}

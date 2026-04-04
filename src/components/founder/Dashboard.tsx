@@ -114,6 +114,73 @@ function ConfirmModal({
   );
 }
 
+// ── Security Events panel ─────────────────────────────────────────────────────
+
+const SECURITY_TYPES = new Set([
+  "auth_failed",
+  "auth_locked",
+  "rate_limited",
+  "forbidden_access",
+  "founder_access_attempt",
+  "api_key_new_ip",
+]);
+
+function SecurityEvents({ rows }: { rows: AuditRow[] }) {
+  const day24Ago = Date.now() - 86400_000;
+  const secRows = rows.filter((r) => SECURITY_TYPES.has(r.actionType));
+  const recent = secRows.filter((r) => r.createdAt && new Date(r.createdAt).getTime() > day24Ago);
+
+  // Group failed logins by IP in last 24h
+  const failedByIp = new Map<string, number>();
+  for (const r of recent.filter((r) => r.actionType === "auth_failed")) {
+    const ip = r.ipAddress ?? "unknown";
+    failedByIp.set(ip, (failedByIp.get(ip) ?? 0) + 1);
+  }
+  const topIps = [...failedByIp.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  const lockedCount = recent.filter((r) => r.actionType === "auth_locked").length;
+  const rateLimitCount = recent.filter((r) => r.actionType === "rate_limited").length;
+  const forbiddenCount = recent.filter((r) => r.actionType === "forbidden_access").length;
+  const founderAttempts = recent.filter((r) => r.actionType === "founder_access_attempt").length;
+
+  if (secRows.length === 0) return null;
+
+  return (
+    <div className="p-4 rounded-xl border border-amber-500/15 bg-amber-500/4 space-y-3">
+      <p className="text-amber-400/80 text-xs uppercase tracking-wide font-mono">Security Events — last 24h</p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: "Failed logins", value: recent.filter((r) => r.actionType === "auth_failed").length, warn: true },
+          { label: "Locked accounts", value: lockedCount, warn: lockedCount > 0 },
+          { label: "Rate limited", value: rateLimitCount, warn: rateLimitCount > 5 },
+          { label: "/founder attempts", value: founderAttempts, warn: founderAttempts > 0 },
+        ].map((s) => (
+          <div key={s.label} className={`p-2.5 rounded-lg text-center border ${s.warn && s.value > 0 ? "border-amber-500/25 bg-amber-500/8" : "border-white/6 bg-white/3"}`}>
+            <p className={`font-bold text-lg tabular-nums ${s.warn && s.value > 0 ? "text-amber-400" : "text-white/60"}`}>{s.value}</p>
+            <p className="text-white/30 text-xs">{s.label}</p>
+          </div>
+        ))}
+      </div>
+      {topIps.length > 0 && (
+        <div>
+          <p className="text-white/30 text-xs font-mono mb-1.5">Top IPs with failed logins (24h)</p>
+          <div className="space-y-1">
+            {topIps.map(([ip, count]) => (
+              <div key={ip} className="flex items-center justify-between">
+                <span className="text-white/40 text-xs font-mono">{ip}</span>
+                <span className="text-amber-400/70 text-xs tabular-nums">{count} attempts</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {forbiddenCount > 0 && (
+        <p className="text-red-400/60 text-xs font-mono">{forbiddenCount} forbidden access attempts in last 24h</p>
+      )}
+    </div>
+  );
+}
+
 // ── Main Dashboard ────────────────────────────────────────────────────────────
 
 export default function FounderDashboard() {
@@ -660,47 +727,56 @@ export default function FounderDashboard() {
 
       {/* ── AUDIT LOG ────────────────────────────────────────────────────── */}
       {tab === "audit" && !loadingTab && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-white/30 text-xs font-mono">
-              Showing latest {auditRows.length} entries — immutable audit trail
-            </p>
-            <a
-              href="/api/founder/export?type=audit"
-              download
-              className="text-xs text-white/30 hover:text-white/60 border border-white/8 hover:border-white/15 px-2.5 py-1 rounded-lg transition-colors font-mono"
-            >
-              Export CSV
-            </a>
-          </div>
+        <div className="space-y-6">
+          {/* Security Events callout */}
+          <SecurityEvents rows={auditRows} />
 
-          <div className="space-y-1">
-            {auditRows.map((row) => (
-              <div key={row.id} className="p-3 rounded-xl bg-white/2 border border-white/5 font-mono">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-amber-400/80 text-xs">{row.actionType}</span>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <Badge text={`L${row.verificationLevel}`} variant="blue" />
-                    <span className="text-white/20 text-xs">
-                      {row.createdAt ? new Date(row.createdAt).toLocaleString() : "—"}
-                    </span>
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-white/30 text-xs font-mono">
+                Showing latest {auditRows.length} entries — immutable audit trail
+              </p>
+              <a
+                href="/api/founder/export?type=audit"
+                download
+                className="text-xs text-white/30 hover:text-white/60 border border-white/8 hover:border-white/15 px-2.5 py-1 rounded-lg transition-colors font-mono"
+              >
+                Export CSV
+              </a>
+            </div>
+
+            <div className="space-y-1">
+              {auditRows.map((row) => (
+                <div key={row.id} className="p-3 rounded-xl bg-white/2 border border-white/5 font-mono">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className={`text-xs ${
+                      ["auth_failed","auth_locked","rate_limited","forbidden_access","founder_access_attempt"].includes(row.actionType)
+                        ? "text-red-400/80"
+                        : "text-amber-400/80"
+                    }`}>{row.actionType}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <Badge text={`L${row.verificationLevel}`} variant="blue" />
+                      <span className="text-white/20 text-xs">
+                        {row.createdAt ? new Date(row.createdAt).toLocaleString() : "—"}
+                      </span>
+                    </div>
                   </div>
+                  {(row.targetType || row.targetId) && (
+                    <p className="text-white/30 text-xs mt-0.5">
+                      {row.targetType} {row.targetId}
+                    </p>
+                  )}
+                  {row.detail && (
+                    <p className="text-white/20 text-xs mt-0.5 truncate">
+                      {JSON.stringify(row.detail)}
+                    </p>
+                  )}
+                  {row.ipAddress && (
+                    <p className="text-white/15 text-xs mt-0.5">{row.ipAddress}</p>
+                  )}
                 </div>
-                {(row.targetType || row.targetId) && (
-                  <p className="text-white/30 text-xs mt-0.5">
-                    {row.targetType} {row.targetId}
-                  </p>
-                )}
-                {row.detail && (
-                  <p className="text-white/20 text-xs mt-0.5 truncate">
-                    {JSON.stringify(row.detail)}
-                  </p>
-                )}
-                {row.ipAddress && (
-                  <p className="text-white/15 text-xs mt-0.5">{row.ipAddress}</p>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}

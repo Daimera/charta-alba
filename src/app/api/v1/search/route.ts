@@ -2,8 +2,10 @@ import { db } from "@/lib/db";
 import { papers, cards, videos, users } from "@/lib/db/schema";
 import { authenticateApiKey, recordUsage, rateLimitHeaders, TIER_LIMITS } from "@/lib/api-auth";
 import { eq, ilike, or, desc } from "drizzle-orm";
+import { sanitizeString } from "@/lib/sanitize";
 
 export async function GET(req: Request) {
+  try {
   const start = Date.now();
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? null;
 
@@ -18,7 +20,8 @@ export async function GET(req: Request) {
   const limits = TIER_LIMITS[key.tier];
 
   const { searchParams } = new URL(req.url);
-  const q = searchParams.get("q")?.trim();
+  const rawQ = searchParams.get("q");
+  const q = sanitizeString(rawQ, 500)?.trim();
   if (!q) {
     return Response.json({ error: "Query parameter 'q' is required" }, { status: 400, headers: rateLimitHeaders(key) });
   }
@@ -68,4 +71,8 @@ export async function GET(req: Request) {
   return Response.json({ data: results, meta: { query: q, count: results.length } }, {
     headers: rateLimitHeaders(key),
   });
+  } catch (err) {
+    console.error("[api/v1/search]", err);
+    return Response.json({ error: "Something went wrong" }, { status: 500 });
+  }
 }

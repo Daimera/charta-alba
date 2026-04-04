@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+// Startup validation — runs on every cold start; throws if secrets are misconfigured
+import "@/lib/startup-checks";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
 import { TopNav } from "@/components/TopNav";
@@ -59,6 +61,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       <body className="bg-[#0a0a0a] text-white">
+        <a href="#main-content" className="skip-to-main">Skip to main content</a>
         <AuthProvider>
           <Suspense fallback={null}>
             <TopNav />

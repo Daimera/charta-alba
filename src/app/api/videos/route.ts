@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { videos, users, papers } from "@/lib/db/schema";
 import { desc, eq, sql } from "drizzle-orm";
+import { isAllowedVideoUrl } from "@/lib/validateUrl";
 
 export async function GET() {
   const rows = await db
@@ -46,11 +47,9 @@ export async function POST(req: Request) {
     return Response.json({ error: "title, description, and videoUrl are required" }, { status: 400 });
   }
 
-  // Basic URL validation
-  try {
-    new URL(videoUrl);
-  } catch {
-    return Response.json({ error: "Invalid video URL" }, { status: 400 });
+  // Validate video URL — only YouTube and Vimeo, no internal hosts
+  if (!isAllowedVideoUrl(videoUrl)) {
+    return Response.json({ error: "Video URL must be a YouTube or Vimeo link" }, { status: 400 });
   }
 
   const [video] = await db

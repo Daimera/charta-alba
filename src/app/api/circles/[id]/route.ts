@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { circles, circleMembers, users } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
+import { assertUUID } from "@/lib/sanitize";
 
 export async function GET(
   _req: Request,
@@ -9,6 +10,8 @@ export async function GET(
 ) {
   const session = await auth();
   const { id } = await params;
+  const uuidErr = assertUUID(id);
+  if (uuidErr) return uuidErr;
 
   const [circle] = await db
     .select({

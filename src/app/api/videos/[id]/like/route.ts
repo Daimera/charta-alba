@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { videoLikes, videos } from "@/lib/db/schema";
 import { eq, and, sql } from "drizzle-orm";
+import { assertUUID } from "@/lib/sanitize";
 
 export async function POST(
   _req: Request,
@@ -13,6 +14,8 @@ export async function POST(
   }
 
   const { id: videoId } = await params;
+  const uuidErr = assertUUID(videoId);
+  if (uuidErr) return uuidErr;
   const userId = session.user.id;
 
   const [inserted] = await db
@@ -46,6 +49,8 @@ export async function DELETE(
   }
 
   const { id: videoId } = await params;
+  const uuidErr2 = assertUUID(videoId);
+  if (uuidErr2) return uuidErr2;
   const userId = session.user.id;
 
   const deleted = await db

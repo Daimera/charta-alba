@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Hem",
+    "top": "Trender",
+    "digest": "Digest",
+    "collections": "Samlingar",
+    "settings": "Inställningar",
+    "signIn": "Logga in",
+    "signOut": "Logga ut"
+  },
+  "feed": {
+    "like": "Gilla",
+    "bookmark": "Spara",
+    "share": "Dela",
+    "translate": "Översätt",
+    "askAI": "Fråga AI",
+    "readPaper": "Läs artikel",
+    "loading": "Laddar artiklar…",
+    "empty": "Inga artiklar ännu. Kom tillbaka snart.",
+    "error": "Det gick inte att läsa in flödet",
+    "noMore": "Du har sett allt för nu"
+  },
+  "card": {
+    "tldr": "Sammanfattning",
+    "authors": "Författare",
+    "categories": "Kategorier",
+    "published": "Publicerad",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "Logga in på Charta Alba",
+    "signUpTitle": "Skapa ditt konto",
+    "email": "E-postadress",
+    "password": "Lösenord",
+    "confirmPassword": "Bekräfta lösenord",
+    "displayName": "Visningsnamn",
+    "continueWithGoogle": "Fortsätt med Google",
+    "orContinueWith": "eller fortsätt med",
+    "forgotPassword": "Glömt lösenordet?",
+    "noAccount": "Inget konto?",
+    "haveAccount": "Har redan ett konto?",
+    "signUp": "Registrera",
+    "signIn": "Logga in",
+    "invalidCredentials": "Fel e-post eller lösenord",
+    "accountLocked": "Kontot är låst på grund av för många misslyckade försök. Försök igen om 30 minuter.",
+    "emailRequired": "E-post krävs",
+    "passwordRequired": "Lösenord krävs"
+  },
+  "settings": {
+    "title": "Inställningar",
+    "profile": "Profil",
+    "account": "Konto",
+    "privacy": "Integritet",
+    "notifications": "Aviseringar",
+    "security": "Säkerhet",
+    "save": "Spara ändringar",
+    "saved": "Ändringar sparade",
+    "error": "Det gick inte att spara"
+  },
+  "common": {
+    "loading": "Laddar…",
+    "error": "Något gick fel",
+    "retry": "Försök igen",
+    "cancel": "Avbryt",
+    "confirm": "Bekräfta",
+    "delete": "Ta bort",
+    "edit": "Redigera",
+    "save": "Spara",
+    "close": "Stäng",
+    "back": "Tillbaka",
+    "next": "Nästa",
+    "submit": "Skicka"
+  }
+}

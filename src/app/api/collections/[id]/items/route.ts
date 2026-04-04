@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { collections, collectionItems } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
+import { assertUUID } from "@/lib/sanitize";
 
 async function assertOwner(collectionId: string, userId: string) {
   const [col] = await db
@@ -20,6 +21,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const uuidErr = assertUUID(id);
+  if (uuidErr) return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -49,6 +52,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const uuidErr2 = assertUUID(id);
+  if (uuidErr2) return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

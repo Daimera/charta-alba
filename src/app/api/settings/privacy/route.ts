@@ -16,6 +16,7 @@ export async function PATCH(req: Request) {
     dmPermission?: string;
     markSensitive?: boolean;
     hiddenReplies?: boolean;
+    shareLocationWithCreators?: boolean;
   };
 
   if (body.commentPermission !== undefined && !VALID_PERMS.includes(body.commentPermission)) {
@@ -31,6 +32,7 @@ export async function PATCH(req: Request) {
   if (body.dmPermission !== undefined) set.dmPermission = body.dmPermission;
   if (body.markSensitive !== undefined) set.markSensitive = body.markSensitive;
   if (body.hiddenReplies !== undefined) set.hiddenReplies = body.hiddenReplies;
+  if (body.shareLocationWithCreators !== undefined) set.shareLocationWithCreators = body.shareLocationWithCreators;
 
   if (Object.keys(set).length === 0) return Response.json({ ok: true });
 

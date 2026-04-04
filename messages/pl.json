@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Strona główna",
+    "top": "Trendy",
+    "digest": "Digest",
+    "collections": "Kolekcje",
+    "settings": "Ustawienia",
+    "signIn": "Zaloguj się",
+    "signOut": "Wyloguj się"
+  },
+  "feed": {
+    "like": "Lubię to",
+    "bookmark": "Zapisz",
+    "share": "Udostępnij",
+    "translate": "Przetłumacz",
+    "askAI": "Zapytaj AI",
+    "readPaper": "Czytaj artykuł",
+    "loading": "Ładowanie artykułów…",
+    "empty": "Brak artykułów. Wróć wkrótce.",
+    "error": "Nie udało się załadować kanału",
+    "noMore": "Na razie widziałeś wszystko"
+  },
+  "card": {
+    "tldr": "Podsumowanie",
+    "authors": "Autorzy",
+    "categories": "Kategorie",
+    "published": "Opublikowano",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "Zaloguj się do Charta Alba",
+    "signUpTitle": "Utwórz swoje konto",
+    "email": "Adres e-mail",
+    "password": "Hasło",
+    "confirmPassword": "Potwierdź hasło",
+    "displayName": "Nazwa wyświetlana",
+    "continueWithGoogle": "Kontynuuj z Google",
+    "orContinueWith": "lub kontynuuj z",
+    "forgotPassword": "Zapomniałeś hasła?",
+    "noAccount": "Nie masz konta?",
+    "haveAccount": "Masz już konto?",
+    "signUp": "Zarejestruj się",
+    "signIn": "Zaloguj się",
+    "invalidCredentials": "Nieprawidłowy e-mail lub hasło",
+    "accountLocked": "Konto zablokowane z powodu zbyt wielu nieudanych prób. Spróbuj ponownie za 30 minut.",
+    "emailRequired": "E-mail jest wymagany",
+    "passwordRequired": "Hasło jest wymagane"
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "profile": "Profil",
+    "account": "Konto",
+    "privacy": "Prywatność",
+    "notifications": "Powiadomienia",
+    "security": "Bezpieczeństwo",
+    "save": "Zapisz zmiany",
+    "saved": "Zmiany zapisane",
+    "error": "Nie udało się zapisać"
+  },
+  "common": {
+    "loading": "Ładowanie…",
+    "error": "Coś poszło nie tak",
+    "retry": "Spróbuj ponownie",
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "save": "Zapisz",
+    "close": "Zamknij",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "submit": "Wyślij"
+  }
+}

@@ -2,8 +2,10 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { users, profiles } from "@/lib/db/schema";
 import { eq, and, ne } from "drizzle-orm";
+import { isAllowedImageUrl } from "@/lib/validateUrl";
 
 export async function PATCH(req: Request) {
+  try {
   const session = await auth();
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
@@ -19,6 +21,7 @@ export async function PATCH(req: Request) {
     feedAlgorithm?: string;
     emailDigest?: boolean;
     emailComments?: boolean;
+    preferredLanguage?: string;
   };
 
   // Update display name on users table
@@ -55,7 +58,13 @@ export async function PATCH(req: Request) {
   }
 
   if (body.bio !== undefined) profileUpdates.bio = body.bio.trim() || null;
-  if (body.avatarUrl !== undefined) profileUpdates.avatarUrl = body.avatarUrl.trim() || null;
+  if (body.avatarUrl !== undefined) {
+    const url = body.avatarUrl.trim();
+    if (url && !isAllowedImageUrl(url)) {
+      return Response.json({ error: "Avatar URL must use https:// and cannot be an internal address" }, { status: 400 });
+    }
+    profileUpdates.avatarUrl = url || null;
+  }
   if (body.isPublic !== undefined) profileUpdates.isPublic = body.isPublic;
   if (body.feedAlgorithm !== undefined) {
     const allowed = ["trending", "chronological", "following"];
@@ -66,6 +75,13 @@ export async function PATCH(req: Request) {
   }
   if (body.emailDigest !== undefined) profileUpdates.emailDigest = body.emailDigest;
   if (body.emailComments !== undefined) profileUpdates.emailComments = body.emailComments;
+  if (body.preferredLanguage !== undefined) {
+    const VALID_LANGS = ["en","es","fr","de","pt","ar","hi","ja","ko","zh-CN","zh-TW","ru","it","nl","tr","pl","sv","id","vi","th"];
+    if (!VALID_LANGS.includes(body.preferredLanguage)) {
+      return Response.json({ error: "Unsupported language" }, { status: 400 });
+    }
+    profileUpdates.preferredLanguage = body.preferredLanguage;
+  }
 
   if (Object.keys(profileUpdates).length > 0) {
     await db
@@ -75,4 +91,8 @@ export async function PATCH(req: Request) {
   }
 
   return Response.json({ ok: true });
+  } catch (err) {
+    console.error("[api/settings/profile]", err);
+    return Response.json({ error: "Something went wrong" }, { status: 500 });
+  }
 }

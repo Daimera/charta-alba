@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "top": "Tendances",
+    "digest": "Digest",
+    "collections": "Collections",
+    "settings": "Paramètres",
+    "signIn": "Connexion",
+    "signOut": "Déconnexion"
+  },
+  "feed": {
+    "like": "J'aime",
+    "bookmark": "Enregistrer",
+    "share": "Partager",
+    "translate": "Traduire",
+    "askAI": "Demander à l'IA",
+    "readPaper": "Lire l'article",
+    "loading": "Chargement des articles…",
+    "empty": "Pas encore d'articles. Revenez bientôt.",
+    "error": "Échec du chargement du fil",
+    "noMore": "Vous avez tout vu pour l'instant"
+  },
+  "card": {
+    "tldr": "En bref",
+    "authors": "Auteurs",
+    "categories": "Catégories",
+    "published": "Publié",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "Connexion à Charta Alba",
+    "signUpTitle": "Créer votre compte",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "displayName": "Nom d'affichage",
+    "continueWithGoogle": "Continuer avec Google",
+    "orContinueWith": "ou continuer avec",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas de compte ?",
+    "haveAccount": "Déjà un compte ?",
+    "signUp": "S'inscrire",
+    "signIn": "Se connecter",
+    "invalidCredentials": "E-mail ou mot de passe incorrect",
+    "accountLocked": "Compte verrouillé suite à trop de tentatives. Réessayez dans 30 minutes.",
+    "emailRequired": "L'e-mail est requis",
+    "passwordRequired": "Le mot de passe est requis"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "profile": "Profil",
+    "account": "Compte",
+    "privacy": "Confidentialité",
+    "notifications": "Notifications",
+    "security": "Sécurité",
+    "save": "Enregistrer les modifications",
+    "saved": "Modifications enregistrées",
+    "error": "Échec de l'enregistrement"
+  },
+  "common": {
+    "loading": "Chargement…",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "submit": "Envoyer"
+  }
+}

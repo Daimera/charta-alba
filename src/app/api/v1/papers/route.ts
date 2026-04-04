@@ -1,9 +1,11 @@
 import { db } from "@/lib/db";
 import { papers, cards } from "@/lib/db/schema";
 import { authenticateApiKey, recordUsage, rateLimitHeaders, TIER_LIMITS } from "@/lib/api-auth";
-import { eq, desc, ilike, or, sql } from "drizzle-orm";
+import { eq, desc, ilike, or, sql, and } from "drizzle-orm";
+import { sanitizeString } from "@/lib/sanitize";
 
 export async function GET(req: Request) {
+  try {
   const start = Date.now();
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? null;
 
@@ -20,8 +22,8 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const rawLimit = Math.min(parseInt(searchParams.get("limit") ?? "20"), limits.results);
   const offset = Math.max(0, parseInt(searchParams.get("offset") ?? "0"));
-  const category = searchParams.get("category");
-  const search = searchParams.get("search");
+  const category = sanitizeString(searchParams.get("category"), 100);
+  const search = sanitizeString(searchParams.get("search"), 500);
   const sort = searchParams.get("sort") ?? "trending";
 
   const query = db
@@ -56,7 +58,7 @@ export async function GET(req: Request) {
   }
 
   let baseQuery = conditions.length > 0
-    ? query.where(conditions.length === 1 ? conditions[0] : sql`(${conditions.join(" AND ")})`)
+    ? query.where(conditions.length === 1 ? conditions[0] : and(...conditions))
     : query;
 
   if (sort === "recent") {
@@ -84,4 +86,8 @@ export async function GET(req: Request) {
   return Response.json({ data: results, meta: { limit: rawLimit, offset, count: results.length } }, {
     headers: rateLimitHeaders(key),
   });
+  } catch (err) {
+    console.error("[api/v1/papers]", err);
+    return Response.json({ error: "Something went wrong" }, { status: 500 });
+  }
 }

@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "top": "الأعلى",
+    "digest": "الملخص",
+    "collections": "المجموعات",
+    "settings": "الإعدادات",
+    "signIn": "تسجيل الدخول",
+    "signOut": "تسجيل الخروج"
+  },
+  "feed": {
+    "like": "إعجاب",
+    "bookmark": "حفظ",
+    "share": "مشاركة",
+    "translate": "ترجمة",
+    "askAI": "اسأل الذكاء الاصطناعي",
+    "readPaper": "قراءة الورقة",
+    "loading": "جارٍ تحميل الأوراق البحثية…",
+    "empty": "لا توجد أوراق بحثية بعد. تفقّد لاحقاً.",
+    "error": "فشل تحميل الخلاصة",
+    "noMore": "لقد رأيت كل شيء في الوقت الحالي"
+  },
+  "card": {
+    "tldr": "ملخص",
+    "authors": "المؤلفون",
+    "categories": "الفئات",
+    "published": "نُشر",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "تسجيل الدخول إلى Charta Alba",
+    "signUpTitle": "إنشاء حسابك",
+    "email": "عنوان البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "displayName": "اسم العرض",
+    "continueWithGoogle": "المتابعة مع Google",
+    "orContinueWith": "أو المتابعة مع",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "noAccount": "ليس لديك حساب؟",
+    "haveAccount": "لديك حساب بالفعل؟",
+    "signUp": "إنشاء حساب",
+    "signIn": "تسجيل الدخول",
+    "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+    "accountLocked": "تم قفل الحساب بسبب كثرة المحاولات الفاشلة. حاول مرة أخرى بعد 30 دقيقة.",
+    "emailRequired": "البريد الإلكتروني مطلوب",
+    "passwordRequired": "كلمة المرور مطلوبة"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "profile": "الملف الشخصي",
+    "account": "الحساب",
+    "privacy": "الخصوصية",
+    "notifications": "الإشعارات",
+    "security": "الأمان",
+    "save": "حفظ التغييرات",
+    "saved": "تم حفظ التغييرات",
+    "error": "فشل حفظ التغييرات"
+  },
+  "common": {
+    "loading": "جارٍ التحميل…",
+    "error": "حدث خطأ ما",
+    "retry": "حاول مرة أخرى",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "save": "حفظ",
+    "close": "إغلاق",
+    "back": "رجوع",
+    "next": "التالي",
+    "submit": "إرسال"
+  }
+}

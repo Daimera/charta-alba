@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Home",
+    "top": "Top",
+    "digest": "Digest",
+    "collections": "Collections",
+    "settings": "Settings",
+    "signIn": "Sign in",
+    "signOut": "Sign out"
+  },
+  "feed": {
+    "like": "Like",
+    "bookmark": "Bookmark",
+    "share": "Share",
+    "translate": "Translate",
+    "askAI": "Ask AI",
+    "readPaper": "Read paper",
+    "loading": "Loading papers…",
+    "empty": "No papers yet. Check back soon.",
+    "error": "Failed to load feed",
+    "noMore": "You've seen everything for now"
+  },
+  "card": {
+    "tldr": "TL;DR",
+    "authors": "Authors",
+    "categories": "Categories",
+    "published": "Published",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "Sign in to Charta Alba",
+    "signUpTitle": "Create your account",
+    "email": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "displayName": "Display name",
+    "continueWithGoogle": "Continue with Google",
+    "orContinueWith": "or continue with",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "signUp": "Sign up",
+    "signIn": "Sign in",
+    "invalidCredentials": "Incorrect email or password",
+    "accountLocked": "Account locked due to too many failed attempts. Try again in 30 minutes.",
+    "emailRequired": "Email is required",
+    "passwordRequired": "Password is required"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "account": "Account",
+    "privacy": "Privacy",
+    "notifications": "Notifications",
+    "security": "Security",
+    "save": "Save changes",
+    "saved": "Changes saved",
+    "error": "Failed to save changes"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit"
+  }
+}

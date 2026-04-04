@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "首页",
+    "top": "热门",
+    "digest": "摘要",
+    "collections": "收藏",
+    "settings": "设置",
+    "signIn": "登录",
+    "signOut": "退出登录"
+  },
+  "feed": {
+    "like": "点赞",
+    "bookmark": "收藏",
+    "share": "分享",
+    "translate": "翻译",
+    "askAI": "询问AI",
+    "readPaper": "阅读论文",
+    "loading": "正在加载论文…",
+    "empty": "暂无论文，请稍后再来。",
+    "error": "加载失败",
+    "noMore": "暂时已全部看完"
+  },
+  "card": {
+    "tldr": "摘要",
+    "authors": "作者",
+    "categories": "分类",
+    "published": "发布于",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "登录 Charta Alba",
+    "signUpTitle": "创建您的账号",
+    "email": "电子邮件地址",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "displayName": "显示名称",
+    "continueWithGoogle": "使用 Google 继续",
+    "orContinueWith": "或继续使用",
+    "forgotPassword": "忘记密码？",
+    "noAccount": "还没有账号？",
+    "haveAccount": "已有账号？",
+    "signUp": "注册",
+    "signIn": "登录",
+    "invalidCredentials": "邮箱或密码不正确",
+    "accountLocked": "由于多次登录失败，账号已被锁定。请30分钟后再试。",
+    "emailRequired": "邮箱不能为空",
+    "passwordRequired": "密码不能为空"
+  },
+  "settings": {
+    "title": "设置",
+    "profile": "个人资料",
+    "account": "账号",
+    "privacy": "隐私",
+    "notifications": "通知",
+    "security": "安全",
+    "save": "保存更改",
+    "saved": "更改已保存",
+    "error": "保存失败"
+  },
+  "common": {
+    "loading": "加载中…",
+    "error": "出了点问题",
+    "retry": "重试",
+    "cancel": "取消",
+    "confirm": "确认",
+    "delete": "删除",
+    "edit": "编辑",
+    "save": "保存",
+    "close": "关闭",
+    "back": "返回",
+    "next": "下一步",
+    "submit": "提交"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Beranda",
+    "top": "Terpopuler",
+    "digest": "Ringkasan",
+    "collections": "Koleksi",
+    "settings": "Pengaturan",
+    "signIn": "Masuk",
+    "signOut": "Keluar"
+  },
+  "feed": {
+    "like": "Suka",
+    "bookmark": "Simpan",
+    "share": "Bagikan",
+    "translate": "Terjemahkan",
+    "askAI": "Tanya AI",
+    "readPaper": "Baca makalah",
+    "loading": "Memuat makalah…",
+    "empty": "Belum ada makalah. Cek lagi nanti.",
+    "error": "Gagal memuat umpan",
+    "noMore": "Anda sudah melihat semuanya untuk sekarang"
+  },
+  "card": {
+    "tldr": "Ringkasan",
+    "authors": "Penulis",
+    "categories": "Kategori",
+    "published": "Diterbitkan",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "Masuk ke Charta Alba",
+    "signUpTitle": "Buat akun Anda",
+    "email": "Alamat email",
+    "password": "Kata sandi",
+    "confirmPassword": "Konfirmasi kata sandi",
+    "displayName": "Nama tampilan",
+    "continueWithGoogle": "Lanjutkan dengan Google",
+    "orContinueWith": "atau lanjutkan dengan",
+    "forgotPassword": "Lupa kata sandi?",
+    "noAccount": "Belum punya akun?",
+    "haveAccount": "Sudah punya akun?",
+    "signUp": "Daftar",
+    "signIn": "Masuk",
+    "invalidCredentials": "Email atau kata sandi salah",
+    "accountLocked": "Akun dikunci karena terlalu banyak percobaan gagal. Coba lagi dalam 30 menit.",
+    "emailRequired": "Email wajib diisi",
+    "passwordRequired": "Kata sandi wajib diisi"
+  },
+  "settings": {
+    "title": "Pengaturan",
+    "profile": "Profil",
+    "account": "Akun",
+    "privacy": "Privasi",
+    "notifications": "Notifikasi",
+    "security": "Keamanan",
+    "save": "Simpan perubahan",
+    "saved": "Perubahan disimpan",
+    "error": "Gagal menyimpan"
+  },
+  "common": {
+    "loading": "Memuat…",
+    "error": "Terjadi kesalahan",
+    "retry": "Coba lagi",
+    "cancel": "Batal",
+    "confirm": "Konfirmasi",
+    "delete": "Hapus",
+    "edit": "Edit",
+    "save": "Simpan",
+    "close": "Tutup",
+    "back": "Kembali",
+    "next": "Berikutnya",
+    "submit": "Kirim"
+  }
+}

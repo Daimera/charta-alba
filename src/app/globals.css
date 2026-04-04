@@ -99,3 +99,102 @@ body {
 .fade-in {
   animation: fadeIn 0.2s ease-out forwards;
 }
+
+/* ── Accessibility ───────────────────────────────────────────────────────── */
+
+/* Screen-reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip to main content link — visible only on focus */
+.skip-to-main {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  padding: 0.75rem 1.25rem;
+  background: #fff;
+  color: #000;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 0 0 0.5rem 0;
+  transform: translateY(-100%);
+  transition: transform 0.15s ease;
+  text-decoration: none;
+}
+.skip-to-main:focus {
+  transform: translateY(0);
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Visible focus indicator for keyboard navigation */
+:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Suppress focus ring for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .drawer-enter,
+  .heart-pop,
+  .toast-enter,
+  .fade-in {
+    animation: none !important;
+  }
+}
+
+/* ── High contrast ───────────────────────────────────────────────────────── */
+@media (prefers-contrast: high) {
+  :root {
+    --background: #000;
+    --foreground: #fff;
+  }
+
+  body {
+    background: #000;
+    color: #fff;
+  }
+
+  /* Increase border visibility */
+  [class*="border-white/"] {
+    border-color: rgba(255, 255, 255, 0.5) !important;
+  }
+
+  /* Increase muted text visibility */
+  [class*="text-white/4"],
+  [class*="text-white/3"],
+  [class*="text-white/2"] {
+    color: rgba(255, 255, 255, 0.75) !important;
+  }
+
+  /* Stronger focus ring */
+  :focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+  }
+}

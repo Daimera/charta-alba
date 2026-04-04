@@ -53,6 +53,7 @@ export default function PrivacyPage() {
   const [dmPermission, setDmPermission] = useState("everyone");
   const [markSensitive, setMarkSensitive] = useState(false);
   const [hiddenReplies, setHiddenReplies] = useState(false);
+  const [shareLocationWithCreators, setShareLocationWithCreators] = useState(true);
   const [privacyMsg, setPrivacyMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [privacyLoading, setPrivacyLoading] = useState(false);
 
@@ -67,13 +68,14 @@ export default function PrivacyPage() {
 
     fetch("/api/settings")
       .then((r) => r.ok ? r.json() : null)
-      .then((d: { profile?: { isPublic?: boolean; commentPermission?: string; dmPermission?: string; markSensitive?: boolean; hiddenReplies?: boolean } | null } | null) => {
+      .then((d: { profile?: { isPublic?: boolean; commentPermission?: string; dmPermission?: string; markSensitive?: boolean; hiddenReplies?: boolean; shareLocationWithCreators?: boolean } | null } | null) => {
         if (!d?.profile) return;
         setIsPublic(d.profile.isPublic ?? true);
         setCommentPermission(d.profile.commentPermission ?? "everyone");
         setDmPermission(d.profile.dmPermission ?? "everyone");
         setMarkSensitive(d.profile.markSensitive ?? false);
         setHiddenReplies(d.profile.hiddenReplies ?? false);
+        setShareLocationWithCreators(d.profile.shareLocationWithCreators ?? true);
       })
       .catch(() => undefined);
 
@@ -89,7 +91,7 @@ export default function PrivacyPage() {
     const res = await fetch("/api/settings/privacy", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isPublic, commentPermission, dmPermission, markSensitive, hiddenReplies, ...overrides }),
+      body: JSON.stringify({ isPublic, commentPermission, dmPermission, markSensitive, hiddenReplies, shareLocationWithCreators, ...overrides }),
     });
     setPrivacyLoading(false);
     if (res.ok) setPrivacyMsg({ ok: true, text: "Saved." });
@@ -191,6 +193,16 @@ export default function PrivacyPage() {
             onChange={async (v) => { setHiddenReplies(v); await savePrivacy({ hiddenReplies: v }); }}
           />
         </div>
+      </Card>
+
+      {/* Location sharing */}
+      <Card title="Location data" description="Controls whether your approximate location is shared when you view profiles and content.">
+        <Toggle
+          label="Share my location with content creators"
+          description="When enabled, creators can see the approximate city/country of visitors. Your IP is never shown."
+          checked={shareLocationWithCreators}
+          onChange={async (v) => { setShareLocationWithCreators(v); await savePrivacy({ shareLocationWithCreators: v }); }}
+        />
       </Card>
 
       {/* Muted keywords */}

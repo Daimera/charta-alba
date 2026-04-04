@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCallback, useTransition, useEffect, useState } from "react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export function TopNav() {
   const pathname = usePathname();
@@ -19,6 +20,14 @@ export function TopNav() {
       .then((r) => r.ok ? r.json() : null)
       .then((d: { balance?: number } | null) => d?.balance != null && setPointsBalance(d.balance))
       .catch(() => undefined);
+  }, [session?.user]);
+
+  // Record login session once per browser session
+  useEffect(() => {
+    if (!session?.user) return;
+    if (sessionStorage.getItem("loginRecorded")) return;
+    sessionStorage.setItem("loginRecorded", "1");
+    fetch("/api/auth/record-login", { method: "POST" }).catch(() => undefined);
   }, [session?.user]);
 
   const handleSearch = useCallback(
@@ -102,6 +111,9 @@ export function TopNav() {
           />
         </div>
       )}
+
+      {/* Language switcher */}
+      <LanguageSwitcher />
 
       {/* Auth */}
       {session?.user ? (

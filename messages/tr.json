@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Ana Sayfa",
+    "top": "Trend",
+    "digest": "Özet",
+    "collections": "Koleksiyonlar",
+    "settings": "Ayarlar",
+    "signIn": "Giriş Yap",
+    "signOut": "Çıkış Yap"
+  },
+  "feed": {
+    "like": "Beğen",
+    "bookmark": "Kaydet",
+    "share": "Paylaş",
+    "translate": "Çevir",
+    "askAI": "AI'ya Sor",
+    "readPaper": "Makaleyi oku",
+    "loading": "Makaleler yükleniyor…",
+    "empty": "Henüz makale yok. Yakında tekrar bakın.",
+    "error": "Akış yüklenemedi",
+    "noMore": "Şimdilik hepsini gördünüz"
+  },
+  "card": {
+    "tldr": "Özet",
+    "authors": "Yazarlar",
+    "categories": "Kategoriler",
+    "published": "Yayınlandı",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "Charta Alba'ya giriş yap",
+    "signUpTitle": "Hesabını oluştur",
+    "email": "E-posta adresi",
+    "password": "Şifre",
+    "confirmPassword": "Şifreyi doğrula",
+    "displayName": "Görünen ad",
+    "continueWithGoogle": "Google ile devam et",
+    "orContinueWith": "veya şununla devam et",
+    "forgotPassword": "Şifreni mi unuttun?",
+    "noAccount": "Hesabın yok mu?",
+    "haveAccount": "Zaten hesabın var mı?",
+    "signUp": "Kayıt ol",
+    "signIn": "Giriş yap",
+    "invalidCredentials": "Hatalı e-posta veya şifre",
+    "accountLocked": "Çok fazla başarısız deneme nedeniyle hesap kilitlendi. 30 dakika sonra tekrar deneyin.",
+    "emailRequired": "E-posta zorunludur",
+    "passwordRequired": "Şifre zorunludur"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "profile": "Profil",
+    "account": "Hesap",
+    "privacy": "Gizlilik",
+    "notifications": "Bildirimler",
+    "security": "Güvenlik",
+    "save": "Değişiklikleri kaydet",
+    "saved": "Değişiklikler kaydedildi",
+    "error": "Kaydetme başarısız"
+  },
+  "common": {
+    "loading": "Yükleniyor…",
+    "error": "Bir şeyler yanlış gitti",
+    "retry": "Tekrar dene",
+    "cancel": "İptal",
+    "confirm": "Onayla",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "save": "Kaydet",
+    "close": "Kapat",
+    "back": "Geri",
+    "next": "İleri",
+    "submit": "Gönder"
+  }
+}

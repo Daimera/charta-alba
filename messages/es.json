@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "top": "Tendencias",
+    "digest": "Resumen",
+    "collections": "Colecciones",
+    "settings": "Ajustes",
+    "signIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión"
+  },
+  "feed": {
+    "like": "Me gusta",
+    "bookmark": "Guardar",
+    "share": "Compartir",
+    "translate": "Traducir",
+    "askAI": "Preguntar a la IA",
+    "readPaper": "Leer artículo",
+    "loading": "Cargando artículos…",
+    "empty": "Aún no hay artículos. Vuelve pronto.",
+    "error": "Error al cargar el feed",
+    "noMore": "Ya has visto todo por ahora"
+  },
+  "card": {
+    "tldr": "Resumen",
+    "authors": "Autores",
+    "categories": "Categorías",
+    "published": "Publicado",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "Inicia sesión en Charta Alba",
+    "signUpTitle": "Crea tu cuenta",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "displayName": "Nombre para mostrar",
+    "continueWithGoogle": "Continuar con Google",
+    "orContinueWith": "o continuar con",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes cuenta?",
+    "haveAccount": "¿Ya tienes cuenta?",
+    "signUp": "Registrarse",
+    "signIn": "Iniciar sesión",
+    "invalidCredentials": "Correo o contraseña incorrectos",
+    "accountLocked": "Cuenta bloqueada por demasiados intentos fallidos. Intenta de nuevo en 30 minutos.",
+    "emailRequired": "El correo es obligatorio",
+    "passwordRequired": "La contraseña es obligatoria"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "profile": "Perfil",
+    "account": "Cuenta",
+    "privacy": "Privacidad",
+    "notifications": "Notificaciones",
+    "security": "Seguridad",
+    "save": "Guardar cambios",
+    "saved": "Cambios guardados",
+    "error": "Error al guardar los cambios"
+  },
+  "common": {
+    "loading": "Cargando…",
+    "error": "Algo salió mal",
+    "retry": "Reintentar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "save": "Guardar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "submit": "Enviar"
+  }
+}

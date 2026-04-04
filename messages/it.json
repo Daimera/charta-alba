@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Home",
+    "top": "Tendenze",
+    "digest": "Digest",
+    "collections": "Collezioni",
+    "settings": "Impostazioni",
+    "signIn": "Accedi",
+    "signOut": "Esci"
+  },
+  "feed": {
+    "like": "Mi piace",
+    "bookmark": "Salva",
+    "share": "Condividi",
+    "translate": "Traduci",
+    "askAI": "Chiedi all'IA",
+    "readPaper": "Leggi articolo",
+    "loading": "Caricamento articoli…",
+    "empty": "Ancora nessun articolo. Torna presto.",
+    "error": "Caricamento feed non riuscito",
+    "noMore": "Hai visto tutto per ora"
+  },
+  "card": {
+    "tldr": "In sintesi",
+    "authors": "Autori",
+    "categories": "Categorie",
+    "published": "Pubblicato",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "Accedi a Charta Alba",
+    "signUpTitle": "Crea il tuo account",
+    "email": "Indirizzo email",
+    "password": "Password",
+    "confirmPassword": "Conferma password",
+    "displayName": "Nome visualizzato",
+    "continueWithGoogle": "Continua con Google",
+    "orContinueWith": "o continua con",
+    "forgotPassword": "Password dimenticata?",
+    "noAccount": "Non hai un account?",
+    "haveAccount": "Hai già un account?",
+    "signUp": "Registrati",
+    "signIn": "Accedi",
+    "invalidCredentials": "Email o password non corretti",
+    "accountLocked": "Account bloccato per troppi tentativi falliti. Riprova tra 30 minuti.",
+    "emailRequired": "L'email è obbligatoria",
+    "passwordRequired": "La password è obbligatoria"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "profile": "Profilo",
+    "account": "Account",
+    "privacy": "Privacy",
+    "notifications": "Notifiche",
+    "security": "Sicurezza",
+    "save": "Salva modifiche",
+    "saved": "Modifiche salvate",
+    "error": "Salvataggio non riuscito"
+  },
+  "common": {
+    "loading": "Caricamento…",
+    "error": "Qualcosa è andato storto",
+    "retry": "Riprova",
+    "cancel": "Annulla",
+    "confirm": "Conferma",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "save": "Salva",
+    "close": "Chiudi",
+    "back": "Indietro",
+    "next": "Avanti",
+    "submit": "Invia"
+  }
+}

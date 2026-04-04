@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Home",
+    "top": "Trending",
+    "digest": "Digest",
+    "collections": "Collecties",
+    "settings": "Instellingen",
+    "signIn": "Inloggen",
+    "signOut": "Uitloggen"
+  },
+  "feed": {
+    "like": "Vind ik leuk",
+    "bookmark": "Opslaan",
+    "share": "Delen",
+    "translate": "Vertalen",
+    "askAI": "Vraag AI",
+    "readPaper": "Lees artikel",
+    "loading": "Artikelen laden…",
+    "empty": "Nog geen artikelen. Kom snel terug.",
+    "error": "Feed laden mislukt",
+    "noMore": "Je hebt alles gezien voor nu"
+  },
+  "card": {
+    "tldr": "Samenvatting",
+    "authors": "Auteurs",
+    "categories": "Categorieën",
+    "published": "Gepubliceerd",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "Inloggen bij Charta Alba",
+    "signUpTitle": "Je account aanmaken",
+    "email": "E-mailadres",
+    "password": "Wachtwoord",
+    "confirmPassword": "Wachtwoord bevestigen",
+    "displayName": "Weergavenaam",
+    "continueWithGoogle": "Doorgaan met Google",
+    "orContinueWith": "of doorgaan met",
+    "forgotPassword": "Wachtwoord vergeten?",
+    "noAccount": "Geen account?",
+    "haveAccount": "Al een account?",
+    "signUp": "Registreren",
+    "signIn": "Inloggen",
+    "invalidCredentials": "Onjuist e-mailadres of wachtwoord",
+    "accountLocked": "Account vergrendeld wegens te veel mislukte pogingen. Probeer het over 30 minuten opnieuw.",
+    "emailRequired": "E-mail is vereist",
+    "passwordRequired": "Wachtwoord is vereist"
+  },
+  "settings": {
+    "title": "Instellingen",
+    "profile": "Profiel",
+    "account": "Account",
+    "privacy": "Privacy",
+    "notifications": "Meldingen",
+    "security": "Beveiliging",
+    "save": "Wijzigingen opslaan",
+    "saved": "Wijzigingen opgeslagen",
+    "error": "Opslaan mislukt"
+  },
+  "common": {
+    "loading": "Laden…",
+    "error": "Er is iets misgegaan",
+    "retry": "Opnieuw proberen",
+    "cancel": "Annuleren",
+    "confirm": "Bevestigen",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "save": "Opslaan",
+    "close": "Sluiten",
+    "back": "Terug",
+    "next": "Volgende",
+    "submit": "Verzenden"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Trang chủ",
+    "top": "Xu hướng",
+    "digest": "Tóm tắt",
+    "collections": "Bộ sưu tập",
+    "settings": "Cài đặt",
+    "signIn": "Đăng nhập",
+    "signOut": "Đăng xuất"
+  },
+  "feed": {
+    "like": "Thích",
+    "bookmark": "Lưu",
+    "share": "Chia sẻ",
+    "translate": "Dịch",
+    "askAI": "Hỏi AI",
+    "readPaper": "Đọc bài báo",
+    "loading": "Đang tải bài báo…",
+    "empty": "Chưa có bài báo. Hãy kiểm tra lại sau.",
+    "error": "Không thể tải nguồn cấp dữ liệu",
+    "noMore": "Bạn đã xem hết tất cả cho đến bây giờ"
+  },
+  "card": {
+    "tldr": "Tóm tắt",
+    "authors": "Tác giả",
+    "categories": "Danh mục",
+    "published": "Xuất bản",
+    "source": "arXiv"
+  },
+  "auth": {
+    "signInTitle": "Đăng nhập vào Charta Alba",
+    "signUpTitle": "Tạo tài khoản của bạn",
+    "email": "Địa chỉ email",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "displayName": "Tên hiển thị",
+    "continueWithGoogle": "Tiếp tục với Google",
+    "orContinueWith": "hoặc tiếp tục với",
+    "forgotPassword": "Quên mật khẩu?",
+    "noAccount": "Chưa có tài khoản?",
+    "haveAccount": "Đã có tài khoản?",
+    "signUp": "Đăng ký",
+    "signIn": "Đăng nhập",
+    "invalidCredentials": "Email hoặc mật khẩu không đúng",
+    "accountLocked": "Tài khoản bị khóa do quá nhiều lần thử thất bại. Hãy thử lại sau 30 phút.",
+    "emailRequired": "Email là bắt buộc",
+    "passwordRequired": "Mật khẩu là bắt buộc"
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "profile": "Hồ sơ",
+    "account": "Tài khoản",
+    "privacy": "Quyền riêng tư",
+    "notifications": "Thông báo",
+    "security": "Bảo mật",
+    "save": "Lưu thay đổi",
+    "saved": "Đã lưu thay đổi",
+    "error": "Không thể lưu"
+  },
+  "common": {
+    "loading": "Đang tải…",
+    "error": "Đã xảy ra lỗi",
+    "retry": "Thử lại",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "save": "Lưu",
+    "close": "Đóng",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "submit": "Gửi"
+  }
+}
