@@ -333,6 +333,34 @@ export async function authenticateFounder(
   return { ok: true, founderId, level: 4 };
 }
 
+// ── User TOTP backup code verification (uses totpBackupCodes, NOT founderBackupCodes) ──
+
+export type UserBackupCodeResult =
+  | { ok: true; codesRemaining: number }
+  | { ok: false; reason: string };
+
+export async function verifyUserTotpBackupCode(userId: string, code: string): Promise<UserBackupCodeResult> {
+  const [user] = await db
+    .select({ totpBackupCodes: users.totpBackupCodes })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  const codes = user?.totpBackupCodes ?? [];
+  if (codes.length === 0) return { ok: false, reason: "No backup codes available" };
+
+  let matchIdx = -1;
+  for (let i = 0; i < codes.length; i++) {
+    if (await compare(code, codes[i])) { matchIdx = i; break; }
+  }
+  if (matchIdx === -1) return { ok: false, reason: "Invalid backup code" };
+
+  const remaining = codes.filter((_, i) => i !== matchIdx);
+  await db.update(users).set({ totpBackupCodes: remaining }).where(eq(users.id, userId));
+
+  return { ok: true, codesRemaining: remaining.length };
+}
+
 // ── Founder API key helpers ───────────────────────────────────────────────────
 
 export function generateFounderApiKey(): { raw: string; hash: string; prefix: string } {

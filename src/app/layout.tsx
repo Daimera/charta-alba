@@ -6,6 +6,7 @@ import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
 import { TopNav } from "@/components/TopNav";
 import { Footer } from "@/components/Footer";
+import { LogoSplash } from "@/components/LogoSplash";
 import { Suspense } from "react";
 
 const geistSans = Geist({
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.png",
+        url: "/logo-black.png",
         width: 1200,
         height: 630,
         alt: "Charta Alba — Research, Reels, Repeat",
@@ -42,11 +43,11 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Charta Alba — Research, Reels, Repeat",
     description: "Discover AI breakthroughs in 60 seconds. The TikTok-style feed for research papers.",
-    images: ["/og-image.png"],
+    images: ["/logo-black.png"],
   },
   icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    icon: "/logo-black.png",
+    apple: "/logo-black.png",
   },
 };
 
@@ -63,6 +64,7 @@ export default function RootLayout({
       <body className="bg-[#0a0a0a] text-white">
         <a href="#main-content" className="skip-to-main">Skip to main content</a>
         <AuthProvider>
+          <LogoSplash />
           <Suspense fallback={null}>
             <TopNav />
           </Suspense>

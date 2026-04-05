@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import type { Comment } from "@/types";
+import { TierBadge } from "@/components/TierBadge";
 
 interface CommentsDrawerProps {
   cardId: string;
@@ -42,10 +43,11 @@ function CommentRow({ comment, onReply, depth = 0 }: CommentRowProps) {
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-baseline gap-2 mb-0.5">
+          <div className="flex items-center gap-1.5 mb-0.5">
             <span className="text-white/80 text-xs font-semibold">
               {comment.authorName ?? "Anonymous"}
             </span>
+            <TierBadge tier={comment.authorTier} />
             <span className="text-white/30 text-xs">{timeAgo(comment.createdAt ?? "")}</span>
           </div>
           <p className="text-white/70 text-sm leading-relaxed">{comment.body}</p>

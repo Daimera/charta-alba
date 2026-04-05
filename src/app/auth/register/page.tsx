@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { AuthLogo } from "@/components/AuthLogo";
 import { PasswordStrengthField, isPasswordValid } from "@/components/PasswordStrengthField";
 
 export default function RegisterPage() {
@@ -63,6 +64,7 @@ export default function RegisterPage() {
     <main className="min-h-dvh bg-[#0a0a0a] flex items-center justify-center px-4 pt-14">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
+          <AuthLogo />
           <h1 className="text-white text-2xl font-bold tracking-tight">Create account</h1>
           <p className="text-white/40 text-sm mt-1">Join Charta Alba</p>
         </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { AuthLogo } from "@/components/AuthLogo";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -35,6 +36,7 @@ export default function ForgotPasswordPage() {
     <main className="min-h-dvh bg-[#0a0a0a] flex items-center justify-center px-4 pt-14">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
+          <AuthLogo />
           <h1 className="text-white text-2xl font-bold tracking-tight">Reset password</h1>
           <p className="text-white/40 text-sm mt-1">
             Enter your email and we&apos;ll send a reset link

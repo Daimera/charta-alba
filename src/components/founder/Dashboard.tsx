@@ -42,7 +42,7 @@ interface FlagRow { key: string; enabled: boolean; description: string | null; u
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-type Tab = "overview" | "users" | "apikeys" | "points" | "config" | "audit";
+type Tab = "overview" | "users" | "apikeys" | "points" | "config" | "audit" | "submissions";
 
 function StatCard({ label, value, sub, accent }: {
   label: string; value: string | number; sub?: string; accent?: string
@@ -321,12 +321,13 @@ export default function FounderDashboard() {
   }
 
   const TABS: { id: Tab; label: string }[] = [
-    { id: "overview", label: "Overview" },
-    { id: "users",    label: "Users" },
-    { id: "apikeys",  label: "API Keys" },
-    { id: "points",   label: "Points" },
-    { id: "config",   label: "Config" },
-    { id: "audit",    label: "Audit Log" },
+    { id: "overview",     label: "Overview" },
+    { id: "users",        label: "Users" },
+    { id: "apikeys",      label: "API Keys" },
+    { id: "points",       label: "Points" },
+    { id: "submissions",  label: "Submissions" },
+    { id: "config",       label: "Config" },
+    { id: "audit",        label: "Audit Log" },
   ];
 
   return (
@@ -779,6 +780,197 @@ export default function FounderDashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── SUBMISSIONS ──────────────────────────────────────────────────── */}
+      {tab === "submissions" && (
+        <SubmissionsPanel />
+      )}
+    </div>
+  );
+}
+
+// ── Submissions Panel ─────────────────────────────────────────────────────────
+
+interface SubmissionRow {
+  id: string;
+  submissionType: string;
+  title: string;
+  authors: string;
+  abstract: string;
+  status: string;
+  userId: string;
+  suggestedTags: string[] | null;
+  aiProcessedAt: string | null;
+  createdAt: string | null;
+  externalUrl: string | null;
+  pdfUrl: string | null;
+  organization: string | null;
+  journalName: string | null;
+}
+
+function SubmissionsPanel() {
+  const [subs, setSubs] = useState<SubmissionRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<SubmissionRow | null>(null);
+  const [rejReason, setRejReason] = useState("");
+  const [actionLoading, setActionLoading] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  useEffect(() => {
+    fetch("/api/founder/submissions")
+      .then(r => r.ok ? r.json() : null)
+      .then((d: { submissions?: SubmissionRow[] } | null) => {
+        if (d?.submissions) setSubs(d.submissions);
+      })
+      .catch(() => undefined)
+      .finally(() => setLoading(false));
+  }, []);
+
+  async function approve(id: string) {
+    setActionLoading(true);
+    const res = await fetch(`/api/founder/submissions/${id}/approve`, { method: "POST" });
+    if (res.ok) {
+      setSubs(prev => prev.filter(s => s.id !== id));
+      setSelected(null);
+      setMsg("Approved and published.");
+    } else {
+      const d = await res.json() as { error?: string };
+      setMsg(d.error ?? "Approval failed");
+    }
+    setActionLoading(false);
+  }
+
+  async function reject(id: string) {
+    if (!rejReason.trim()) { setMsg("Enter a rejection reason."); return; }
+    setActionLoading(true);
+    const res = await fetch(`/api/founder/submissions/${id}/reject`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason: rejReason }),
+    });
+    if (res.ok) {
+      setSubs(prev => prev.filter(s => s.id !== id));
+      setSelected(null);
+      setRejReason("");
+      setMsg("Rejected.");
+    } else {
+      setMsg("Rejection failed");
+    }
+    setActionLoading(false);
+  }
+
+  if (loading) return <div className="text-white/30 text-sm">Loading submissions…</div>;
+
+  const pending = subs.filter(s => s.status === "pending" || s.status === "ai_processing");
+  const processed = subs.filter(s => s.status === "published" || s.status === "rejected");
+
+  return (
+    <div className="space-y-5">
+      {msg && (
+        <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-white/70 text-sm">
+          {msg}
+          <button onClick={() => setMsg("")} className="ml-3 text-white/40 hover:text-white text-xs">×</button>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between">
+        <h2 className="text-white font-semibold">Pending Submissions ({pending.length})</h2>
+      </div>
+
+      {pending.length === 0 && <p className="text-white/30 text-sm">No pending submissions.</p>}
+
+      <div className="space-y-3">
+        {pending.map(sub => (
+          <div key={sub.id} className="p-4 rounded-xl bg-white/3 border border-white/8 space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 text-xs border border-blue-500/20">
+                    {sub.submissionType.replace("_", " ")}
+                  </span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs border ${
+                    sub.status === "ai_processing"
+                      ? "bg-amber-500/15 text-amber-400 border-amber-500/20"
+                      : "bg-white/8 text-white/50 border-white/10"
+                  }`}>
+                    {sub.status}
+                  </span>
+                </div>
+                <p className="text-white font-medium text-sm mt-1.5 line-clamp-2">{sub.title}</p>
+                <p className="text-white/45 text-xs mt-0.5">{sub.authors}</p>
+                {sub.suggestedTags && sub.suggestedTags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {sub.suggestedTags.map(t => (
+                      <span key={t} className="px-1.5 py-0.5 rounded bg-white/5 text-white/40 text-xs">{t}</span>
+                    ))}
+                  </div>
+                )}
+                <p className="text-white/20 text-xs mt-1">
+                  {sub.createdAt ? new Date(sub.createdAt).toLocaleDateString() : "—"}
+                  {sub.externalUrl && <> · <a href={sub.externalUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-white/50">Source ↗</a></>}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelected(selected?.id === sub.id ? null : sub)}
+                className="shrink-0 px-3 py-1.5 text-xs text-white/60 border border-white/10 rounded-lg hover:bg-white/5 transition-colors"
+              >
+                {selected?.id === sub.id ? "Hide" : "Review"}
+              </button>
+            </div>
+
+            {selected?.id === sub.id && (
+              <div className="space-y-3 pt-3 border-t border-white/8">
+                <p className="text-white/55 text-xs leading-relaxed line-clamp-5">{sub.abstract}</p>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => approve(sub.id)}
+                    disabled={actionLoading}
+                    className="px-4 py-2 bg-green-600/30 text-green-400 border border-green-600/30 rounded-lg text-sm font-semibold hover:bg-green-600/50 transition-colors disabled:opacity-50"
+                  >
+                    ✓ Approve & Publish
+                  </button>
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Rejection reason…"
+                    value={rejReason}
+                    onChange={e => setRejReason(e.target.value)}
+                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/25"
+                  />
+                  <button
+                    onClick={() => reject(sub.id)}
+                    disabled={actionLoading}
+                    className="px-4 py-2 bg-red-600/20 text-red-400 border border-red-600/20 rounded-lg text-sm font-semibold hover:bg-red-600/40 transition-colors disabled:opacity-50"
+                  >
+                    ✗ Reject
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {processed.length > 0 && (
+        <details className="mt-4">
+          <summary className="text-white/30 text-xs cursor-pointer hover:text-white/50">
+            {processed.length} processed submissions
+          </summary>
+          <div className="mt-2 space-y-1">
+            {processed.map(sub => (
+              <div key={sub.id} className="flex items-center justify-between p-2 rounded-lg bg-white/2 border border-white/5 text-xs">
+                <span className="text-white/50 truncate flex-1">{sub.title}</span>
+                <span className={`ml-2 ${sub.status === "published" ? "text-green-400" : "text-red-400"}`}>
+                  {sub.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        </details>
       )}
     </div>
   );

@@ -40,6 +40,13 @@ export const users = pgTable("users", {
   // Account lockout
   failedLoginCount: integer("failed_login_count").notNull().default(0),
   lockedUntil: timestamp("locked_until", { withTimezone: true, mode: "string" }),
+  // User 2FA (all users)
+  totpSecret: text("totp_secret"),         // AES-256-GCM encrypted, null = disabled
+  totpEnabled: boolean("totp_enabled").notNull().default(false),
+  totpBackupCodes: text("totp_backup_codes").array(), // bcrypt-hashed
+  totpEnabledAt: timestamp("totp_enabled_at", { withTimezone: true, mode: "string" }),
+  totpFailedAttempts: integer("totp_failed_attempts").notNull().default(0),
+  totpLockedUntil: timestamp("totp_locked_until", { withTimezone: true, mode: "string" }),
 });
 
 export const accounts = pgTable(
@@ -111,6 +118,11 @@ export const cards = pgTable("cards", {
   videoUrl: text("video_url"),
   replicationStatus: text("replication_status"),
   eli5Summary: text("eli5_summary"),
+  // Fraud / quality detection
+  semanticFingerprint: text("semantic_fingerprint"),
+  fraudRiskScore: integer("fraud_risk_score"),
+  fraudFlags: text("fraud_flags").array(),
+  fraudCheckedAt: timestamp("fraud_checked_at", { withTimezone: true, mode: "string" }),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
 });
 
@@ -136,12 +148,17 @@ export const profiles = pgTable("profiles", {
   emailNewFollower: boolean("email_new_follower").notNull().default(false),
   emailReply: boolean("email_reply").notNull().default(false),
   emailBreakthrough: boolean("email_breakthrough").notNull().default(false),
+  // Subscription tier
+  subscriptionTier: text("subscription_tier").notNull().default("free"),
   // Billing
   stripeCustomerId: text("stripe_customer_id"),
   // Points / engagement
   loginStreak: integer("login_streak").notNull().default(0),
   lastLoginDate: date("last_login_date"),
   pointFeatures: jsonb("point_features"),
+  // Social graph counts (denormalized for performance)
+  followerCount: integer("follower_count").notNull().default(0),
+  followingCount: integer("following_count").notNull().default(0),
   // Analytics privacy
   shareLocationWithCreators: boolean("share_location_with_creators").notNull().default(true),
   // i18n
@@ -626,4 +643,61 @@ export const translations = pgTable(
     lastUsedAt:          timestamp("last_used_at", { withTimezone: true, mode: "string" }).defaultNow(),
   },
   (t) => [unique("translations_content_lang_unique").on(t.contentType, t.contentId, t.languageCode)],
+);
+
+// ── Social follow graph ────────────────────────────────────────────────────
+
+export const userFollows = pgTable(
+  "user_follows",
+  {
+    id:          uuid("id").primaryKey().defaultRandom(),
+    followerId:  text("follower_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    followingId: text("following_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    createdAt:   timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+  },
+  (t) => [unique("user_follows_pair_unique").on(t.followerId, t.followingId)],
+);
+
+// ── Submissions ────────────────────────────────────────────────────────────
+
+export const submissions = pgTable("submissions", {
+  id:               uuid("id").primaryKey().defaultRandom(),
+  userId:           text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  submissionType:   text("submission_type").notNull(), // 'paper'|'white_paper'|'discovery'|'dataset'
+  title:            text("title").notNull(),
+  authors:          text("authors").notNull(),
+  abstract:         text("abstract").notNull(),
+  externalUrl:      text("external_url"),
+  pdfUrl:           text("pdf_url"),
+  doi:              text("doi"),
+  journalName:      text("journal_name"),
+  organization:     text("organization"),
+  category:         text("category"),
+  datasetSize:      text("dataset_size"),
+  datasetFormat:    text("dataset_format"),
+  datasetLicense:   text("dataset_license"),
+  versionNumber:    text("version_number"),
+  methodology:      text("methodology"),
+  fieldOfDiscovery: text("field_of_discovery"),
+  peerReviewed:     boolean("peer_reviewed").notNull().default(false),
+  status:           text("status").notNull().default("pending"), // pending|ai_processing|published|rejected
+  aiProcessedAt:    timestamp("ai_processed_at", { withTimezone: true, mode: "string" }),
+  publishedCardId:  uuid("published_card_id"),
+  rejectionReason:  text("rejection_reason"),
+  suggestedTags:    text("suggested_tags").array(),
+  createdAt:        timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+});
+
+// ── Device tokens (push notifications) ────────────────────────────────────
+
+export const deviceTokens = pgTable(
+  "device_tokens",
+  {
+    id:        uuid("id").primaryKey().defaultRandom(),
+    userId:    text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    token:     text("token").notNull(),
+    platform:  text("platform").notNull(), // 'ios'|'android'
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+  },
+  (t) => [unique("device_tokens_user_token_unique").on(t.userId, t.token)],
 );

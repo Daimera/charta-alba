@@ -1,19 +1,26 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { useParams } from "next/navigation";
-import { countryFlag } from "@/lib/geo";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { TierBadge } from "@/components/TierBadge";
 
 interface ProfileData {
   id: string;
   username: string | null;
+  displayName: string | null;
   bio: string | null;
   avatarUrl: string | null;
   isPublic: boolean;
   totalViews: number;
   viewsThisWeek: number;
   uniqueCountries?: number;
+  followerCount: number;
+  followingCount: number;
+  subscriptionTier?: string;
+  joinedAt: string | null;
+  isOrcidVerified?: boolean;
 }
 
 interface Analytics {
@@ -29,38 +36,109 @@ interface Analytics {
   recentViewers: { username: string; city: string | null; country: string | null; flag: string; device: string | null; viewedAt: string | null }[];
 }
 
+interface FollowUser {
+  userId: string;
+  username: string | null;
+  displayName: string | null;
+  bio: string | null;
+  avatarUrl: string | null;
+  followerCount: number;
+  isFollowingBack: boolean;
+}
+
+type ProfileTab = "posts" | "liked" | "collections" | "circles" | "followers" | "following";
+
+function Avatar({ url, name, size = 80 }: { url: string | null; name: string | null; size?: number }) {
+  const dim = `${size}px`;
+  if (url) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={url} alt={name ?? ""} className="rounded-full object-cover ring-2 ring-white/10" style={{ width: dim, height: dim }} />;
+  }
+  return (
+    <div className="rounded-full bg-white/10 flex items-center justify-center font-bold text-white" style={{ width: dim, height: dim, fontSize: size / 2.5 }}>
+      {(name ?? "?")[0].toUpperCase()}
+    </div>
+  );
+}
+
+function FollowUserCard({ user, viewerUsername, onFollowChange }: {
+  user: FollowUser;
+  viewerUsername: string | null | undefined;
+  onFollowChange?: () => void;
+}) {
+  const [following, setFollowing] = useState(user.isFollowingBack);
+  const [loading, setLoading] = useState(false);
+  const isOwn = viewerUsername === user.username;
+
+  async function toggle() {
+    if (!user.username) return;
+    setLoading(true);
+    const method = following ? "DELETE" : "POST";
+    const res = await fetch(`/api/users/${user.username}/follow`, { method });
+    if (res.ok) {
+      setFollowing(!following);
+      onFollowChange?.();
+    }
+    setLoading(false);
+  }
+
+  return (
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-white/3 border border-white/6">
+      <Link href={user.username ? `/profile/${user.username}` : "#"}>
+        <Avatar url={user.avatarUrl} name={user.displayName ?? user.username} size={44} />
+      </Link>
+      <div className="flex-1 min-w-0">
+        <Link href={user.username ? `/profile/${user.username}` : "#"} className="block">
+          <p className="text-white text-sm font-semibold truncate">{user.displayName ?? user.username}</p>
+          {user.username && <p className="text-white/40 text-xs">@{user.username}</p>}
+        </Link>
+        {user.bio && <p className="text-white/50 text-xs mt-0.5 line-clamp-1">{user.bio}</p>}
+      </div>
+      {!isOwn && (
+        <button
+          onClick={toggle}
+          disabled={loading}
+          className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            following
+              ? "bg-white/10 text-white/70 hover:bg-red-500/20 hover:text-red-400"
+              : "bg-white text-black hover:bg-white/90"
+          }`}
+        >
+          {loading ? "…" : following ? "Following" : "Follow"}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function ProfilePage() {
   const params = useParams<{ username: string }>();
   const username = params.username;
   const { data: session } = useSession();
+  const router = useRouter();
 
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
-  const [loading, setLoading] = useState(true);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
+  const [followerUsers, setFollowerUsers] = useState<FollowUser[]>([]);
+  const [followingUsers, setFollowingUsers] = useState<FollowUser[]>([]);
+  const [followListLoading, setFollowListLoading] = useState(false);
 
   useEffect(() => {
     if (!username) return;
 
-    // Record the view (fire-and-forget)
     fetch(`/api/profiles/${username}/view`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ referrer: document.referrer || null }),
-    })
-      .then((r) => r.ok ? r.json() : null)
-      .then((d: { totalViews?: number; viewsThisWeek?: number; selfView?: boolean } | null) => {
-        if (d && !d.selfView) {
-          setProfile((prev) =>
-            prev ? { ...prev, totalViews: d.totalViews ?? prev.totalViews, viewsThisWeek: d.viewsThisWeek ?? prev.viewsThisWeek } : prev
-          );
-        }
-      })
-      .catch(() => undefined);
+    }).catch(() => undefined);
 
-    // Load public profile data via settings API (just use the username to find the profile)
     fetch(`/api/profiles/${username}`)
       .then((r) => {
         if (r.status === 404) { setNotFound(true); return null; }
@@ -73,8 +151,37 @@ export default function ProfilePage() {
       .finally(() => setLoading(false));
   }, [username]);
 
+  // Check if viewer follows this profile
+  useEffect(() => {
+    if (!session?.user?.id || !profile?.id || session.user.id === profile.id) return;
+    fetch(`/api/users/${username}/followers`)
+      .then(r => r.ok ? r.json() : null)
+      .then((d: { items: FollowUser[] } | null) => {
+        if (d) {
+          const found = d.items.some((u) => u.userId === session.user?.id);
+          setIsFollowing(found);
+        }
+      })
+      .catch(() => undefined);
+  }, [username, profile?.id, session?.user?.id]);
+
+  const loadFollowList = useCallback(async (type: "followers" | "following") => {
+    setFollowListLoading(true);
+    const res = await fetch(`/api/users/${username}/${type}`);
+    if (res.ok) {
+      const d = await res.json() as { items: FollowUser[] };
+      if (type === "followers") setFollowerUsers(d.items);
+      else setFollowingUsers(d.items);
+    }
+    setFollowListLoading(false);
+  }, [username]);
+
+  useEffect(() => {
+    if (activeTab === "followers") loadFollowList("followers");
+    if (activeTab === "following") loadFollowList("following");
+  }, [activeTab, loadFollowList]);
+
   async function loadAnalytics() {
-    if (!username) return;
     setAnalyticsLoading(true);
     const res = await fetch(`/api/profiles/${username}/analytics`);
     if (res.ok) {
@@ -85,10 +192,23 @@ export default function ProfilePage() {
     setAnalyticsLoading(false);
   }
 
+  async function toggleFollow() {
+    if (!session?.user) { router.push("/auth/signin"); return; }
+    setFollowLoading(true);
+    const method = isFollowing ? "DELETE" : "POST";
+    const res = await fetch(`/api/users/${username}/follow`, { method });
+    if (res.ok) {
+      const d = await res.json() as { following: boolean; followerCount: number };
+      setIsFollowing(d.following);
+      setProfile(prev => prev ? { ...prev, followerCount: d.followerCount } : prev);
+    }
+    setFollowLoading(false);
+  }
+
   if (loading) {
     return (
       <main className="min-h-dvh bg-[#0a0a0a] pt-14 flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-white/15 border-t-white/50 rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-white/15 border-t-white/50 rounded-full animate-spin" aria-label="Loading" />
       </main>
     );
   }
@@ -106,53 +226,190 @@ export default function ProfilePage() {
 
   const isOwner = session?.user?.id === profile.id;
 
+  const tabs: { id: ProfileTab; label: string }[] = [
+    { id: "posts", label: "Posts" },
+    { id: "liked", label: "Liked" },
+    { id: "collections", label: "Collections" },
+    { id: "circles", label: "Circles" },
+    { id: "followers", label: `Followers ${profile.followerCount > 0 ? `(${profile.followerCount})` : ""}` },
+    { id: "following", label: `Following ${profile.followingCount > 0 ? `(${profile.followingCount})` : ""}` },
+  ];
+
   return (
-    <main className="min-h-dvh bg-[#0a0a0a] pt-14">
-      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+    <main className="min-h-dvh bg-[#0a0a0a] pt-14" id="main-content">
+      <div className="max-w-2xl mx-auto px-4 py-8">
+
         {/* Profile header */}
-        <div className="flex items-start gap-4">
-          <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-2xl font-bold text-white shrink-0">
-            {profile.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={profile.avatarUrl} alt={profile.username ?? ""} className="w-16 h-16 rounded-full object-cover" />
-            ) : (
-              (profile.username ?? "?")[0].toUpperCase()
-            )}
-          </div>
+        <div className="flex items-start gap-5 mb-6">
+          <Avatar url={profile.avatarUrl} name={profile.displayName ?? profile.username} size={80} />
           <div className="flex-1 min-w-0">
-            <h1 className="text-white text-xl font-bold">@{profile.username}</h1>
-            {profile.bio && <p className="text-white/60 text-sm mt-1 leading-relaxed">{profile.bio}</p>}
-            {/* Public stats */}
-            <div className="flex items-center gap-4 mt-3">
-              <div className="text-center">
-                <p className="text-white font-semibold text-sm">{(profile.totalViews ?? 0).toLocaleString()}</p>
-                <p className="text-white/35 text-xs">profile views</p>
-              </div>
-              {(profile.uniqueCountries ?? 0) > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-white text-xl font-bold">
+                {profile.displayName ?? profile.username}
+              </h1>
+              <TierBadge tier={profile.subscriptionTier} />
+              {profile.isOrcidVerified && (
+                <span className="px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 text-xs font-medium border border-green-500/20">
+                  ✓ ORCID
+                </span>
+              )}
+            </div>
+            {profile.username && (
+              <p className="text-white/45 text-sm">@{profile.username}</p>
+            )}
+            {profile.bio && (
+              <p className="text-white/65 text-sm mt-2 leading-relaxed">{profile.bio}</p>
+            )}
+
+            {/* Stats row */}
+            <div className="flex items-center gap-5 mt-3">
+              <button
+                onClick={() => setActiveTab("followers")}
+                className="text-center hover:opacity-80 transition-opacity"
+              >
+                <p className="text-white font-semibold text-sm">{profile.followerCount.toLocaleString()}</p>
+                <p className="text-white/35 text-xs">followers</p>
+              </button>
+              <button
+                onClick={() => setActiveTab("following")}
+                className="text-center hover:opacity-80 transition-opacity"
+              >
+                <p className="text-white font-semibold text-sm">{profile.followingCount.toLocaleString()}</p>
+                <p className="text-white/35 text-xs">following</p>
+              </button>
+              {profile.totalViews > 0 && (
                 <div className="text-center">
-                  <p className="text-white font-semibold text-sm">{profile.uniqueCountries}</p>
-                  <p className="text-white/35 text-xs">countries</p>
+                  <p className="text-white font-semibold text-sm">{profile.totalViews.toLocaleString()}</p>
+                  <p className="text-white/35 text-xs">profile views</p>
                 </div>
+              )}
+            </div>
+
+            {profile.joinedAt && (
+              <p className="text-white/25 text-xs mt-2">
+                Member since {new Date(profile.joinedAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+              </p>
+            )}
+
+            {/* Action buttons */}
+            <div className="flex items-center gap-2 mt-3">
+              {isOwner ? (
+                <>
+                  <Link
+                    href="/settings/profile"
+                    className="px-4 py-1.5 rounded-lg border border-white/20 text-white/80 text-sm font-medium hover:bg-white/8 transition-colors"
+                  >
+                    Edit Profile
+                  </Link>
+                  <Link
+                    href="/creator"
+                    className="px-4 py-1.5 rounded-lg border border-white/20 text-white/80 text-sm font-medium hover:bg-white/8 transition-colors"
+                  >
+                    Creator Dashboard
+                  </Link>
+                </>
+              ) : (
+                <button
+                  onClick={toggleFollow}
+                  disabled={followLoading}
+                  aria-label={isFollowing ? "Unfollow" : "Follow"}
+                  className={`px-5 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    isFollowing
+                      ? "bg-white/10 text-white/70 hover:bg-red-500/20 hover:text-red-400 border border-white/10"
+                      : "bg-white text-black hover:bg-white/90"
+                  }`}
+                >
+                  {followLoading ? "…" : isFollowing ? "Following" : "Follow"}
+                </button>
               )}
             </div>
           </div>
         </div>
 
-        {/* Owner analytics toggle */}
-        {isOwner && (
-          <div>
-            {!showAnalytics ? (
-              <button
-                onClick={loadAnalytics}
-                disabled={analyticsLoading}
-                className="text-sm text-white/40 hover:text-white border border-white/8 hover:border-white/20 px-4 py-2 rounded-xl transition-colors"
-              >
-                {analyticsLoading ? "Loading analytics…" : "View profile analytics"}
-              </button>
-            ) : analytics ? (
-              <ProfileAnalytics analytics={analytics} />
-            ) : null}
+        {/* Owner analytics */}
+        {isOwner && !showAnalytics && (
+          <button
+            onClick={loadAnalytics}
+            disabled={analyticsLoading}
+            className="w-full text-sm text-white/40 hover:text-white border border-white/8 hover:border-white/20 px-4 py-2.5 rounded-xl transition-colors mb-6"
+          >
+            {analyticsLoading ? "Loading analytics…" : "View profile analytics ↗"}
+          </button>
+        )}
+        {isOwner && showAnalytics && analytics && (
+          <div className="mb-6">
+            <ProfileAnalytics analytics={analytics} />
           </div>
+        )}
+
+        {/* Private account guard */}
+        {!profile.isPublic && !isOwner ? (
+          <div className="text-center py-16">
+            <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-3">
+              <svg className="w-7 h-7 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <p className="text-white/60 font-medium">This account is private</p>
+            <p className="text-white/30 text-sm mt-1">Follow to see their posts and activity</p>
+          </div>
+        ) : (
+          <>
+            {/* Tabs */}
+            <div role="tablist" className="flex gap-1 overflow-x-auto hide-scrollbar border-b border-white/8 mb-6">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  aria-selected={activeTab === tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`shrink-0 pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === tab.id
+                      ? "border-white text-white"
+                      : "border-transparent text-white/40 hover:text-white/70"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab content */}
+            {(activeTab === "posts" || activeTab === "liked" || activeTab === "collections" || activeTab === "circles") && (
+              <div className="text-center py-12 text-white/30 text-sm">
+                {activeTab === "posts" && "No posts yet."}
+                {activeTab === "liked" && "No public likes yet."}
+                {activeTab === "collections" && "No public collections yet."}
+                {activeTab === "circles" && "No circles yet."}
+              </div>
+            )}
+
+            {(activeTab === "followers" || activeTab === "following") && (
+              <div className="space-y-2">
+                {followListLoading ? (
+                  <div className="flex justify-center py-8">
+                    <div className="w-5 h-5 border-2 border-white/15 border-t-white/50 rounded-full animate-spin" />
+                  </div>
+                ) : (
+                  <>
+                    {(activeTab === "followers" ? followerUsers : followingUsers).map((u) => (
+                      <FollowUserCard
+                        key={u.userId}
+                        user={u}
+                        viewerUsername={session?.user?.name}
+                        onFollowChange={() => loadFollowList(activeTab)}
+                      />
+                    ))}
+                    {(activeTab === "followers" ? followerUsers : followingUsers).length === 0 && (
+                      <p className="text-center text-white/30 text-sm py-12">
+                        {activeTab === "followers" ? "No followers yet." : "Not following anyone yet."}
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
     </main>
@@ -160,12 +417,12 @@ export default function ProfilePage() {
 }
 
 function ProfileAnalytics({ analytics }: { analytics: Analytics }) {
-  // Simple bar chart using CSS widths
   const maxDay = Math.max(...analytics.viewsByDay.map((d) => d.count), 1);
 
   return (
-    <div className="space-y-5">
-      {/* Summary cards */}
+    <div className="space-y-5 p-4 rounded-xl bg-white/3 border border-white/8">
+      <p className="text-white/50 text-xs uppercase tracking-wide font-medium">Profile Analytics</p>
+
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: "Total views", value: analytics.totalViews },
@@ -180,7 +437,6 @@ function ProfileAnalytics({ analytics }: { analytics: Analytics }) {
         ))}
       </div>
 
-      {/* Views by day */}
       {analytics.viewsByDay.length > 0 && (
         <div>
           <p className="text-white/40 text-xs uppercase tracking-wide mb-3">Views — last 30 days</p>
@@ -201,7 +457,6 @@ function ProfileAnalytics({ analytics }: { analytics: Analytics }) {
         </div>
       )}
 
-      {/* Top countries */}
       {analytics.topCountries.length > 0 && (
         <div>
           <p className="text-white/40 text-xs uppercase tracking-wide mb-3">Top countries</p>
@@ -213,10 +468,7 @@ function ProfileAnalytics({ analytics }: { analytics: Analytics }) {
                   <span className="text-base shrink-0">{c.flag}</span>
                   <span className="text-white/60 text-xs w-28 truncate shrink-0">{c.country}</span>
                   <div className="flex-1 h-1.5 bg-white/8 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-white/40 rounded-full"
-                      style={{ width: `${(c.count / maxCount) * 100}%` }}
-                    />
+                    <div className="h-full bg-white/40 rounded-full" style={{ width: `${(c.count / maxCount) * 100}%` }} />
                   </div>
                   <span className="text-white/40 text-xs shrink-0 w-8 text-right">{c.count}</span>
                 </div>
@@ -226,48 +478,18 @@ function ProfileAnalytics({ analytics }: { analytics: Analytics }) {
         </div>
       )}
 
-      {/* Device breakdown */}
       <div>
         <p className="text-white/40 text-xs uppercase tracking-wide mb-3">Devices</p>
         <div className="flex gap-3">
-          {Object.entries(analytics.deviceBreakdown)
-            .filter(([, v]) => v > 0)
-            .map(([type, count]) => (
-              <div key={type} className="flex-1 p-3 rounded-xl bg-white/4 border border-white/8 text-center">
-                <p className="text-white font-semibold">{count}</p>
-                <p className="text-white/35 text-xs mt-0.5 capitalize">{type}</p>
-              </div>
-            ))}
+          {Object.entries(analytics.deviceBreakdown).filter(([, v]) => v > 0).map(([type, count]) => (
+            <div key={type} className="flex-1 p-3 rounded-xl bg-white/4 border border-white/8 text-center">
+              <p className="text-white font-semibold">{count}</p>
+              <p className="text-white/35 text-xs mt-0.5 capitalize">{type}</p>
+            </div>
+          ))}
         </div>
       </div>
-
-      {/* Recent viewers */}
-      {analytics.recentViewers.length > 0 && (
-        <div>
-          <p className="text-white/40 text-xs uppercase tracking-wide mb-3">Recent viewers</p>
-          <div className="space-y-1.5">
-            {analytics.recentViewers.slice(0, 10).map((v, i) => (
-              <div key={i} className="flex items-center justify-between p-2.5 rounded-lg bg-white/3 border border-white/6">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-sm">{v.flag}</span>
-                  <div className="min-w-0">
-                    <span className="text-white/70 text-xs">{v.username}</span>
-                    {(v.city || v.country) && (
-                      <p className="text-white/30 text-xs">{[v.city, v.country].filter(Boolean).join(", ")}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="shrink-0 text-right">
-                  <p className="text-white/25 text-xs">{v.device}</p>
-                  <p className="text-white/20 text-xs">
-                    {v.viewedAt ? new Date(v.viewedAt).toLocaleDateString() : "—"}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
+

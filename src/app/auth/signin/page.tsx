@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { AuthLogo } from "@/components/AuthLogo";
 
 function SignInForm() {
   const searchParams = useSearchParams();
@@ -86,6 +87,7 @@ export default function SignInPage() {
     <main className="min-h-dvh bg-[#0a0a0a] flex items-center justify-center px-4 pt-14">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
+          <AuthLogo />
           <h1 className="text-white text-2xl font-bold tracking-tight">Sign in</h1>
           <p className="text-white/40 text-sm mt-1">Welcome back to Charta Alba</p>
         </div>

@@ -1,6 +1,6 @@
 import { desc, eq, gte, and, isNull, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { cards, papers, likes, bookmarks, comments, claims, users, citations } from "@/lib/db/schema";
+import { cards, papers, likes, bookmarks, comments, claims, users, citations, profiles } from "@/lib/db/schema";
 import type { FeedCardData, CitationLink, TrendingTag } from "@/types";
 
 const feedSelect = {
@@ -108,9 +108,11 @@ export async function getComments(cardId: string) {
       createdAt: comments.createdAt,
       authorName: users.name,
       authorImage: users.image,
+      authorTier: profiles.subscriptionTier,
     })
     .from(comments)
     .leftJoin(users, eq(comments.userId, users.id))
+    .leftJoin(profiles, eq(comments.userId, profiles.id))
     .where(and(eq(comments.cardId, cardId), isNull(comments.parentId)))
     .orderBy(desc(comments.createdAt))
     .limit(30);
@@ -128,9 +130,11 @@ export async function getComments(cardId: string) {
       createdAt: comments.createdAt,
       authorName: users.name,
       authorImage: users.image,
+      authorTier: profiles.subscriptionTier,
     })
     .from(comments)
     .leftJoin(users, eq(comments.userId, users.id))
+    .leftJoin(profiles, eq(comments.userId, profiles.id))
     .where(inArray(comments.parentId, topLevelIds))
     .orderBy(desc(comments.createdAt));
 

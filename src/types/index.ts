@@ -68,6 +68,7 @@ export interface Comment {
   createdAt: string | null;
   authorName: string | null;
   authorImage: string | null;
+  authorTier?: string | null;
   replies?: Comment[];
 }
 
