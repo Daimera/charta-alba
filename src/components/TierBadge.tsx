@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 
 const BADGE_CONFIG: Record<string, { img: string; video: string; label: string } | null> = {
-  free: null,
+  free:    null,
   basic:   { img: "/logo-blue.png",    video: "/logo-animation-blue.mp4",    label: "Standard Member" },
   pro:     { img: "/logo-gold.png",    video: "/logo-animation-gold.mp4",    label: "Pro Member" },
   diamond: { img: "/logo-diamond.png", video: "/logo-animation-diamond.mp4", label: "Diamond Member" },
@@ -71,7 +71,7 @@ export function TierBadge({ tier }: TierBadgeProps) {
             muted
             playsInline
             autoPlay
-            style={{ width: "32px", height: "32px", display: "block" }}
+            style={{ width: "32px", height: "32px", display: "block", mixBlendMode: "screen" }}
           />
         </span>
       )}

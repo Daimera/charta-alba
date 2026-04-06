@@ -13,7 +13,7 @@ export function AuthLogo() {
         <img
           src="/logo-black.png"
           alt="Charta Alba"
-          style={{ height: "80px", width: "auto", filter: "brightness(0) invert(1)", display: "inline-block" }}
+          style={{ height: "56px", width: "auto", display: "inline-block" }}
         />
       ) : (
         /* eslint-disable-next-line jsx-a11y/media-has-caption */
@@ -25,7 +25,7 @@ export function AuthLogo() {
           playsInline
           loop={false}
           onError={() => setVideoFailed(true)}
-          style={{ height: "80px", width: "auto", display: "inline-block" }}
+          style={{ height: "56px", width: "auto", display: "inline-block" }}
         />
       )}
     </div>

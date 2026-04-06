@@ -44,12 +44,16 @@ export function LogoSplash() {
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <video
         ref={videoRef}
-        src="/logo-animation-black.mp4"
+        src="/logo-animation-diamond.mp4"
         autoPlay
         muted
         playsInline
         onEnded={handleEnded}
-        style={{ maxWidth: "min(320px, 80vw)", maxHeight: "80vh" }}
+        style={{
+          maxWidth: "min(320px, 80vw)",
+          maxHeight: "80vh",
+          mixBlendMode: "screen",
+        }}
       />
     </div>
   );

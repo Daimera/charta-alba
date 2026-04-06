@@ -31,6 +31,9 @@ export async function POST(req: Request) {
       .where(eq(users.email, email))
       .limit(1);
 
+    const isDev = !process.env.RESEND_API_KEY || process.env.NODE_ENV === "development";
+    let devResetUrl: string | undefined;
+
     if (user) {
       const token = randomBytes(32).toString("hex");
       const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
@@ -39,19 +42,24 @@ export async function POST(req: Request) {
 
       const resetUrl = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${token}`;
 
-      await sendEmail({
-        to: email,
-        subject: "Reset your Charta Alba password",
-        html: `
-          <p>Hi,</p>
-          <p>Click the link below to reset your password. This link expires in 1 hour.</p>
-          <p><a href="${resetUrl}">${resetUrl}</a></p>
-          <p>If you didn't request this, you can safely ignore this email.</p>
-        `,
-      });
+      if (isDev) {
+        // No email provider — expose URL in response for dev testing only
+        devResetUrl = resetUrl;
+      } else {
+        await sendEmail({
+          to: email,
+          subject: "Reset your Charta Alba password",
+          html: `
+            <p>Hi,</p>
+            <p>Click the link below to reset your password. This link expires in 1 hour.</p>
+            <p><a href="${resetUrl}">${resetUrl}</a></p>
+            <p>If you didn't request this, you can safely ignore this email.</p>
+          `,
+        });
+      }
     }
 
-    return Response.json({ ok: true });
+    return Response.json({ ok: true, ...(devResetUrl ? { devResetUrl } : {}) });
   } catch (err) {
     console.error("[api/auth/forgot-password]", err);
     return Response.json({ error: "Something went wrong" }, { status: 500 });

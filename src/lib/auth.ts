@@ -33,7 +33,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user?.id) token.sub = user.id;
+      if (user?.id) {
+        token.sub = user.id;
+        // Carry rememberMe through from authorize()
+        if ((user as { rememberMe?: boolean }).rememberMe) {
+          token.rememberMe = true;
+        }
+      }
       // Fetch role + isFounder from DB on first sign-in (token won't have them yet)
       if (token.sub && !token.role) {
         const [dbUser] = await db
@@ -43,6 +49,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           .limit(1);
         token.role = dbUser?.role ?? "user";
         token.isFounder = dbUser?.isFounder ?? false;
+      }
+      // Extend session lifetime for remembered devices
+      if (token.rememberMe) {
+        token.maxAge = 30 * 24 * 60 * 60;
       }
       return token;
     },
@@ -60,8 +70,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
     Credentials({
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email:      { label: "Email",           type: "email"    },
+        password:   { label: "Password",        type: "password" },
+        rememberMe: { label: "Remember device", type: "text"     },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
@@ -124,10 +135,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           .where(eq(users.id, user.id));
 
         return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
+          id:         user.id,
+          email:      user.email,
+          name:       user.name,
+          image:      user.image,
+          rememberMe: credentials.rememberMe === "true",
         };
       },
     }),

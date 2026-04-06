@@ -701,3 +701,19 @@ export const deviceTokens = pgTable(
   },
   (t) => [unique("device_tokens_user_token_unique").on(t.userId, t.token)],
 );
+
+// ── Remember-me trusted devices ───────────────────────────────────────────────
+
+export const rememberDevices = pgTable("remember_devices", {
+  id:              uuid("id").primaryKey().defaultRandom(),
+  userId:          text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  deviceTokenHash: text("device_token_hash").notNull().unique(), // SHA-256 of raw token
+  deviceName:      text("device_name"),                          // parsed from User-Agent
+  userAgent:       text("user_agent"),
+  ipAddress:       text("ip_address"),
+  city:            text("city"),
+  country:         text("country"),
+  createdAt:       timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+  expiresAt:       timestamp("expires_at", { withTimezone: true, mode: "string" }).notNull(),
+  lastUsedAt:      timestamp("last_used_at", { withTimezone: true, mode: "string" }),
+});

@@ -5,6 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { PasswordStrengthField, isPasswordValid } from "@/components/PasswordStrengthField";
+import { PasswordInput } from "@/components/PasswordInput";
 
 interface LoginSession {
   id: string;
@@ -25,6 +26,15 @@ interface TwoFAStatus {
   enabled: boolean;
   enabledAt: string | null;
   backupCodesRemaining: number;
+}
+
+interface TrustedDevice {
+  id: string;
+  deviceName: string;
+  city: string | null;
+  country: string | null;
+  lastUsedAt: string | null;
+  createdAt: string | null;
 }
 
 function Card({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
@@ -296,6 +306,10 @@ export default function SecurityPage() {
   const [showSetup, setShowSetup] = useState(false);
   const [showDisable, setShowDisable] = useState(false);
 
+  const [trustedDevices, setTrustedDevices] = useState<TrustedDevice[]>([]);
+  const [devicesLoading, setDevicesLoading] = useState(true);
+  const [removeAllLoading, setRemoveAllLoading] = useState(false);
+
   useEffect(() => {
     if (status === "unauthenticated") { router.push("/auth/signin"); return; }
     if (status !== "authenticated") return;
@@ -313,6 +327,12 @@ export default function SecurityPage() {
       .then((r) => r.ok ? r.json() : null)
       .then((d: TwoFAStatus | null) => { if (d) setTwoFAStatus(d); })
       .catch(() => undefined);
+
+    fetch("/api/auth/trusted-devices")
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: { devices?: TrustedDevice[] } | null) => setTrustedDevices(d?.devices ?? []))
+      .catch(() => undefined)
+      .finally(() => setDevicesLoading(false));
   }, [status, router]);
 
   async function handlePasswordSave(e: React.FormEvent) {
@@ -334,6 +354,18 @@ export default function SecurityPage() {
       const d = await res.json() as { error?: string };
       setPwMsg({ ok: false, text: d.error ?? "Failed to change password." });
     }
+  }
+
+  async function handleRemoveDevice(id: string) {
+    await fetch(`/api/auth/trusted-devices/${id}`, { method: "DELETE" });
+    setTrustedDevices((prev) => prev.filter((d) => d.id !== id));
+  }
+
+  async function handleRemoveAllDevices() {
+    setRemoveAllLoading(true);
+    await fetch("/api/auth/trusted-devices", { method: "DELETE" });
+    setTrustedDevices([]);
+    setRemoveAllLoading(false);
   }
 
   async function handleSignOutAll() {
@@ -385,12 +417,12 @@ export default function SecurityPage() {
           <form onSubmit={handlePasswordSave} className="space-y-4">
             <div>
               <label className="block text-xs text-white/50 mb-1.5">Current password</label>
-              <input type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} placeholder="••••••••" autoComplete="current-password" className={inputCls} />
+              <PasswordInput value={currentPw} onChange={setCurrentPw} autoComplete="current-password" className={inputCls + " pr-10"} />
             </div>
             <PasswordStrengthField label="New password" value={newPw} onChange={setNewPw} autoComplete="new-password" />
             <div>
               <label className="block text-xs text-white/50 mb-1.5">Confirm new password</label>
-              <input type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} placeholder="••••••••" autoComplete="new-password" className={inputCls} />
+              <PasswordInput value={confirmPw} onChange={setConfirmPw} autoComplete="new-password" className={inputCls + " pr-10"} />
             </div>
             <div className="flex items-center gap-4">
               <button type="submit" disabled={pwLoading} className="px-4 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:bg-white/90 disabled:opacity-50 transition-colors">
@@ -526,6 +558,42 @@ export default function SecurityPage() {
               <span className="text-xs text-green-400 bg-green-500/10 border border-green-500/20 px-2.5 py-1 rounded-full">Active</span>
             )}
           </div>
+        </Card>
+
+        {/* Trusted devices */}
+        <Card title="Trusted devices" description="Devices you've chosen to stay signed in for 30 days.">
+          {devicesLoading ? (
+            <div className="w-4 h-4 border-2 border-white/15 border-t-white/40 rounded-full animate-spin" />
+          ) : trustedDevices.length === 0 ? (
+            <p className="text-white/30 text-sm">No trusted devices. Check &quot;Remember this device&quot; when signing in.</p>
+          ) : (
+            <div className="space-y-2">
+              {trustedDevices.map((d) => (
+                <div key={d.id} className="flex items-center justify-between p-3 rounded-lg bg-white/4 border border-white/8">
+                  <div>
+                    <p className="text-white/80 text-xs font-medium">{d.deviceName}</p>
+                    <p className="text-white/35 text-xs mt-0.5">
+                      {[d.city, d.country].filter(Boolean).join(", ") || "Unknown location"}
+                      {d.lastUsedAt ? ` · Last used ${new Date(d.lastUsedAt).toLocaleDateString()}` : ""}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveDevice(d.id)}
+                    className="text-xs text-red-400/70 hover:text-red-400 transition-colors px-2 py-1 rounded hover:bg-red-500/10"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={handleRemoveAllDevices}
+                disabled={removeAllLoading}
+                className="mt-2 px-3 py-1.5 rounded-lg text-xs text-red-400/70 hover:text-red-400 border border-white/8 hover:bg-red-500/10 disabled:opacity-50 transition-colors"
+              >
+                {removeAllLoading ? "Removing…" : "Remove all devices"}
+              </button>
+            </div>
+          )}
         </Card>
 
         {/* Sessions */}

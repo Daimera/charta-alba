@@ -7,6 +7,7 @@ import { AuthLogo } from "@/components/AuthLogo";
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [devResetUrl, setDevResetUrl] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -29,6 +30,8 @@ export default function ForgotPasswordPage() {
       return;
     }
 
+    const data = await res.json() as { devResetUrl?: string };
+    if (data.devResetUrl) setDevResetUrl(data.devResetUrl);
     setSubmitted(true);
   }
 
@@ -55,6 +58,16 @@ export default function ForgotPasswordPage() {
               <p className="text-white/40 text-sm">
                 If an account exists for <span className="text-white/60">{email}</span>, you&apos;ll receive a reset link shortly.
               </p>
+              {devResetUrl && (
+                <div style={{ marginTop: "12px", padding: "10px 12px", background: "rgba(234,179,8,0.08)", border: "1px solid rgba(234,179,8,0.25)", borderRadius: "8px", textAlign: "left" }}>
+                  <p style={{ color: "#ca8a04", fontSize: "12px", marginBottom: "6px" }}>
+                    🔧 Dev mode — Resend not configured.
+                  </p>
+                  <a href={devResetUrl} style={{ color: "#eab308", fontSize: "12px", wordBreak: "break-all" }}>
+                    Click here to reset password →
+                  </a>
+                </div>
+              )}
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">

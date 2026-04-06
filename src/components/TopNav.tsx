@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useCallback, useTransition, useEffect, useState } from "react";
+import { useCallback, useTransition, useEffect, useRef, useState } from "react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { TierBadge } from "@/components/TierBadge";
 
@@ -16,6 +16,8 @@ export function TopNav() {
   const [, startTransition] = useTransition();
   const [pointsBalance, setPointsBalance] = useState<number | null>(null);
   const [userTier, setUserTier] = useState<string>("free");
+  const [logoHovered, setLogoHovered] = useState(false);
+  const logoVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     if (!session?.user) { setPointsBalance(null); setUserTier("free"); return; }
@@ -51,17 +53,46 @@ export function TopNav() {
     [pathname, router, searchParams]
   );
 
+  function handleLogoMouseEnter() {
+    setLogoHovered(true);
+    logoVideoRef.current?.play().catch(() => undefined);
+  }
+
+  function handleLogoMouseLeave() {
+    setLogoHovered(false);
+    const v = logoVideoRef.current;
+    if (v) { v.pause(); v.currentTime = 0; }
+  }
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-4 bg-black/85 backdrop-blur-md border-b border-white/8">
       {/* Logo */}
-      <Link href="/" className="shrink-0">
+      <Link
+        href="/"
+        className="shrink-0"
+        onMouseEnter={handleLogoMouseEnter}
+        onMouseLeave={handleLogoMouseLeave}
+      >
         <Image
-          src="/logo-black.png"
+          src="/logo-diamond.png"
           alt="Charta Alba"
           width={120}
           height={36}
-          style={{ height: "36px", width: "auto", filter: "brightness(0) invert(1)" }}
+          style={{ height: "36px", width: "auto", display: logoHovered ? "none" : "block" }}
           priority
+        />
+        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+        <video
+          ref={logoVideoRef}
+          src="/logo-animation-diamond.mp4"
+          muted
+          playsInline
+          style={{
+            height: "36px",
+            width: "auto",
+            display: logoHovered ? "block" : "none",
+            mixBlendMode: "screen",
+          }}
         />
       </Link>
 
@@ -147,27 +178,27 @@ export function TopNav() {
               {pointsBalance != null ? pointsBalance.toLocaleString() : "—"}
             </span>
           </Link>
-        <div className="flex items-center gap-1.5">
-          <TierBadge tier={userTier} />
-          <Link
-            href="/settings"
-            className="flex items-center"
-            title="Settings"
-          >
-            {session.user.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={session.user.image}
-                alt={session.user.name ?? "User"}
-                className="w-7 h-7 rounded-full object-cover ring-1 ring-white/20 hover:ring-white/40 transition-all"
-              />
-            ) : (
-              <span className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center text-xs text-white font-medium hover:bg-white/25 transition-colors">
-                {(session.user.name ?? session.user.email ?? "?")[0].toUpperCase()}
-              </span>
-            )}
-          </Link>
-        </div>
+          <div className="flex items-center gap-1.5">
+            <TierBadge tier={userTier} />
+            <Link
+              href="/settings"
+              className="flex items-center"
+              title="Settings"
+            >
+              {session.user.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={session.user.image}
+                  alt={session.user.name ?? "User"}
+                  className="w-7 h-7 rounded-full object-cover ring-1 ring-white/20 hover:ring-white/40 transition-all"
+                />
+              ) : (
+                <span className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center text-xs text-white font-medium hover:bg-white/25 transition-colors">
+                  {(session.user.name ?? session.user.email ?? "?")[0].toUpperCase()}
+                </span>
+              )}
+            </Link>
+          </div>
         </div>
       ) : (
         <Link

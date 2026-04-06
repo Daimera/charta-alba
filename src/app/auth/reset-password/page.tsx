@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { PasswordStrengthField, isPasswordValid } from "@/components/PasswordStrengthField";
+import { PasswordInput } from "@/components/PasswordInput";
 
 function ResetForm() {
   const searchParams = useSearchParams();
@@ -12,9 +13,12 @@ function ResetForm() {
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [confirmTouched, setConfirmTouched] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+
+  const passwordsMatch = confirm === password;
 
   if (!token) {
     return (
@@ -88,19 +92,24 @@ function ResetForm() {
       />
       <div>
         <label className="block text-sm text-white/60 mb-1.5">Confirm password</label>
-        <input
-          type="password"
+        <PasswordInput
           value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          required
+          onChange={(v) => { setConfirm(v); if (!confirmTouched) setConfirmTouched(true); }}
           autoComplete="new-password"
-          className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/25 focus:bg-white/8 transition-colors"
-          placeholder="••••••••"
+          required
         />
+        {confirmTouched && confirm.length > 0 && (
+          <p style={{ marginTop: "6px", fontSize: "13px" }}>
+            {passwordsMatch
+              ? <span style={{ color: "#22c55e" }}>✓ Passwords match</span>
+              : <span style={{ color: "#ef4444" }}>✗ Passwords don&apos;t match</span>
+            }
+          </p>
+        )}
       </div>
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || (confirmTouched && !passwordsMatch)}
         className="w-full py-2.5 rounded-lg bg-white text-black text-sm font-semibold hover:bg-white/90 disabled:opacity-50 transition-colors"
       >
         {loading ? "Updating…" : "Set new password"}

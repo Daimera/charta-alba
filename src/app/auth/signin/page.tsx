@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthLogo } from "@/components/AuthLogo";
+import { PasswordInput } from "@/components/PasswordInput";
 
 function SignInForm() {
   const searchParams = useSearchParams();
@@ -12,6 +13,7 @@ function SignInForm() {
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -22,12 +24,17 @@ function SignInForm() {
     const result = await signIn("credentials", {
       email,
       password,
+      rememberMe: rememberMe ? "true" : "false",
       redirect: false,
     });
     setLoading(false);
     if (result?.error) {
       setError("Invalid email or password.");
     } else {
+      if (rememberMe) {
+        // Register device for 30-day trusted access
+        fetch("/api/auth/remember-device", { method: "POST" }).catch(() => undefined);
+      }
       router.push(callbackUrl);
     }
   }
@@ -61,15 +68,20 @@ function SignInForm() {
             Forgot password?
           </Link>
         </div>
-        <input
-          type="password"
+        <PasswordInput
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
+          onChange={setPassword}
           autoComplete="current-password"
-          className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/25 focus:bg-white/8 transition-colors"
-          placeholder="••••••••"
+          required
         />
+        <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", cursor: "pointer", marginTop: "8px" }}>
+          <input
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+          />
+          <span className="text-white/50 text-sm">Remember this device for 30 days</span>
+        </label>
       </div>
       <button
         type="submit"
