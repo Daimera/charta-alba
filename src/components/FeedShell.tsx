@@ -8,6 +8,7 @@ import {
   useCallback,
   Suspense,
 } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FeedCard } from "./FeedCard";
 import { ProgressDots } from "./ProgressDots";
@@ -25,7 +26,10 @@ interface FeedShellProps {
   initialLikedIds: string[];
   initialBookmarkedIds: string[];
   trendingTags: TrendingTag[];
+  loggedIn?: boolean;
 }
+
+const WALL_LIMIT = 2;
 
 type DrawerState =
   | { type: "comments"; cardId: string }
@@ -36,7 +40,7 @@ type DrawerState =
 const TOAST_TRIGGER = 5;
 const STORAGE_KEY = "ca_tag_filter";
 
-function FeedShellInner({ cards, initialLikedIds, initialBookmarkedIds, trendingTags }: FeedShellProps) {
+function FeedShellInner({ cards, initialLikedIds, initialBookmarkedIds, trendingTags, loggedIn = true }: FeedShellProps) {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("q") ?? "";
 
@@ -156,34 +160,68 @@ function FeedShellInner({ cards, initialLikedIds, initialBookmarkedIds, trending
             <p className="text-white/30 text-sm">No cards match your filter.</p>
           </div>
         ) : (
-          filteredCards.map((card, i) => (
-            <FeedCard
-              key={card.id}
-              card={card}
-              index={i}
-              initialLiked={initialLikedIds.includes(card.id)}
-              initialBookmarked={initialBookmarkedIds.includes(card.id)}
-              initialRating={null}
-              commentCount={0}
-              onLike={handleLike}
-              onTagClick={handleTagClick}
-              onOpenComments={() => setDrawer({ type: "comments", cardId: card.id })}
-              onOpenAskAI={() =>
-                setDrawer({ type: "ask-ai", cardId: card.id, headline: card.headline })
-              }
-              onOpenClaims={() =>
-                setDrawer({
-                  type: "claims",
-                  cardId: card.id,
-                  paperId: card.paperId,
-                  paperTitle: card.paperTitle ?? null,
-                })
-              }
-              onOpenCollections={() =>
-                setDrawer({ type: "collections", cardId: card.id })
-              }
-            />
-          ))
+          <>
+            {(loggedIn ? filteredCards : filteredCards.slice(0, WALL_LIMIT)).map((card, i) => (
+              <FeedCard
+                key={card.id}
+                card={card}
+                index={i}
+                initialLiked={initialLikedIds.includes(card.id)}
+                initialBookmarked={initialBookmarkedIds.includes(card.id)}
+                initialRating={null}
+                commentCount={0}
+                onLike={handleLike}
+                onTagClick={handleTagClick}
+                onOpenComments={() => setDrawer({ type: "comments", cardId: card.id })}
+                onOpenAskAI={() =>
+                  setDrawer({ type: "ask-ai", cardId: card.id, headline: card.headline })
+                }
+                onOpenClaims={() =>
+                  setDrawer({
+                    type: "claims",
+                    cardId: card.id,
+                    paperId: card.paperId,
+                    paperTitle: card.paperTitle ?? null,
+                  })
+                }
+                onOpenCollections={() =>
+                  setDrawer({ type: "collections", cardId: card.id })
+                }
+              />
+            ))}
+            {!loggedIn && (
+              <div className="h-dvh snap-start snap-always flex items-end justify-center relative bg-black">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/70 to-black pointer-events-none" />
+                <div className="relative z-10 flex flex-col items-center gap-4 px-6 pb-16 text-center w-full max-w-xs mx-auto">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/logo-blue.png"
+                    alt="Charta Alba"
+                    style={{ height: "52px", width: "auto", mixBlendMode: "screen" }}
+                  />
+                  <h2 className="text-xl font-bold text-white leading-snug">
+                    Don&apos;t miss what&apos;s happening
+                  </h2>
+                  <p className="text-white/55 text-sm">
+                    Join Charta Alba to follow AI research and stay ahead.
+                  </p>
+                  <Link
+                    href="/auth/register"
+                    className="w-full py-2.5 rounded-full text-sm font-semibold text-black transition-opacity hover:opacity-90"
+                    style={{ background: "#89CFF0" }}
+                  >
+                    Create account
+                  </Link>
+                  <Link
+                    href="/auth/signin"
+                    className="w-full py-2.5 rounded-full text-sm font-medium text-white border border-white/30 hover:border-white/50 transition-colors"
+                  >
+                    Sign in
+                  </Link>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 

@@ -54,7 +54,7 @@ function ResetForm() {
     setLoading(false);
 
     if (!res.ok) {
-      const data = await res.json() as { error?: string };
+      const data = await res.json() as { error?: string; expired?: boolean };
       setError(data.error ?? "Something went wrong.");
       return;
     }
@@ -80,8 +80,16 @@ function ResetForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-          {error}
+        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm space-y-2">
+          <p>{error}</p>
+          {error.toLowerCase().includes("expired") && (
+            <Link
+              href="/auth/forgot-password"
+              className="inline-block text-xs text-red-300 underline hover:text-red-200 transition-colors"
+            >
+              Request a new link →
+            </Link>
+          )}
         </div>
       )}
       <PasswordStrengthField

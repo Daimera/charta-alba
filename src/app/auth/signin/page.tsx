@@ -29,7 +29,7 @@ function SignInForm() {
     });
     setLoading(false);
     if (result?.error) {
-      setError("Invalid email or password.");
+      setError("Invalid credentials or account not found.");
     } else {
       if (rememberMe) {
         // Register device for 30-day trusted access
@@ -47,15 +47,15 @@ function SignInForm() {
         </div>
       )}
       <div>
-        <label className="block text-sm text-white/60 mb-1.5">Email</label>
+        <label className="block text-sm text-white/60 mb-1.5">Email, username, or phone number</label>
         <input
-          type="email"
+          type="text"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          autoComplete="email"
+          autoComplete="username"
           className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/25 focus:bg-white/8 transition-colors"
-          placeholder="you@example.com"
+          placeholder="Email, @username, or phone number"
         />
       </div>
       <div>

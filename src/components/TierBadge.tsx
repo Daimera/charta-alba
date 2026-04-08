@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useRef, useState } from "react";
 
 const BADGE_CONFIG: Record<string, { img: string; video: string; label: string } | null> = {
@@ -38,17 +37,14 @@ export function TierBadge({ tier }: TierBadgeProps) {
       onMouseLeave={handleMouseLeave}
       style={{ position: "relative", display: "inline-flex", alignItems: "center" }}
     >
-      {/* Static badge image */}
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={config.img}
         alt={config.label}
         title={config.label}
-        width={40}
-        height={20}
-        style={{ height: "20px", width: "auto", cursor: "default" }}
+        style={{ height: "18px", width: "auto", background: "transparent", display: "block" }}
       />
 
-      {/* Hover video tooltip */}
       {hovered && (
         <span
           style={{

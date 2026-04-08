@@ -1,9 +1,13 @@
 export const dynamic = "force-dynamic";
 
+import Link from "next/link";
+import { auth } from "@/lib/auth";
 import { loadTop } from "@/lib/queries";
 import { ReplicationBadge } from "@/components/ReplicationBadge";
 import DigestSubscribeForm from "./DigestSubscribeForm";
 import type { Metadata } from "next";
+
+const WALL_LIMIT = 2;
 
 export const metadata: Metadata = {
   title: "Weekly Digest — Charta Alba",
@@ -11,8 +15,10 @@ export const metadata: Metadata = {
 };
 
 export default async function DigestPage() {
-  const topCards = await loadTop("week");
+  const [session, topCards] = await Promise.all([auth(), loadTop("week")]);
+  const loggedIn = !!session?.user?.id;
   const top5 = topCards.slice(0, 5);
+  const displayCards = loggedIn ? top5 : top5.slice(0, WALL_LIMIT);
 
   const weekLabel = (() => {
     const now = new Date();
@@ -41,8 +47,9 @@ export default async function DigestPage() {
             No data yet for this week — check back soon.
           </p>
         ) : (
+          <>
           <ol className="space-y-6">
-            {top5.map((card, i) => (
+            {displayCards.map((card, i) => (
               <li key={card.id}>
                 <a
                   href={`/paper/${card.id}`}
@@ -102,6 +109,25 @@ export default async function DigestPage() {
               </li>
             ))}
           </ol>
+          {!loggedIn && top5.length > WALL_LIMIT && (
+            <div className="mt-8 flex flex-col items-center gap-4 py-10 px-6 text-center rounded-2xl bg-white/3 border border-white/8">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-blue.png" alt="Charta Alba" style={{ height: "44px", width: "auto", mixBlendMode: "screen" }} />
+              <h2 className="text-lg font-bold text-white">Read the full digest</h2>
+              <p className="text-white/50 text-sm">Join free to see all 5 papers in this week&apos;s digest.</p>
+              <Link
+                href="/auth/register"
+                className="w-full py-2.5 rounded-full text-sm font-semibold text-black transition-opacity hover:opacity-90"
+                style={{ background: "#89CFF0" }}
+              >
+                Create account
+              </Link>
+              <Link href="/auth/signin" className="text-white/50 text-sm hover:text-white transition-colors">
+                Sign in
+              </Link>
+            </div>
+          )}
+          </>
         )}
 
         {/* Subscribe section */}

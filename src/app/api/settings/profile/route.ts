@@ -15,6 +15,7 @@ export async function PATCH(req: Request) {
   const body = await req.json() as {
     name?: string;
     username?: string;
+    phone?: string;
     bio?: string;
     avatarUrl?: string;
     isPublic?: boolean;
@@ -57,6 +58,13 @@ export async function PATCH(req: Request) {
     }
   }
 
+  if (body.phone !== undefined) {
+    const phone = body.phone.trim() || null;
+    if (phone && !/^\+?[\d\s\-().]{7,20}$/.test(phone)) {
+      return Response.json({ error: "Invalid phone number format" }, { status: 400 });
+    }
+    profileUpdates.phone = phone;
+  }
   if (body.bio !== undefined) profileUpdates.bio = body.bio.trim() || null;
   if (body.avatarUrl !== undefined) {
     const url = body.avatarUrl.trim();

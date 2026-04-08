@@ -52,6 +52,7 @@ export default async function FeedPage() {
           initialLikedIds={likedIds}
           initialBookmarkedIds={bookmarkedIds}
           trendingTags={trendingTags}
+          loggedIn={!!session?.user?.id}
         />
       </Suspense>
     );

@@ -23,7 +23,8 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: https:",
+      "img-src 'self' data: https: blob:",
+      "media-src 'self'",
       "frame-src https://www.youtube.com https://player.vimeo.com",
       "connect-src 'self' https://api.anthropic.com",
     ].join("; "),
@@ -33,6 +34,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   serverExternalPackages: ["geoip-lite"],
   reactStrictMode: true,
+  images: { unoptimized: true },
   async headers() {
     return [
       {

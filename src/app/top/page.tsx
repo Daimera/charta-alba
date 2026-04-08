@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import type { FeedCardData } from "@/types";
+
+const WALL_LIMIT = 5;
 
 const WINDOWS = [
   { key: "today", label: "Today" },
@@ -68,6 +71,8 @@ function RankRow({ card, rank }: { card: FeedCardData; rank: number }) {
 }
 
 export default function TopPage() {
+  const { data: session } = useSession();
+  const loggedIn = !!session?.user;
   const [window, setWindow] = useState<Window>("today");
   const [cards, setCards] = useState<FeedCardData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -117,11 +122,31 @@ export default function TopPage() {
             <p className="text-white/30 text-sm">No cards yet for this period.</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {cards.map((card, i) => (
-              <RankRow key={card.id} card={card} rank={i + 1} />
-            ))}
-          </div>
+          <>
+            <div className="space-y-3">
+              {(loggedIn ? cards : cards.slice(0, WALL_LIMIT)).map((card, i) => (
+                <RankRow key={card.id} card={card} rank={i + 1} />
+              ))}
+            </div>
+            {!loggedIn && cards.length > WALL_LIMIT && (
+              <div className="mt-8 flex flex-col items-center gap-4 py-10 px-6 text-center rounded-2xl bg-white/3 border border-white/8">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo-blue.png" alt="Charta Alba" style={{ height: "44px", width: "auto", mixBlendMode: "screen" }} />
+                <h2 className="text-lg font-bold text-white">See the full rankings</h2>
+                <p className="text-white/50 text-sm">Create a free account to see all trending papers.</p>
+                <Link
+                  href="/auth/register"
+                  className="w-full py-2.5 rounded-full text-sm font-semibold text-black transition-opacity hover:opacity-90"
+                  style={{ background: "#89CFF0" }}
+                >
+                  Create account
+                </Link>
+                <Link href="/auth/signin" className="text-white/50 text-sm hover:text-white transition-colors">
+                  Sign in
+                </Link>
+              </div>
+            )}
+          </>
         )}
       </div>
     </main>

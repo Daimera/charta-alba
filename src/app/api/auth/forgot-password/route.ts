@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { users, passwordResetTokens } from "@/lib/db/schema";
+import { users, profiles, passwordResetTokens } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { sendEmail } from "@/lib/email";
 import { randomBytes } from "crypto";
@@ -18,13 +18,46 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json() as { email?: string };
-    const email = body.email?.trim().toLowerCase();
+    const identifier = body.email?.trim();
 
-    if (!email) {
-      return Response.json({ error: "Email is required" }, { status: 400 });
+    if (!identifier) {
+      return Response.json({ error: "Please enter your email, username, or phone number" }, { status: 400 });
+    }
+
+    // Resolve identifier → email
+    let resolvedEmail: string | undefined;
+
+    if (identifier.includes("@") && identifier.includes(".")) {
+      // Looks like an email
+      resolvedEmail = identifier.toLowerCase();
+    } else if (identifier.startsWith("+") || /^\d+$/.test(identifier)) {
+      // Phone number
+      const [row] = await db
+        .select({ email: users.email })
+        .from(users)
+        .innerJoin(profiles, eq(users.id, profiles.id))
+        .where(eq(profiles.phone, identifier))
+        .limit(1);
+      resolvedEmail = row?.email;
+    } else {
+      // Username (strip @ if present)
+      const username = identifier.replace(/^@/, "").toLowerCase();
+      const [row] = await db
+        .select({ email: users.email })
+        .from(users)
+        .innerJoin(profiles, eq(users.id, profiles.id))
+        .where(eq(profiles.username, username))
+        .limit(1);
+      resolvedEmail = row?.email;
     }
 
     // Always return success to avoid user enumeration
+    if (!resolvedEmail) {
+      return Response.json({ ok: true });
+    }
+
+    const email = resolvedEmail;
+
     const [user] = await db
       .select({ id: users.id, email: users.email })
       .from(users)
@@ -36,7 +69,7 @@ export async function POST(req: Request) {
 
     if (user) {
       const token = randomBytes(32).toString("hex");
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
 
       await db.insert(passwordResetTokens).values({ token, email, expiresAt });
 
@@ -51,7 +84,7 @@ export async function POST(req: Request) {
           subject: "Reset your Charta Alba password",
           html: `
             <p>Hi,</p>
-            <p>Click the link below to reset your password. This link expires in 1 hour.</p>
+            <p>Click the link below to reset your password. This link expires in 24 hours.</p>
             <p><a href="${resetUrl}">${resetUrl}</a></p>
             <p>If you didn't request this, you can safely ignore this email.</p>
           `,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export interface PasswordCriteria {
   minLength: boolean;
@@ -33,6 +33,20 @@ const CRITERIA_LABELS: { key: keyof PasswordCriteria; label: string }[] = [
   { key: "hasSpecial", label: "One special character (!@#$%^&*…)" },
 ];
 
+const EyeIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const EyeOffIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+    <line x1="1" y1="1" x2="23" y2="23" />
+  </svg>
+);
+
 interface Props {
   label: string;
   value: string;
@@ -42,6 +56,7 @@ interface Props {
 }
 
 export function PasswordStrengthField({ label, value, onChange, autoComplete, placeholder }: Props) {
+  const [show, setShow] = useState(false);
   const criteria = useMemo(() => checkPassword(value), [value]);
   const metCount = Object.values(criteria).filter(Boolean).length;
   const strength = !value ? null : metCount <= 2 ? "weak" : metCount <= 4 ? "medium" : "strong";
@@ -49,14 +64,37 @@ export function PasswordStrengthField({ label, value, onChange, autoComplete, pl
   return (
     <div>
       <label className="block text-sm text-white/60 mb-1.5">{label}</label>
-      <input
-        type="password"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder ?? "••••••••"}
-        autoComplete={autoComplete}
-        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/25 focus:bg-white/8 transition-colors"
-      />
+      <div style={{ position: "relative" }}>
+        <input
+          type={show ? "text" : "password"}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder ?? "••••••••"}
+          autoComplete={autoComplete}
+          className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 pr-10 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/25 focus:bg-white/8 transition-colors"
+        />
+        <button
+          type="button"
+          onClick={() => setShow((s) => !s)}
+          tabIndex={-1}
+          aria-label={show ? "Hide password" : "Show password"}
+          style={{
+            position: "absolute",
+            right: "12px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            background: "none",
+            border: "none",
+            padding: 0,
+            cursor: "pointer",
+            color: "#888",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          {show ? <EyeOffIcon /> : <EyeIcon />}
+        </button>
+      </div>
       {value.length > 0 && (
         <div className="mt-2 space-y-2">
           <div className="flex items-center gap-2">

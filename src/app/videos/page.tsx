@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
 import { VideoCard } from "@/components/VideoCard";
 import { PostVideoModal } from "@/components/PostVideoModal";
+
+const WALL_LIMIT = 3;
 
 interface VideoData {
   id: string;
@@ -21,6 +24,7 @@ interface VideoData {
 
 export default function VideosPage() {
   const { data: session } = useSession();
+  const loggedIn = !!session?.user;
   const [videos, setVideos] = useState<VideoData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -91,11 +95,31 @@ export default function VideosPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {videos.map((v) => (
-              <VideoCard key={v.id} video={v} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {(loggedIn ? videos : videos.slice(0, WALL_LIMIT)).map((v) => (
+                <VideoCard key={v.id} video={v} />
+              ))}
+            </div>
+            {!loggedIn && videos.length > WALL_LIMIT && (
+              <div className="mt-8 flex flex-col items-center gap-4 py-10 px-6 text-center rounded-2xl bg-white/3 border border-white/8">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo-blue.png" alt="Charta Alba" style={{ height: "44px", width: "auto", mixBlendMode: "screen" }} />
+                <h2 className="text-lg font-bold text-white">See all community videos</h2>
+                <p className="text-white/50 text-sm">Create a free account to watch, like, and post videos.</p>
+                <Link
+                  href="/auth/register"
+                  className="w-full py-2.5 rounded-full text-sm font-semibold text-black transition-opacity hover:opacity-90"
+                  style={{ background: "#89CFF0" }}
+                >
+                  Create account
+                </Link>
+                <Link href="/auth/signin" className="text-white/50 text-sm hover:text-white transition-colors">
+                  Sign in
+                </Link>
+              </div>
+            )}
+          </>
         )}
       </div>
 

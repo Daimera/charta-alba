@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useCallback, useTransition, useEffect, useRef, useState } from "react";
+import { useCallback, useTransition, useEffect, useState } from "react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { TierBadge } from "@/components/TierBadge";
+import { LogoMark } from "@/components/LogoMark";
 
 export function TopNav() {
   const pathname = usePathname();
@@ -16,8 +16,6 @@ export function TopNav() {
   const [, startTransition] = useTransition();
   const [pointsBalance, setPointsBalance] = useState<number | null>(null);
   const [userTier, setUserTier] = useState<string>("free");
-  const [logoHovered, setLogoHovered] = useState(false);
-  const logoVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     if (!session?.user) { setPointsBalance(null); setUserTier("free"); return; }
@@ -53,47 +51,15 @@ export function TopNav() {
     [pathname, router, searchParams]
   );
 
-  function handleLogoMouseEnter() {
-    setLogoHovered(true);
-    logoVideoRef.current?.play().catch(() => undefined);
-  }
-
-  function handleLogoMouseLeave() {
-    setLogoHovered(false);
-    const v = logoVideoRef.current;
-    if (v) { v.pause(); v.currentTime = 0; }
-  }
-
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-4 bg-black/85 backdrop-blur-md border-b border-white/8">
       {/* Logo */}
-      <Link
-        href="/"
-        className="shrink-0"
-        onMouseEnter={handleLogoMouseEnter}
-        onMouseLeave={handleLogoMouseLeave}
-      >
-        <Image
-          src="/logo-diamond.png"
-          alt="Charta Alba"
-          width={120}
-          height={36}
-          style={{ height: "36px", width: "auto", display: logoHovered ? "none" : "block" }}
-          priority
-        />
-        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-        <video
-          ref={logoVideoRef}
-          src="/logo-animation-diamond.mp4"
-          muted
-          playsInline
-          style={{
-            height: "36px",
-            width: "auto",
-            display: logoHovered ? "block" : "none",
-            mixBlendMode: "screen",
-          }}
-        />
+      <Link href="/" style={{
+        display: "flex", alignItems: "center",
+        background: "transparent", backgroundColor: "transparent",
+        border: "none", padding: 0,
+      }}>
+        <LogoMark size={36} color="#89CFF0" showGlow={true} />
       </Link>
 
       {/* Nav links */}
@@ -201,12 +167,21 @@ export function TopNav() {
           </div>
         </div>
       ) : (
-        <Link
-          href="/auth/signin"
-          className="shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium bg-white text-black hover:bg-white/90 transition-colors"
-        >
-          Sign in
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          <Link
+            href="/auth/register"
+            className="shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+            style={{ background: "#89CFF0", color: "#000" }}
+          >
+            Create account
+          </Link>
+          <Link
+            href="/auth/signin"
+            className="shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium text-white/80 hover:text-white transition-colors border border-white/25 hover:border-white/40"
+          >
+            Sign in
+          </Link>
+        </div>
       )}
     </nav>
   );

@@ -10,6 +10,7 @@ interface ProfileData {
   bio: string | null;
   avatarUrl: string | null;
   username: string | null;
+  phone: string | null;
   isPublic: boolean;
   isActive: boolean;
 }
@@ -92,6 +93,7 @@ export default function AccountPage() {
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [phone, setPhone] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [profileMsg, setProfileMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
@@ -126,6 +128,7 @@ export default function AccountPage() {
         setUsername(d.profile?.username ?? "");
         setBio(d.profile?.bio ?? "");
         setAvatarUrl(d.profile?.avatarUrl ?? "");
+        setPhone(d.profile?.phone ?? "");
         setIsPublic(d.profile?.isPublic ?? true);
       })
       .catch(() => undefined);
@@ -138,7 +141,7 @@ export default function AccountPage() {
     const res = await fetch("/api/settings/profile", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, bio, avatarUrl, username, isPublic }),
+      body: JSON.stringify({ name, bio, avatarUrl, username, phone, isPublic }),
     });
     setProfileLoading(false);
     if (res.ok) {
@@ -244,6 +247,17 @@ export default function AccountPage() {
               />
             </div>
             <p className="text-white/30 text-xs mt-1">3–20 characters, letters, numbers, underscores.</p>
+          </Field>
+          <Field label="Phone number">
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+1 (312) 555-0000"
+              autoComplete="tel"
+              className={inputCls}
+            />
+            <p className="text-white/30 text-xs mt-1">Used for sign in. Include country code.</p>
           </Field>
           <Field label="Bio">
             <textarea

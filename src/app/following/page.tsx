@@ -2,19 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { FeedCardData } from "@/types";
 import { FeedShell } from "@/components/FeedShell";
 
 export default function FollowingFeedPage() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [cards, setCards] = useState<FeedCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [empty, setEmpty] = useState<"not_following" | "no_activity" | null>(null);
 
   useEffect(() => {
     if (status === "loading") return;
-    if (!session?.user) { setLoading(false); return; }
+    if (!session?.user) {
+      router.replace("/auth/signin?callbackUrl=/following");
+      return;
+    }
 
     fetch("/api/feed/following")
       .then(r => r.ok ? r.json() : null)
@@ -37,18 +42,7 @@ export default function FollowingFeedPage() {
     );
   }
 
-  if (!session?.user) {
-    return (
-      <main className="min-h-dvh bg-[#0a0a0a] pt-14 flex items-center justify-center" id="main-content">
-        <div className="text-center max-w-xs">
-          <p className="text-white/60 mb-4">Sign in to see papers from people you follow.</p>
-          <Link href="/auth/signin" className="px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-white/90 transition-colors">
-            Sign in
-          </Link>
-        </div>
-      </main>
-    );
-  }
+  if (!session?.user) return null;
 
   if (empty === "not_following") {
     return (

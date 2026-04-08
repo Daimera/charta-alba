@@ -10,6 +10,7 @@ import {
   accounts,
   sessions,
   verificationTokens,
+  profiles,
 } from "@/lib/db/schema";
 import { logAuditFireAndForget } from "@/lib/audit";
 
@@ -77,11 +78,43 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const [user] = await db
-          .select()
-          .from(users)
-          .where(eq(users.email, (credentials.email as string).toLowerCase()))
-          .limit(1);
+        const identifier = (credentials.email as string).trim();
+        const userCols = {
+          id: users.id,
+          email: users.email,
+          name: users.name,
+          image: users.image,
+          passwordHash: users.passwordHash,
+          role: users.role,
+          failedLoginCount: users.failedLoginCount,
+          lockedUntil: users.lockedUntil,
+        };
+
+        type UserRow = {
+          id: string; email: string; name: string | null; image: string | null;
+          passwordHash: string | null; role: string; failedLoginCount: number; lockedUntil: string | null;
+        };
+        let user: UserRow | undefined;
+
+        if (identifier.includes("@") && identifier.includes(".")) {
+          // Email
+          [user] = await db.select(userCols).from(users)
+            .where(eq(users.email, identifier.toLowerCase()))
+            .limit(1);
+        } else if (identifier.startsWith("+") || /^\d+$/.test(identifier)) {
+          // Phone number
+          [user] = await db.select(userCols).from(users)
+            .innerJoin(profiles, eq(users.id, profiles.id))
+            .where(eq(profiles.phone, identifier))
+            .limit(1);
+        } else {
+          // Username (strip leading @ if present)
+          const username = identifier.replace(/^@/, "").toLowerCase();
+          [user] = await db.select(userCols).from(users)
+            .innerJoin(profiles, eq(users.id, profiles.id))
+            .where(eq(profiles.username, username))
+            .limit(1);
+        }
 
         if (!user?.passwordHash) return null;
 
@@ -94,6 +127,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           credentials.password as string,
           user.passwordHash
         );
+        console.log("[auth] bcrypt compare result:", valid, "for:", credentials.email);
 
         if (!valid) {
           // Increment failed attempts; lock if threshold reached

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { AuthLogo } from "@/components/AuthLogo";
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [devResetUrl, setDevResetUrl] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
     const res = await fetch("/api/auth/forgot-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email: identifier }),
     });
 
     setLoading(false);
@@ -56,14 +56,28 @@ export default function ForgotPasswordPage() {
               </div>
               <p className="text-white text-sm font-medium">Check your inbox</p>
               <p className="text-white/40 text-sm">
-                If an account exists for <span className="text-white/60">{email}</span>, you&apos;ll receive a reset link shortly.
+                If an account exists for <span className="text-white/60">{identifier}</span>, you&apos;ll receive a reset link shortly.
               </p>
               {devResetUrl && (
-                <div style={{ marginTop: "12px", padding: "10px 12px", background: "rgba(234,179,8,0.08)", border: "1px solid rgba(234,179,8,0.25)", borderRadius: "8px", textAlign: "left" }}>
-                  <p style={{ color: "#ca8a04", fontSize: "12px", marginBottom: "6px" }}>
-                    🔧 Dev mode — Resend not configured.
+                <div style={{ marginTop: "12px", padding: "12px", background: "rgba(234,179,8,0.08)", border: "1px solid rgba(234,179,8,0.25)", borderRadius: "8px", textAlign: "left" }}>
+                  <p style={{ color: "#ca8a04", fontSize: "12px", marginBottom: "8px", fontWeight: 600 }}>
+                    🔧 Dev mode — Resend not configured. Your reset link (valid 24 hours):
                   </p>
-                  <a href={devResetUrl} style={{ color: "#eab308", fontSize: "12px", wordBreak: "break-all" }}>
+                  <a
+                    href={devResetUrl}
+                    style={{
+                      display: "block",
+                      padding: "8px 12px",
+                      background: "rgba(234,179,8,0.12)",
+                      border: "1px solid rgba(234,179,8,0.3)",
+                      borderRadius: "6px",
+                      color: "#fbbf24",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      wordBreak: "break-all",
+                      textDecoration: "none",
+                    }}
+                  >
                     Click here to reset password →
                   </a>
                 </div>
@@ -77,15 +91,15 @@ export default function ForgotPasswordPage() {
                 </div>
               )}
               <div>
-                <label className="block text-sm text-white/60 mb-1.5">Email</label>
+                <label className="block text-sm text-white/60 mb-1.5">Email, username, or phone number</label>
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="text"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   required
-                  autoComplete="email"
+                  autoComplete="username"
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-white/25 focus:bg-white/8 transition-colors"
-                  placeholder="you@example.com"
+                  placeholder="Email, @username, or phone number"
                 />
               </div>
               <button

@@ -148,6 +148,8 @@ export const profiles = pgTable("profiles", {
   emailNewFollower: boolean("email_new_follower").notNull().default(false),
   emailReply: boolean("email_reply").notNull().default(false),
   emailBreakthrough: boolean("email_breakthrough").notNull().default(false),
+  // Sign-in identifier
+  phone: text("phone").unique(),
   // Subscription tier
   subscriptionTier: text("subscription_tier").notNull().default("free"),
   // Billing
