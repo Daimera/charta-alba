@@ -31,6 +31,7 @@ export default function PersonalizationPage() {
   );
   const [langLoading, setLangLoading] = useState(false);
   const [langMsg, setLangMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [langSaved, setLangSaved] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") { router.push("/auth/signin"); return; }
@@ -73,9 +74,9 @@ export default function PersonalizationPage() {
     });
     setLangLoading(false);
     if (res.ok) {
-      // Update module store so translation logic picks it up immediately
       setPreferredLanguage(language);
-      setLangMsg({ ok: true, text: "Language saved." });
+      setLangSaved(true);
+      setLangMsg(null);
     } else {
       const d = await res.json() as { error?: string };
       setLangMsg({ ok: false, text: d.error ?? "Failed." });
@@ -144,12 +145,26 @@ export default function PersonalizationPage() {
               </option>
             ))}
           </select>
-          <div className="flex items-center gap-4">
-            <button type="submit" disabled={langLoading} className="px-4 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:bg-white/90 disabled:opacity-50 transition-colors">
-              {langLoading ? "Saving…" : "Save language"}
-            </button>
-            {langMsg && <Msg ok={langMsg.ok} text={langMsg.text} />}
-          </div>
+          {langSaved ? (
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-400 shrink-0"><polyline points="20 6 9 17 4 12" /></svg>
+              <p className="text-white/70 text-sm flex-1">Language saved. Reload to apply changes.</p>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="px-3 py-1.5 rounded-lg bg-white text-black text-xs font-semibold hover:bg-white/90 transition-colors shrink-0"
+              >
+                Reload now
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <button type="submit" disabled={langLoading} className="px-4 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:bg-white/90 disabled:opacity-50 transition-colors">
+                {langLoading ? "Saving…" : "Save language"}
+              </button>
+              {langMsg && <Msg ok={langMsg.ok} text={langMsg.text} />}
+            </div>
+          )}
         </form>
       </div>
 
