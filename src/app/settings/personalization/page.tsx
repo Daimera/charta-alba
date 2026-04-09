@@ -40,9 +40,8 @@ export default function PersonalizationPage() {
       .then((r) => r.ok ? r.json() : null)
       .then((d: { profile?: { feedAlgorithm?: string; preferredLanguage?: string } | null } | null) => {
         if (d?.profile?.feedAlgorithm) setFeedAlgorithm(d.profile.feedAlgorithm);
-        // Only override localStorage value if DB has a non-default language saved,
-        // preventing the DB column default "en" from wiping the user's stored choice.
-        if (d?.profile?.preferredLanguage && d.profile.preferredLanguage !== "en") {
+        // DB is source of truth — always set dropdown from DB value when available
+        if (d?.profile?.preferredLanguage) {
           setLanguage(d.profile.preferredLanguage as LanguageCode);
         }
       })

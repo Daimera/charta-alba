@@ -19,7 +19,6 @@ export function TopNav() {
   const [userTier, setUserTier] = useState<string>("free");
   const [username, setUsername] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [logoHovered, setLogoHovered] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Fetch points balance + tier
@@ -46,14 +45,12 @@ export function TopNav() {
         // Hydrate language from DB — but only when DB has a non-default value.
         // If DB returns "en" (the column default), trust localStorage instead so
         // we don't overwrite a language the user saved before migrations were applied.
+        // DB is always the source of truth — always sync to module store + localStorage
+        // so the user's saved language follows them across devices and page loads.
         const dbLang = d?.profile?.preferredLanguage;
-        if (dbLang && dbLang !== "en") {
+        if (dbLang) {
           setPreferredLanguage(dbLang as LanguageCode);
-        } else if (!dbLang) {
-          // Profile missing entirely — read localStorage (already the default)
         }
-        // If dbLang === "en" we leave localStorage untouched; the hook already
-        // initialized from it and may have a non-English value stored there.
       })
       .catch(() => undefined);
   }, [session?.user]);
@@ -95,25 +92,18 @@ export function TopNav() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-4 bg-black/85 backdrop-blur-md border-b border-white/8">
-      {/* Logo — with hover glow intensification */}
+      {/* Logo — animation handled by LogoMark's inline CSS (.lm-hover:hover) */}
       <Link
         href="/"
-        onMouseEnter={() => setLogoHovered(true)}
-        onMouseLeave={() => setLogoHovered(false)}
         style={{
           display: "flex",
           alignItems: "center",
           background: "transparent",
           border: "none",
           padding: 0,
-          filter: logoHovered
-            ? "drop-shadow(0 0 12px rgba(137,207,240,0.8))"
-            : "drop-shadow(0 0 4px rgba(137,207,240,0.4))",
-          transform: logoHovered ? "scale(1.1)" : "scale(1)",
-          transition: "filter 0.2s ease, transform 0.2s ease",
         }}
       >
-        <LogoMark size={36} color="#89CFF0" showGlow={false} />
+        <LogoMark size={40} showGlow={true} />
       </Link>
 
       {/* Nav links */}
