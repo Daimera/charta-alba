@@ -72,8 +72,13 @@ export function LanguageSwitcher() {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = usePreferredLanguage();
   const menuRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
-  const currentLang = SUPPORTED_LANGUAGES.find(l => l.code === current) ?? SUPPORTED_LANGUAGES[0];
+  // Server renders "EN" placeholder; client re-renders with actual stored language
+  const currentLang = mounted
+    ? (SUPPORTED_LANGUAGES.find(l => l.code === current) ?? SUPPORTED_LANGUAGES[0])
+    : SUPPORTED_LANGUAGES[0];
 
   // Close on outside click
   useEffect(() => {

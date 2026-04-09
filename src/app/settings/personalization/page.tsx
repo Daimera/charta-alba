@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { SUPPORTED_LANGUAGES, setPreferredLanguage, type LanguageCode } from "@/components/LanguageSwitcher";
 
 function Msg({ ok, text }: { ok: boolean; text: string }) {
   return <span className={`text-xs ${ok ? "text-green-400" : "text-red-400"}`}>{text}</span>;
@@ -23,14 +24,19 @@ export default function PersonalizationPage() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
+  const [language, setLanguage] = useState<LanguageCode>("en");
+  const [langLoading, setLangLoading] = useState(false);
+  const [langMsg, setLangMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
   useEffect(() => {
     if (status === "unauthenticated") { router.push("/auth/signin"); return; }
     if (status !== "authenticated") return;
 
     fetch("/api/settings")
       .then((r) => r.ok ? r.json() : null)
-      .then((d: { profile?: { feedAlgorithm?: string } | null } | null) => {
+      .then((d: { profile?: { feedAlgorithm?: string; preferredLanguage?: string } | null } | null) => {
         if (d?.profile?.feedAlgorithm) setFeedAlgorithm(d.profile.feedAlgorithm);
+        if (d?.profile?.preferredLanguage) setLanguage(d.profile.preferredLanguage as LanguageCode);
       })
       .catch(() => undefined);
   }, [status, router]);
@@ -47,6 +53,26 @@ export default function PersonalizationPage() {
     setLoading(false);
     if (res.ok) setMsg({ ok: true, text: "Preferences saved." });
     else { const d = await res.json() as { error?: string }; setMsg({ ok: false, text: d.error ?? "Failed." }); }
+  }
+
+  async function handleLanguageSave(e: React.FormEvent) {
+    e.preventDefault();
+    setLangMsg(null);
+    setLangLoading(true);
+    const res = await fetch("/api/settings/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ preferredLanguage: language }),
+    });
+    setLangLoading(false);
+    if (res.ok) {
+      // Update module store so translation logic picks it up immediately
+      setPreferredLanguage(language);
+      setLangMsg({ ok: true, text: "Language saved." });
+    } else {
+      const d = await res.json() as { error?: string };
+      setLangMsg({ ok: false, text: d.error ?? "Failed." });
+    }
   }
 
   if (status === "loading") {
@@ -91,6 +117,31 @@ export default function PersonalizationPage() {
               {loading ? "Saving…" : "Save"}
             </button>
             {msg && <Msg ok={msg.ok} text={msg.text} />}
+          </div>
+        </form>
+      </div>
+
+      {/* Preferred language */}
+      <div className="border-b border-white/8 pb-6 mb-6">
+        <h2 className="text-white font-semibold text-sm mb-1">Preferred language</h2>
+        <p className="text-white/40 text-xs mb-4">Paper cards will be translated into your chosen language. Saved to your profile so it follows you across devices.</p>
+        <form onSubmit={handleLanguageSave} className="space-y-4">
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as LanguageCode)}
+            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/25 transition-colors appearance-none cursor-pointer"
+          >
+            {SUPPORTED_LANGUAGES.map((l) => (
+              <option key={l.code} value={l.code} style={{ background: "#111" }}>
+                {l.flag} {l.name}
+              </option>
+            ))}
+          </select>
+          <div className="flex items-center gap-4">
+            <button type="submit" disabled={langLoading} className="px-4 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:bg-white/90 disabled:opacity-50 transition-colors">
+              {langLoading ? "Saving…" : "Save language"}
+            </button>
+            {langMsg && <Msg ok={langMsg.ok} text={langMsg.text} />}
           </div>
         </form>
       </div>

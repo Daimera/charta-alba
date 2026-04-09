@@ -121,6 +121,8 @@ export interface FeedCardData {
   paperTitle: string | null;
   abstract: string | null;
   citations?: CitationLink[];
+  /** ISO 639 language code of the original card content. Defaults to "en". */
+  sourceLanguage?: string | null;
 }
 
 export interface Collection {

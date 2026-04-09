@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useCallback, useTransition, useEffect, useRef, useState } from "react";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { setPreferredLanguage, type LanguageCode } from "@/components/LanguageSwitcher";
 import { TierBadge } from "@/components/TierBadge";
 import { LogoMark } from "@/components/LogoMark";
 
@@ -38,11 +38,15 @@ export function TopNav() {
       })
       .catch(() => undefined);
 
-    // Fetch username for profile link
+    // Fetch username + preferred language from profile
     fetch("/api/settings")
       .then((r) => r.ok ? r.json() : null)
-      .then((d: { profile?: { username?: string | null } } | null) => {
+      .then((d: { profile?: { username?: string | null; preferredLanguage?: string | null } } | null) => {
         if (d?.profile?.username) setUsername(d.profile.username);
+        // Hydrate language module store from DB so it persists across devices
+        if (d?.profile?.preferredLanguage) {
+          setPreferredLanguage(d.profile.preferredLanguage as LanguageCode);
+        }
       })
       .catch(() => undefined);
   }, [session?.user]);
@@ -169,9 +173,6 @@ export function TopNav() {
           />
         </div>
       )}
-
-      {/* Language switcher */}
-      <LanguageSwitcher />
 
       {/* Auth */}
       {session?.user ? (

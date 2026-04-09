@@ -48,7 +48,9 @@ export function FeedCard({
   const [translating, setTranslating] = useState(false);
 
   useEffect(() => {
-    if (lang === "en") { setTranslatedContent(null); return; }
+    // Only translate if user's language differs from the card's source language
+    const cardLang = card.sourceLanguage ?? "en";
+    if (lang === cardLang) { setTranslatedContent(null); return; }
     if (!session?.user) { setTranslatedContent(null); return; }
 
     let cancelled = false;
