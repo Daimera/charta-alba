@@ -18,6 +18,7 @@ import { AskAiDrawer } from "./AskAiDrawer";
 import { ClaimsModal } from "./ClaimsModal";
 import { CollectionsModal } from "./CollectionsModal";
 import { TrendingTopics } from "./TrendingTopics";
+import { LogoMark } from "./LogoMark";
 import { PersonalizationToast } from "./PersonalizationToast";
 import type { FeedCardData, TrendingTag } from "@/types";
 
@@ -193,12 +194,7 @@ function FeedShellInner({ cards, initialLikedIds, initialBookmarkedIds, trending
               <div className="h-dvh snap-start snap-always flex items-end justify-center relative bg-black">
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/70 to-black pointer-events-none" />
                 <div className="relative z-10 flex flex-col items-center gap-4 px-6 pb-16 text-center w-full max-w-xs mx-auto">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/logo-blue.png"
-                    alt="Charta Alba"
-                    style={{ height: "52px", width: "auto", mixBlendMode: "screen" }}
-                  />
+                  <LogoMark size={52} color="#89CFF0" showGlow={true} />
                   <h2 className="text-xl font-bold text-white leading-snug">
                     Don&apos;t miss what&apos;s happening
                   </h2>

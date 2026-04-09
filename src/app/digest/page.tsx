@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { loadTop } from "@/lib/queries";
 import { ReplicationBadge } from "@/components/ReplicationBadge";
 import DigestSubscribeForm from "./DigestSubscribeForm";
+import { LogoMark } from "@/components/LogoMark";
 import type { Metadata } from "next";
 
 const WALL_LIMIT = 2;
@@ -111,8 +112,7 @@ export default async function DigestPage() {
           </ol>
           {!loggedIn && top5.length > WALL_LIMIT && (
             <div className="mt-8 flex flex-col items-center gap-4 py-10 px-6 text-center rounded-2xl bg-white/3 border border-white/8">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo-blue.png" alt="Charta Alba" style={{ height: "44px", width: "auto", mixBlendMode: "screen" }} />
+              <LogoMark size={44} color="#89CFF0" showGlow={true} />
               <h2 className="text-lg font-bold text-white">Read the full digest</h2>
               <p className="text-white/50 text-sm">Join free to see all 5 papers in this week&apos;s digest.</p>
               <Link

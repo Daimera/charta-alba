@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
 import { VideoCard } from "@/components/VideoCard";
 import { PostVideoModal } from "@/components/PostVideoModal";
+import { LogoMark } from "@/components/LogoMark";
 
 const WALL_LIMIT = 3;
 
@@ -103,8 +104,7 @@ export default function VideosPage() {
             </div>
             {!loggedIn && videos.length > WALL_LIMIT && (
               <div className="mt-8 flex flex-col items-center gap-4 py-10 px-6 text-center rounded-2xl bg-white/3 border border-white/8">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo-blue.png" alt="Charta Alba" style={{ height: "44px", width: "auto", mixBlendMode: "screen" }} />
+                <LogoMark size={44} color="#89CFF0" showGlow={true} />
                 <h2 className="text-lg font-bold text-white">See all community videos</h2>
                 <p className="text-white/50 text-sm">Create a free account to watch, like, and post videos.</p>
                 <Link

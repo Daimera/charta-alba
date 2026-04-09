@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { LogoMark } from "@/components/LogoMark";
 import type { FeedCardData } from "@/types";
 
 const WALL_LIMIT = 5;
@@ -130,8 +131,7 @@ export default function TopPage() {
             </div>
             {!loggedIn && cards.length > WALL_LIMIT && (
               <div className="mt-8 flex flex-col items-center gap-4 py-10 px-6 text-center rounded-2xl bg-white/3 border border-white/8">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo-blue.png" alt="Charta Alba" style={{ height: "44px", width: "auto", mixBlendMode: "screen" }} />
+                <LogoMark size={44} color="#89CFF0" showGlow={true} />
                 <h2 className="text-lg font-bold text-white">See the full rankings</h2>
                 <p className="text-white/50 text-sm">Create a free account to see all trending papers.</p>
                 <Link

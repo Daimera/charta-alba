@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { LogoMark } from "./LogoMark";
 
-const BADGE_CONFIG: Record<string, { img: string; video: string; label: string } | null> = {
+const BADGE_CONFIG: Record<string, { color: string; video: string; label: string } | null> = {
   free:    null,
-  basic:   { img: "/logo-blue.png",    video: "/logo-animation-blue.mp4",    label: "Standard Member" },
-  pro:     { img: "/logo-gold.png",    video: "/logo-animation-gold.mp4",    label: "Pro Member" },
-  diamond: { img: "/logo-diamond.png", video: "/logo-animation-diamond.mp4", label: "Diamond Member" },
+  basic:   { color: "#89CFF0", video: "/logo-animation-blue.mp4",    label: "Standard Member" },
+  pro:     { color: "#FFD700", video: "/logo-animation-gold.mp4",    label: "Pro Member" },
+  diamond: { color: "#B9F2FF", video: "/logo-animation-diamond.mp4", label: "Diamond Member" },
 };
 
 interface TierBadgeProps {
@@ -36,14 +37,9 @@ export function TierBadge({ tier }: TierBadgeProps) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{ position: "relative", display: "inline-flex", alignItems: "center" }}
+      title={config.label}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={config.img}
-        alt={config.label}
-        title={config.label}
-        style={{ height: "18px", width: "auto", background: "transparent", display: "block" }}
-      />
+      <LogoMark size={18} color={config.color} showGlow={false} />
 
       {hovered && (
         <span
