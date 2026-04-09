@@ -25,6 +25,9 @@ psql "$DATABASE_URL" -f supabase/migrations/20260329000000_competitive_features.
 psql "$DATABASE_URL" -f supabase/migrations/20260329120000_phase2_features.sql
 psql "$DATABASE_URL" -f supabase/migrations/20260329130000_videos_auth_settings.sql
 psql "$DATABASE_URL" -f supabase/migrations/20260401000000_settings_circles_expansion.sql
+psql "$DATABASE_URL" -f supabase/migrations/20260405000000_subscription_tier.sql
+psql "$DATABASE_URL" -f supabase/migrations/20260405010000_remember_devices.sql
+psql "$DATABASE_URL" -f supabase/migrations/20260408000000_profiles_phone.sql
 ```
 
 > **Tip:** You can paste each file's contents directly into the Neon Console SQL Editor at https://console.neon.tech if you don't have `psql` installed.
@@ -73,6 +76,24 @@ Set all of the following in **Vercel Dashboard → Project → Settings → Envi
 | `ANTHROPIC_API_KEY` | From https://console.anthropic.com |
 | `CRON_SECRET` | `openssl rand -hex 32` |
 | `RESEND_API_KEY` | From Resend dashboard |
+
+### NEXTAUTH_URL — Critical
+
+`NEXTAUTH_URL` must match the **exact** URL Vercel assigns your project. If you
+haven't added a custom domain yet, this will be the Vercel preview URL:
+
+```
+https://charta-alba.vercel.app
+```
+
+Set it to your custom domain once DNS is live (e.g. `https://chartaalba.com`).
+
+> **Important:** After adding or changing any environment variable in the Vercel
+> dashboard you **must redeploy** for it to take effect. Either push a new commit
+> or use **Vercel Dashboard → Project → Deployments → Redeploy** on the latest
+> deployment. Variables are baked in at build/deploy time, not read at runtime.
+
+---
 
 ### Deploy
 
