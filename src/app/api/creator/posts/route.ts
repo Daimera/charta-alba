@@ -6,8 +6,8 @@
 
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { submissions, cards, papers, likes, bookmarks, contentViews } from "@/lib/db/schema";
-import { eq, and, sql, desc, asc } from "drizzle-orm";
+import { submissions, cards, bookmarks, contentViews } from "@/lib/db/schema";
+import { eq, and, sql } from "drizzle-orm";
 
 type SortField = "views" | "likes" | "bookmarks" | "date";
 

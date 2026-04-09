@@ -12,7 +12,7 @@ import {
   totpVerify,
   generateBackupCodes,
 } from "@/lib/founder-auth";
-import { checkRateLimit, getIpFromRequest } from "@/lib/rate-limit";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -20,7 +20,6 @@ export async function POST(req: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const ip = getIpFromRequest(req);
   const rl = checkRateLimit(`2fa-verify:${session.user.id}`, 5, 15 * 60 * 1000);
   if (!rl.allowed) {
     return Response.json({ error: "Too many attempts" }, { status: 429 });
