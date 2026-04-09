@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { users, profiles } from "@/lib/db/schema";
-import { eq, and, ne } from "drizzle-orm";
+import { eq, and, ne, sql } from "drizzle-orm";
 import { isAllowedImageUrl } from "@/lib/validateUrl";
 
 export async function PATCH(req: Request) {
@@ -91,21 +91,73 @@ export async function PATCH(req: Request) {
     profileUpdates.preferredLanguage = body.preferredLanguage;
   }
 
-  if (Object.keys(profileUpdates).length > 0) {
-    console.log("[api/settings/profile] upserting fields:", Object.keys(profileUpdates), "for user:", userId);
+  if (Object.keys(profileUpdates).length === 0) {
+    return Response.json({ ok: true });
+  }
+
+  console.log("[api/settings/profile] upserting fields:", Object.keys(profileUpdates), "for user:", userId);
+
+  // If only preferredLanguage is being saved (the most common failure case), use a
+  // raw SQL upsert that bypasses any Drizzle schema mapping issues entirely.
+  if (
+    Object.keys(profileUpdates).length === 1 &&
+    profileUpdates.preferredLanguage !== undefined
+  ) {
+    const lang = profileUpdates.preferredLanguage as string;
+    try {
+      // Try Drizzle first — fast path
+      await db
+        .insert(profiles)
+        .values({ id: userId, preferredLanguage: lang })
+        .onConflictDoUpdate({ target: profiles.id, set: { preferredLanguage: lang } });
+      console.log("[api/settings/profile] preferredLanguage saved via Drizzle");
+    } catch (drizzleErr: unknown) {
+      const e = drizzleErr instanceof Error ? drizzleErr : new Error(String(drizzleErr));
+      console.error("[api/settings/profile] Drizzle language save failed:", {
+        message: e.message,
+        // @ts-ignore pg driver attaches .code
+        code:    (drizzleErr as Record<string, unknown>).code,
+        stack:   e.stack,
+      });
+      // Raw SQL fallback — works regardless of Drizzle schema state
+      console.log("[api/settings/profile] retrying preferredLanguage with raw SQL");
+      await db.execute(
+        sql`INSERT INTO profiles (id, preferred_language)
+            VALUES (${userId}, ${lang})
+            ON CONFLICT (id) DO UPDATE SET preferred_language = ${lang}`
+      );
+      console.log("[api/settings/profile] preferredLanguage saved via raw SQL");
+    }
+    return Response.json({ ok: true });
+  }
+
+  // General upsert for all other fields
+  try {
     await db
       .insert(profiles)
       .values({ id: userId, ...profileUpdates })
       .onConflictDoUpdate({ target: profiles.id, set: profileUpdates });
     console.log("[api/settings/profile] upsert ok");
+  } catch (upsertErr: unknown) {
+    const e = upsertErr instanceof Error ? upsertErr : new Error(String(upsertErr));
+    console.error("[api/settings/profile] upsert failed:", {
+      message: e.message,
+      // @ts-ignore pg driver attaches .code
+      code:    (upsertErr as Record<string, unknown>).code,
+      stack:   e.stack,
+    });
+    throw upsertErr; // re-throw to outer catch
   }
 
   return Response.json({ ok: true });
-  } catch (err) {
-    console.error("[api/settings/profile] error:", err instanceof Error ? err.message : err);
-    const msg = err instanceof Error && err.message.includes("column")
-      ? "Database schema mismatch — please run the latest migration in Neon Console."
-      : "Something went wrong";
-    return Response.json({ error: msg }, { status: 500 });
+  } catch (err: unknown) {
+    const e = err instanceof Error ? err : new Error(String(err));
+    console.error("[api/settings/profile] unhandled error:", {
+      message: e.message,
+      // @ts-ignore pg driver attaches .code
+      code:    (err as Record<string, unknown>).code,
+      stack:   e.stack,
+    });
+    return Response.json({ error: "Something went wrong" }, { status: 500 });
   }
 }
