@@ -18,31 +18,29 @@ function RadioGroup<T extends string>({
   options: { value: T; label: string; description?: string }[];
 }) {
   return (
-    <div className="border-b border-white/8 pb-6 mb-6 last:border-b-0 last:mb-0 last:pb-0">
+    <div className="space-y-2">
       <h2 className="text-white font-semibold text-sm mb-3">{label}</h2>
-      <div className="space-y-2">
-        {options.map((opt) => (
-          <label
-            key={opt.value}
-            className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-colors ${
-              value === opt.value ? "bg-white/8 border-white/20" : "bg-white/3 border-white/8 hover:bg-white/5"
-            }`}
-          >
-            <input
-              type="radio"
-              name={label}
-              value={opt.value}
-              checked={value === opt.value}
-              onChange={() => onChange(opt.value)}
-              className="accent-white shrink-0"
-            />
-            <div>
-              <p className="text-white text-sm font-medium">{opt.label}</p>
-              {opt.description && <p className="text-white/40 text-xs mt-0.5">{opt.description}</p>}
-            </div>
-          </label>
-        ))}
-      </div>
+      {options.map((opt) => (
+        <label
+          key={opt.value}
+          className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-colors ${
+            value === opt.value ? "bg-white/8 border-white/20" : "bg-white/3 border-white/8 hover:bg-white/5"
+          }`}
+        >
+          <input
+            type="radio"
+            name={label}
+            value={opt.value}
+            checked={value === opt.value}
+            onChange={() => onChange(opt.value)}
+            className="accent-white shrink-0"
+          />
+          <div>
+            <p className="text-white text-sm font-medium">{opt.label}</p>
+            {opt.description && <p className="text-white/40 text-xs mt-0.5">{opt.description}</p>}
+          </div>
+        </label>
+      ))}
     </div>
   );
 }
@@ -65,46 +63,86 @@ function Toggle({ checked, onChange, label, description }: { checked: boolean; o
   );
 }
 
+function SaveRow({ onSave, saved, loading }: { onSave: () => void; saved: boolean; loading?: boolean }) {
+  return (
+    <div className="flex items-center gap-3 pt-3">
+      <button
+        onClick={onSave}
+        disabled={loading}
+        className="px-4 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:bg-white/90 disabled:opacity-50 transition-colors"
+      >
+        {loading ? "Saving…" : "Save"}
+      </button>
+      {saved && <span className="text-green-400 text-xs">Saved.</span>}
+    </div>
+  );
+}
+
 export default function AccessibilityPage() {
+  // Current applied values (what's in localStorage / on the DOM)
   const [theme, setTheme] = useState<Theme>("dark");
   const [fontSize, setFontSize] = useState<FontSize>("default");
   const [reduceMotion, setReduceMotion] = useState(false);
-  const [saved, setSaved] = useState(false);
+
+  // Pending (staged) values — only committed on Save
+  const [pendingTheme, setPendingTheme] = useState<Theme>("dark");
+  const [pendingFont, setPendingFont] = useState<FontSize>("default");
+  const [pendingMotion, setPendingMotion] = useState(false);
+
+  const [themeSaved, setThemeSaved] = useState(false);
+  const [fontSaved, setFontSaved] = useState(false);
+  const [motionSaved, setMotionSaved] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    setTheme((localStorage.getItem("ca-theme") as Theme) ?? "dark");
-    setFontSize((localStorage.getItem("ca-font-size") as FontSize) ?? "default");
-    setReduceMotion(localStorage.getItem("ca-reduce-motion") === "true");
+    const t = (localStorage.getItem("ca-theme") as Theme) ?? "dark";
+    const f = (localStorage.getItem("ca-font-size") as FontSize) ?? "default";
+    const m = localStorage.getItem("ca-reduce-motion") === "true";
+    setTheme(t); setPendingTheme(t);
+    setFontSize(f); setPendingFont(f);
+    setReduceMotion(m); setPendingMotion(m);
   }, []);
 
-  function applyAndSave(newTheme: Theme, newFont: FontSize, newMotion: boolean) {
-    localStorage.setItem("ca-theme", newTheme);
-    localStorage.setItem("ca-font-size", newFont);
-    localStorage.setItem("ca-reduce-motion", String(newMotion));
-
-    // Apply theme via data-theme attribute — CSS vars react to this immediately
-    document.documentElement.setAttribute("data-theme", newTheme);
-
-    // Apply font-size class to root (maps to CSS html.font-large / html.font-xlarge)
-    document.documentElement.classList.remove("font-large", "font-xlarge");
-    if (newFont === "large") document.documentElement.classList.add("font-large");
-    if (newFont === "xlarge") document.documentElement.classList.add("font-xlarge");
-
-    // Apply reduce motion class (html.reduce-motion suppresses all transitions)
-    if (newMotion) {
-      document.documentElement.classList.add("reduce-motion");
-    } else {
-      document.documentElement.classList.remove("reduce-motion");
-    }
-
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  function applyTheme(t: Theme) {
+    localStorage.setItem("ca-theme", t);
+    document.documentElement.setAttribute("data-theme", t);
+    setTheme(t);
   }
 
-  const handleTheme = (v: Theme) => { setTheme(v); applyAndSave(v, fontSize, reduceMotion); };
-  const handleFont = (v: FontSize) => { setFontSize(v); applyAndSave(theme, v, reduceMotion); };
-  const handleMotion = (v: boolean) => { setReduceMotion(v); applyAndSave(theme, fontSize, v); };
+  function applyFont(f: FontSize) {
+    localStorage.setItem("ca-font-size", f);
+    document.documentElement.classList.remove("font-large", "font-xlarge");
+    if (f === "large") document.documentElement.classList.add("font-large");
+    if (f === "xlarge") document.documentElement.classList.add("font-xlarge");
+    setFontSize(f);
+  }
+
+  function applyMotion(m: boolean) {
+    localStorage.setItem("ca-reduce-motion", String(m));
+    if (m) document.documentElement.classList.add("reduce-motion");
+    else document.documentElement.classList.remove("reduce-motion");
+    setReduceMotion(m);
+  }
+
+  function flash(setter: (v: boolean) => void) {
+    setter(true);
+    setTimeout(() => setter(false), 2000);
+  }
+
+  function handleSaveTheme() {
+    applyTheme(pendingTheme);
+    flash(setThemeSaved);
+  }
+  function handleSaveFont() {
+    applyFont(pendingFont);
+    flash(setFontSaved);
+  }
+  function handleSaveMotion() {
+    applyMotion(pendingMotion);
+    flash(setMotionSaved);
+  }
+
+  void theme; void fontSize; void reduceMotion; // suppress "unused" — kept for symmetry
 
   return (
     <div className="px-4 sm:px-6 py-6 max-w-xl">
@@ -116,56 +154,63 @@ export default function AccessibilityPage() {
       </div>
       <h1 className="hidden md:block text-white text-xl font-bold mb-6">Accessibility &amp; Display</h1>
 
-      {saved && (
-        <div className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm">
-          Display preferences saved.
-        </div>
-      )}
-
       <p className="text-white/40 text-xs mb-6">
         These preferences are stored locally in your browser and apply to this device only.
       </p>
 
-      <RadioGroup
-        label="Theme"
-        value={theme}
-        onChange={handleTheme}
-        options={[
-          { value: "dark", label: "Dark", description: "Dark background — easier on the eyes at night." },
-          { value: "light", label: "Light", description: "Full light-theme support coming soon." },
-          { value: "system", label: "System", description: "Match your device's system preference." },
-        ]}
-      />
+      {/* Theme */}
+      <div className="border-b border-white/8 pb-6 mb-6">
+        <RadioGroup
+          label="Theme"
+          value={pendingTheme}
+          onChange={setPendingTheme}
+          options={[
+            { value: "dark", label: "Dark", description: "Dark background — easier on the eyes at night." },
+            { value: "light", label: "Light", description: "Light background with dark text." },
+            { value: "system", label: "System", description: "Match your device's system preference." },
+          ]}
+        />
+        <SaveRow onSave={handleSaveTheme} saved={themeSaved} />
+      </div>
 
-      <RadioGroup
-        label="Font size"
-        value={fontSize}
-        onChange={handleFont}
-        options={[
-          { value: "default", label: "Default", description: "Standard reading size." },
-          { value: "large", label: "Large", description: "Slightly larger for easier reading." },
-          { value: "xlarge", label: "Extra Large", description: "Maximum size for accessibility." },
-        ]}
-      />
+      {/* Font size */}
+      <div className="border-b border-white/8 pb-6 mb-6">
+        <RadioGroup
+          label="Font size"
+          value={pendingFont}
+          onChange={setPendingFont}
+          options={[
+            { value: "default", label: "Default", description: "Standard reading size." },
+            { value: "large", label: "Large", description: "Slightly larger for easier reading." },
+            { value: "xlarge", label: "Extra Large", description: "Maximum size for accessibility." },
+          ]}
+        />
+        <SaveRow onSave={handleSaveFont} saved={fontSaved} />
+      </div>
 
+      {/* Motion */}
       <div className="border-b border-white/8 pb-6 mb-6">
         <h2 className="text-white font-semibold text-sm mb-3">Motion</h2>
         <Toggle
           label="Reduce animations"
           description="Minimises transitions and motion effects throughout the app."
-          checked={reduceMotion}
-          onChange={handleMotion}
+          checked={pendingMotion}
+          onChange={setPendingMotion}
         />
+        <SaveRow onSave={handleSaveMotion} saved={motionSaved} />
       </div>
 
+      {/* Language */}
       <div>
         <h2 className="text-white font-semibold text-sm mb-3">Language</h2>
         <div className="flex items-center justify-between p-3.5 rounded-xl bg-white/4 border border-white/8">
           <div>
             <p className="text-white text-sm font-medium">English</p>
-            <p className="text-white/40 text-xs mt-0.5">Additional languages coming soon.</p>
+            <p className="text-white/40 text-xs mt-0.5">Change language in Settings → Personalization.</p>
           </div>
-          <span className="text-xs text-white/30 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full">Current</span>
+          <Link href="/settings/personalization" className="text-xs text-white/30 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full hover:text-white/60 transition-colors">
+            Change
+          </Link>
         </div>
       </div>
     </div>

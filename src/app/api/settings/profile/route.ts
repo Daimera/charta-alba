@@ -92,15 +92,20 @@ export async function PATCH(req: Request) {
   }
 
   if (Object.keys(profileUpdates).length > 0) {
+    console.log("[api/settings/profile] upserting fields:", Object.keys(profileUpdates), "for user:", userId);
     await db
       .insert(profiles)
       .values({ id: userId, ...profileUpdates })
       .onConflictDoUpdate({ target: profiles.id, set: profileUpdates });
+    console.log("[api/settings/profile] upsert ok");
   }
 
   return Response.json({ ok: true });
   } catch (err) {
-    console.error("[api/settings/profile]", err);
-    return Response.json({ error: "Something went wrong" }, { status: 500 });
+    console.error("[api/settings/profile] error:", err instanceof Error ? err.message : err);
+    const msg = err instanceof Error && err.message.includes("column")
+      ? "Database schema mismatch — please run the latest migration in Neon Console."
+      : "Something went wrong";
+    return Response.json({ error: msg }, { status: 500 });
   }
 }

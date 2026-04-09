@@ -1,3 +1,5 @@
+import styles from "./LogoMark.module.css";
+
 export type LogoTier = "basic" | "pro" | "diamond";
 
 interface LogoMarkProps {
@@ -49,14 +51,12 @@ export function LogoMark({
       alt="Charta Alba"
       width={size}
       height={size}
-      className="logomark-img"
+      className={styles.logo}
       style={{
         width: size,
         height: size,
-        background: "transparent",
-        backgroundColor: "transparent",
         filter: baseFilter,
-        // CSS var picked up by .logomark-img:hover in globals.css
+        // picked up by .logo:hover via CSS var
         ["--logomark-hover-filter" as string]: hoverFilter,
       }}
     />

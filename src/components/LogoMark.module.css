@@ -1,0 +1,12 @@
+.logo {
+  display: block;
+  background: transparent;
+  background-color: transparent;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  cursor: pointer;
+}
+
+.logo:hover {
+  transform: scale(1.1);
+  filter: var(--logomark-hover-filter, drop-shadow(0 0 8px #89CFF0));
+}

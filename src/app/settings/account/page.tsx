@@ -89,6 +89,7 @@ export default function AccountPage() {
   const router = useRouter();
 
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
@@ -118,11 +119,14 @@ export default function AccountPage() {
 
     fetch("/api/settings")
       .then(async (r) => {
-        if (!r.ok) return null;
+        if (!r.ok) {
+          const err = await r.json().catch(() => ({})) as { error?: string };
+          throw new Error(err.error ?? `HTTP ${r.status}`);
+        }
         return r.json() as Promise<{ user: UserData; profile: ProfileData | null }>;
       })
       .then((d) => {
-        if (!d?.user) return;
+        if (!d?.user) { setLoadError("Could not load account data."); return; }
         setUserData(d.user);
         setName(d.user.name ?? "");
         setUsername(d.profile?.username ?? "");
@@ -131,7 +135,10 @@ export default function AccountPage() {
         setPhone(d.profile?.phone ?? "");
         setIsPublic(d.profile?.isPublic ?? true);
       })
-      .catch(() => undefined);
+      .catch((err: unknown) => {
+        console.error("[settings/account] load error:", err);
+        setLoadError(err instanceof Error ? err.message : "Failed to load account data.");
+      });
   }, [status, router]);
 
   async function handleProfileSave(e: React.FormEvent) {
@@ -205,10 +212,22 @@ export default function AccountPage() {
     }
   }
 
-  if (status === "loading" || !userData) {
+  if (status === "loading" || (!userData && !loadError)) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="w-5 h-5 border-2 border-white/15 border-t-white/50 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="px-4 sm:px-6 py-6 max-w-xl">
+        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <p className="font-medium mb-1">Failed to load account data</p>
+          <p className="text-xs opacity-80">{loadError}</p>
+          <p className="text-xs opacity-60 mt-2">If this persists, try signing out and back in, or contact support.</p>
+        </div>
       </div>
     );
   }
@@ -315,7 +334,7 @@ export default function AccountPage() {
       {/* Change email */}
       <Card title="Change email">
         <p className="text-white/40 text-sm mb-4">
-          Current: <span className="text-white/70">{userData.email}</span>
+          Current: <span className="text-white/70">{userData?.email}</span>
         </p>
         <form onSubmit={handleEmailSave} className="space-y-4">
           <Field label="New email address">

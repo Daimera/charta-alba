@@ -22,6 +22,44 @@
   color-scheme: light;
 }
 
+/* Override hardcoded Tailwind dark classes so light mode actually renders */
+[data-theme="light"] body {
+  background: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+/* Text colour overrides — catches all text-white/* variants */
+[data-theme="light"] .text-white { color: #111111 !important; }
+[data-theme="light"] .text-white\/90 { color: rgba(17,17,17,0.9) !important; }
+[data-theme="light"] .text-white\/70 { color: rgba(17,17,17,0.7) !important; }
+[data-theme="light"] .text-white\/60 { color: rgba(17,17,17,0.6) !important; }
+[data-theme="light"] .text-white\/50 { color: rgba(17,17,17,0.5) !important; }
+[data-theme="light"] .text-white\/45 { color: rgba(17,17,17,0.45) !important; }
+[data-theme="light"] .text-white\/40 { color: rgba(17,17,17,0.4) !important; }
+[data-theme="light"] .text-white\/30 { color: rgba(17,17,17,0.3) !important; }
+[data-theme="light"] .text-white\/25 { color: rgba(17,17,17,0.25) !important; }
+[data-theme="light"] .text-white\/20 { color: rgba(17,17,17,0.2) !important; }
+[data-theme="light"] .text-white\/15 { color: rgba(17,17,17,0.15) !important; }
+
+/* Background overrides for hardcoded dark containers */
+[data-theme="light"] .bg-\[\#0a0a0a\] { background-color: var(--background) !important; }
+[data-theme="light"] .bg-\[\#111111\],
+[data-theme="light"] .bg-\[\#111\] { background-color: var(--card-bg) !important; }
+
+/* Card / surface backgrounds — invert white-alpha to black-alpha */
+[data-theme="light"] .bg-white\/3 { background-color: rgba(0,0,0,0.03) !important; }
+[data-theme="light"] .bg-white\/4 { background-color: rgba(0,0,0,0.04) !important; }
+[data-theme="light"] .bg-white\/5 { background-color: rgba(0,0,0,0.05) !important; }
+[data-theme="light"] .bg-white\/8 { background-color: rgba(0,0,0,0.08) !important; }
+[data-theme="light"] .bg-white\/10 { background-color: rgba(0,0,0,0.08) !important; }
+[data-theme="light"] .bg-white\/15 { background-color: rgba(0,0,0,0.10) !important; }
+[data-theme="light"] .bg-white\/20 { background-color: rgba(0,0,0,0.12) !important; }
+
+/* Border overrides */
+[data-theme="light"] .border-white\/8 { border-color: rgba(0,0,0,0.08) !important; }
+[data-theme="light"] .border-white\/10 { border-color: rgba(0,0,0,0.10) !important; }
+[data-theme="light"] .border-white\/20 { border-color: rgba(0,0,0,0.18) !important; }
+
 /* System preference: honour OS setting when user picks "system" */
 [data-theme="system"] {
   color-scheme: light dark;

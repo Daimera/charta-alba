@@ -74,7 +74,7 @@ export default function RootLayout({
         if(f==='xlarge')document.documentElement.classList.add('font-xlarge');
         if(m)document.documentElement.classList.add('reduce-motion');
       }catch(e){}})();` }} />
-      <body className="bg-[#0a0a0a] text-white">
+      <body>
         <a href="#main-content" className="skip-to-main">Skip to main content</a>
         <AuthProvider>
           <LogoSplash />
