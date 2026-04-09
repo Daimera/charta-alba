@@ -55,6 +55,8 @@ export function LogoMark({
       style={{
         width: size,
         height: size,
+        background: "none",
+        backgroundColor: "transparent",
         filter: baseFilter,
         // picked up by .logo:hover via CSS var
         ["--logomark-hover-filter" as string]: hoverFilter,

@@ -55,10 +55,35 @@
 [data-theme="light"] .bg-white\/15 { background-color: rgba(0,0,0,0.10) !important; }
 [data-theme="light"] .bg-white\/20 { background-color: rgba(0,0,0,0.12) !important; }
 
+/* Additional text-white fractions used in FeedCard */
+[data-theme="light"] .text-white\/85 { color: rgba(17,17,17,0.85) !important; }
+[data-theme="light"] .text-white\/75 { color: rgba(17,17,17,0.75) !important; }
+[data-theme="light"] .text-white\/35 { color: rgba(17,17,17,0.35) !important; }
+
 /* Border overrides */
 [data-theme="light"] .border-white\/8 { border-color: rgba(0,0,0,0.08) !important; }
 [data-theme="light"] .border-white\/10 { border-color: rgba(0,0,0,0.10) !important; }
+[data-theme="light"] .border-white\/12 { border-color: rgba(0,0,0,0.10) !important; }
 [data-theme="light"] .border-white\/20 { border-color: rgba(0,0,0,0.18) !important; }
+[data-theme="light"] .border-white\/25 { border-color: rgba(0,0,0,0.22) !important; }
+
+/* ── Light-mode navbar ───────────────────────────────────────────────────── */
+/* TopNav uses: bg-black/85 backdrop-blur-md border-b border-white/8 */
+[data-theme="light"] nav.fixed {
+  background: rgba(248,248,248,0.95) !important;
+  border-bottom-color: rgba(0,0,0,0.1) !important;
+}
+/* bg-black/* utilities inside nav */
+[data-theme="light"] .bg-black\/85 { background-color: rgba(248,248,248,0.95) !important; }
+[data-theme="light"] .bg-black\/70 { background-color: rgba(248,248,248,0.85) !important; }
+
+/* ── Light-mode feed cards ───────────────────────────────────────────────── */
+/* FeedCard outer container uses bg-[#0a0a0a] — already overridden above.   */
+/* Gradient overlays: invert for readability on white */
+[data-theme="light"] .from-black\/60 { --tw-gradient-from: rgba(0,0,0,0) !important; }
+[data-theme="light"] .to-black\/0   { --tw-gradient-to:   rgba(0,0,0,0) !important; }
+/* Sidebar action buttons inside cards */
+[data-theme="light"] .text-white.drop-shadow-lg { color: #111111 !important; }
 
 /* System preference: honour OS setting when user picks "system" */
 [data-theme="system"] {
