@@ -44,39 +44,26 @@ export function LogoMark({
     ? (glowColor ? `drop-shadow(0 0 4px ${glowColor})` : TIER_GLOW_BASE[resolvedTier])
     : "none";
 
+  // Animation handled by globals.css (.lm-hover / .lm-hover:hover)
+  // --lm-hover-filter CSS custom property controls the hover glow colour per tier
+  // eslint-disable-next-line @next/next/no-img-element
   return (
-    <>
-      {/* Scoped style tag — bypasses CSS module purging and PostCSS transforms */}
-      <style>{`
-        .${CLS} {
-          transition: transform 0.2s ease, filter 0.2s ease;
-          cursor: pointer;
-          display: block;
-          background: none !important;
-          background-color: transparent !important;
-        }
-        .${CLS}:hover {
-          transform: scale(1.1);
-          filter: ${hoverFilter} !important;
-        }
-      `}</style>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt="Charta Alba"
-        width={size}
-        height={size}
-        className={CLS}
-        style={{
-          width: size,
-          height: size,
-          display: "block",
-          background: "none",
-          backgroundColor: "transparent",
-          flexShrink: 0,
-          filter: baseFilter,
-        }}
-      />
-    </>
+    <img
+      src={src}
+      alt="Charta Alba"
+      width={size}
+      height={size}
+      className={CLS}
+      style={{
+        width: size,
+        height: size,
+        display: "block",
+        background: "none",
+        backgroundColor: "transparent",
+        flexShrink: 0,
+        filter: baseFilter,
+        ["--lm-hover-filter" as string]: hoverFilter,
+      }}
+    />
   );
 }

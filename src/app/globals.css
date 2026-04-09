@@ -206,17 +206,18 @@ html.font-xlarge { font-size: 21px; }
 }
 
 /* ── LogoMark PNG hover animation ───────────────────────────────────────── */
-/* Using CSS so it cannot be overridden by inline styles or Tailwind purge.  */
-.logomark-img {
+/* globals.css is never tree-shaken — this is the reliable home for logo CSS. */
+.lm-hover {
   display: block !important;
-  background: transparent !important;
+  background: none !important;
   background-color: transparent !important;
   transition: filter 0.2s ease, transform 0.2s ease !important;
   will-change: filter, transform;
+  flex-shrink: 0;
 }
-.logomark-img:hover {
-  transform: scale(1.08) !important;
-  filter: var(--logomark-hover-filter, drop-shadow(0 0 8px rgba(137,207,240,0.9))) !important;
+.lm-hover:hover {
+  transform: scale(1.1) !important;
+  filter: var(--lm-hover-filter, drop-shadow(0 0 10px rgba(137,207,240,0.9)) brightness(1.2)) !important;
 }
 
 /* ── Reduce-motion class (set by Accessibility page toggle) ─────────────── */
