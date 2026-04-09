@@ -33,7 +33,8 @@ export async function POST(req: Request) {
     .orderBy(desc(loginSessions.createdAt))
     .limit(3);
 
-  const recentCountries = recent.map((r) => r.countryCode).filter(Boolean) as string[];
+  // Filter out "XX" (unknown/localhost) so development sessions don't pollute the history
+  const recentCountries = recent.map((r) => r.countryCode).filter((c): c is string => !!c && c !== "XX");
   const newCountry = geo?.countryCode && geo.countryCode !== "XX";
   const isSuspicious =
     newCountry &&

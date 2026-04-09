@@ -25,9 +25,17 @@ psql "$DATABASE_URL" -f supabase/migrations/20260329000000_competitive_features.
 psql "$DATABASE_URL" -f supabase/migrations/20260329120000_phase2_features.sql
 psql "$DATABASE_URL" -f supabase/migrations/20260329130000_videos_auth_settings.sql
 psql "$DATABASE_URL" -f supabase/migrations/20260401000000_settings_circles_expansion.sql
+psql "$DATABASE_URL" -f supabase/migrations/20260402000000_api_platform.sql
+psql "$DATABASE_URL" -f supabase/migrations/20260402120000_points_system.sql
+psql "$DATABASE_URL" -f supabase/migrations/20260403000000_founder_system.sql
+psql "$DATABASE_URL" -f supabase/migrations/20260403120000_location_analytics.sql
+psql "$DATABASE_URL" -f supabase/migrations/20260404000000_account_lockout.sql
+psql "$DATABASE_URL" -f supabase/migrations/20260404120000_compliance_i18n.sql
+psql "$DATABASE_URL" -f supabase/migrations/20260404180000_sessions4_8.sql
 psql "$DATABASE_URL" -f supabase/migrations/20260405000000_subscription_tier.sql
 psql "$DATABASE_URL" -f supabase/migrations/20260405010000_remember_devices.sql
 psql "$DATABASE_URL" -f supabase/migrations/20260408000000_profiles_phone.sql
+psql "$DATABASE_URL" -f supabase/migrations/20260409000000_preferred_language_hotfix.sql
 ```
 
 > **Tip:** You can paste each file's contents directly into the Neon Console SQL Editor at https://console.neon.tech if you don't have `psql` installed.

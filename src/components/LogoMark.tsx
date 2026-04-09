@@ -1,7 +1,3 @@
-"use client";
-
-import { useState } from "react";
-
 export type LogoTier = "basic" | "pro" | "diamond";
 
 interface LogoMarkProps {
@@ -19,13 +15,15 @@ const TIER_SRC: Record<LogoTier, string> = {
   diamond: "/logo-silver.png",
 };
 
-const TIER_GLOW_BASE: Record<string, string> = {
-  pro:     "rgba(255,215,0,0.4)",
-  diamond: "rgba(185,242,255,0.4)",
-};
 const TIER_GLOW_HOVER: Record<string, string> = {
-  pro:     "rgba(255,215,0,0.9)",
-  diamond: "rgba(185,242,255,0.9)",
+  basic:   "drop-shadow(0 0 8px rgba(137,207,240,0.9))",
+  pro:     "drop-shadow(0 0 8px rgba(255,215,0,0.9))",
+  diamond: "drop-shadow(0 0 8px rgba(185,242,255,0.9))",
+};
+const TIER_GLOW_BASE: Record<string, string> = {
+  basic:   "drop-shadow(0 0 4px rgba(137,207,240,0.4))",
+  pro:     "drop-shadow(0 0 4px rgba(255,215,0,0.4))",
+  diamond: "drop-shadow(0 0 4px rgba(185,242,255,0.4))",
 };
 
 export function LogoMark({
@@ -34,13 +32,15 @@ export function LogoMark({
   showGlow = true,
   glowColor,
 }: LogoMarkProps) {
-  const [hovered, setHovered] = useState(false);
-
   const src = tier ? TIER_SRC[tier] : "/logo-blue.png";
-  const glowPx   = Math.max(3, Math.round(size / 9));
-  const hoverPx  = Math.max(6, Math.round(size / 5));
-  const baseGlow  = glowColor ?? TIER_GLOW_BASE[tier ?? ""] ?? "rgba(137,207,240,0.4)";
-  const hoverGlow = TIER_GLOW_HOVER[tier ?? ""] ?? "rgba(137,207,240,0.9)";
+  const resolvedTier = tier ?? "basic";
+
+  const hoverFilter = glowColor
+    ? `drop-shadow(0 0 8px ${glowColor})`
+    : TIER_GLOW_HOVER[resolvedTier];
+  const baseFilter = showGlow
+    ? (glowColor ? `drop-shadow(0 0 4px ${glowColor})` : TIER_GLOW_BASE[resolvedTier])
+    : "none";
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -49,21 +49,15 @@ export function LogoMark({
       alt="Charta Alba"
       width={size}
       height={size}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      className="logomark-img"
       style={{
-        display: "block",
         width: size,
         height: size,
-        objectFit: "contain",
         background: "transparent",
-        filter: hovered
-          ? `drop-shadow(0 0 ${hoverPx}px ${hoverGlow})`
-          : showGlow
-          ? `drop-shadow(0 0 ${glowPx}px ${baseGlow})`
-          : "none",
-        transform: hovered ? "scale(1.08)" : "scale(1)",
-        transition: "filter 0.2s ease, transform 0.2s ease",
+        backgroundColor: "transparent",
+        filter: baseFilter,
+        // CSS var picked up by .logomark-img:hover in globals.css
+        ["--logomark-hover-filter" as string]: hoverFilter,
       }}
     />
   );

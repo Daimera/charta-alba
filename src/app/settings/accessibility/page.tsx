@@ -83,12 +83,15 @@ export default function AccessibilityPage() {
     localStorage.setItem("ca-font-size", newFont);
     localStorage.setItem("ca-reduce-motion", String(newMotion));
 
-    // Apply font-size class to root
+    // Apply theme via data-theme attribute — CSS vars react to this immediately
+    document.documentElement.setAttribute("data-theme", newTheme);
+
+    // Apply font-size class to root (maps to CSS html.font-large / html.font-xlarge)
     document.documentElement.classList.remove("font-large", "font-xlarge");
     if (newFont === "large") document.documentElement.classList.add("font-large");
     if (newFont === "xlarge") document.documentElement.classList.add("font-xlarge");
 
-    // Apply reduce motion
+    // Apply reduce motion class (html.reduce-motion suppresses all transitions)
     if (newMotion) {
       document.documentElement.classList.add("reduce-motion");
     } else {

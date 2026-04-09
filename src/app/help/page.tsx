@@ -8,7 +8,7 @@ const SECTIONS: { title: string; faqs: FAQ[] }[] = [
     faqs: [
       { q: "What is Charta Alba?", a: "Charta Alba is a mobile-first platform that transforms AI and machine learning research papers into short, digestible explainer cards — think TikTok for academic papers. Swipe through the feed, like papers, bookmark your favourites, and follow topics you care about." },
       { q: "How do I sign up?", a: "Click 'Sign in' in the top navigation and choose to sign in with Google or create an account with an email and password. Creating an account is free." },
-      { q: "Is Charta Alba free?", a: "Yes, completely. Charta Alba is ad-free and free to use. We're funded by the research community." },
+      { q: "Is Charta Alba free?", a: "Yes, completely. Charta Alba is free to use. Creating an account and accessing the full feed costs nothing." },
     ],
   },
   {

@@ -169,8 +169,8 @@ export default function PersonalizationPage() {
           <div className="flex items-start gap-3 p-4 rounded-xl bg-white/4 border border-white/8">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="text-white/50 mt-0.5 shrink-0"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
             <div>
-              <p className="text-white text-sm font-medium">Charta Alba is ad-free for all users</p>
-              <p className="text-white/40 text-xs mt-0.5">No advertising, ever. We&apos;re funded by the research community.</p>
+              <p className="text-white text-sm font-medium">Free to use</p>
+              <p className="text-white/40 text-xs mt-0.5">Full access to the feed and all features at no cost.</p>
             </div>
           </div>
         </div>

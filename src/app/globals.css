@@ -1,8 +1,40 @@
 @import "tailwindcss";
 
-:root {
+/* ── Design tokens (dark, the default) ──────────────────────────────────── */
+:root,
+[data-theme="dark"] {
   --background: #0a0a0a;
   --foreground: #ededed;
+  --nav-bg: rgba(0, 0, 0, 0.85);
+  --card-bg: #111111;
+  --border: rgba(255, 255, 255, 0.08);
+  --muted: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Light theme ──────────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --background: #f4f4f5;
+  --foreground: #111111;
+  --nav-bg: rgba(244, 244, 245, 0.92);
+  --card-bg: #ffffff;
+  --border: rgba(0, 0, 0, 0.1);
+  --muted: rgba(0, 0, 0, 0.45);
+  color-scheme: light;
+}
+
+/* System preference: honour OS setting when user picks "system" */
+[data-theme="system"] {
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: light) {
+  [data-theme="system"] {
+    --background: #f4f4f5;
+    --foreground: #111111;
+    --nav-bg: rgba(244, 244, 245, 0.92);
+    --card-bg: #ffffff;
+    --border: rgba(0, 0, 0, 0.1);
+    --muted: rgba(0, 0, 0, 0.45);
+  }
 }
 
 @theme inline {
@@ -17,6 +49,10 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
 }
+
+/* ── Font size scaling ───────────────────────────────────────────────────── */
+html.font-large  { font-size: 18px; }
+html.font-xlarge { font-size: 21px; }
 
 /* Hide scrollbars while keeping scroll functionality */
 .hide-scrollbar {
@@ -104,6 +140,30 @@ body {
 
 .fade-in {
   animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* ── LogoMark PNG hover animation ───────────────────────────────────────── */
+/* Using CSS so it cannot be overridden by inline styles or Tailwind purge.  */
+.logomark-img {
+  display: block !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  transition: filter 0.2s ease, transform 0.2s ease !important;
+  will-change: filter, transform;
+}
+.logomark-img:hover {
+  transform: scale(1.08) !important;
+  filter: var(--logomark-hover-filter, drop-shadow(0 0 8px rgba(137,207,240,0.9))) !important;
+}
+
+/* ── Reduce-motion class (set by Accessibility page toggle) ─────────────── */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }
 
 /* ── Accessibility ───────────────────────────────────────────────────────── */

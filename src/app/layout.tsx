@@ -63,6 +63,17 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
+      {/* Inline script: applies theme, font-size, and reduce-motion from localStorage
+          synchronously before the first paint — prevents flash of wrong settings. */}
+      <script dangerouslySetInnerHTML={{ __html: `(function(){try{
+        var t=localStorage.getItem('ca-theme')||'dark';
+        var f=localStorage.getItem('ca-font-size')||'default';
+        var m=localStorage.getItem('ca-reduce-motion')==='true';
+        document.documentElement.setAttribute('data-theme',t);
+        if(f==='large')document.documentElement.classList.add('font-large');
+        if(f==='xlarge')document.documentElement.classList.add('font-xlarge');
+        if(m)document.documentElement.classList.add('reduce-motion');
+      }catch(e){}})();` }} />
       <body className="bg-[#0a0a0a] text-white">
         <a href="#main-content" className="skip-to-main">Skip to main content</a>
         <AuthProvider>
