@@ -43,10 +43,17 @@ export function TopNav() {
       .then((r) => r.ok ? r.json() : null)
       .then((d: { profile?: { username?: string | null; preferredLanguage?: string | null } } | null) => {
         if (d?.profile?.username) setUsername(d.profile.username);
-        // Hydrate language module store from DB so it persists across devices
-        if (d?.profile?.preferredLanguage) {
-          setPreferredLanguage(d.profile.preferredLanguage as LanguageCode);
+        // Hydrate language from DB — but only when DB has a non-default value.
+        // If DB returns "en" (the column default), trust localStorage instead so
+        // we don't overwrite a language the user saved before migrations were applied.
+        const dbLang = d?.profile?.preferredLanguage;
+        if (dbLang && dbLang !== "en") {
+          setPreferredLanguage(dbLang as LanguageCode);
+        } else if (!dbLang) {
+          // Profile missing entirely — read localStorage (already the default)
         }
+        // If dbLang === "en" we leave localStorage untouched; the hook already
+        // initialized from it and may have a non-English value stored there.
       })
       .catch(() => undefined);
   }, [session?.user]);

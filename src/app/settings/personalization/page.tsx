@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { SUPPORTED_LANGUAGES, setPreferredLanguage, type LanguageCode } from "@/components/LanguageSwitcher";
+import { SUPPORTED_LANGUAGES, setPreferredLanguage, getStoredLanguage, type LanguageCode } from "@/components/LanguageSwitcher";
 
 function Msg({ ok, text }: { ok: boolean; text: string }) {
   return <span className={`text-xs ${ok ? "text-green-400" : "text-red-400"}`}>{text}</span>;
@@ -24,7 +24,11 @@ export default function PersonalizationPage() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
-  const [language, setLanguage] = useState<LanguageCode>("en");
+  // Initialize from localStorage so the dropdown shows the right value immediately,
+  // before the async DB fetch completes (DB fetch may override if non-default).
+  const [language, setLanguage] = useState<LanguageCode>(() =>
+    typeof window !== "undefined" ? getStoredLanguage() : "en"
+  );
   const [langLoading, setLangLoading] = useState(false);
   const [langMsg, setLangMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -36,7 +40,11 @@ export default function PersonalizationPage() {
       .then((r) => r.ok ? r.json() : null)
       .then((d: { profile?: { feedAlgorithm?: string; preferredLanguage?: string } | null } | null) => {
         if (d?.profile?.feedAlgorithm) setFeedAlgorithm(d.profile.feedAlgorithm);
-        if (d?.profile?.preferredLanguage) setLanguage(d.profile.preferredLanguage as LanguageCode);
+        // Only override localStorage value if DB has a non-default language saved,
+        // preventing the DB column default "en" from wiping the user's stored choice.
+        if (d?.profile?.preferredLanguage && d.profile.preferredLanguage !== "en") {
+          setLanguage(d.profile.preferredLanguage as LanguageCode);
+        }
       })
       .catch(() => undefined);
   }, [status, router]);

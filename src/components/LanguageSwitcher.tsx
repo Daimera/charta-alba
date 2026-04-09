@@ -28,7 +28,7 @@ export const SUPPORTED_LANGUAGES = [
 
 export type LanguageCode = (typeof SUPPORTED_LANGUAGES)[number]["code"];
 
-function getStoredLanguage(): LanguageCode {
+export function getStoredLanguage(): LanguageCode {
   if (typeof window === "undefined") return "en";
   return (localStorage.getItem("preferredLanguage") as LanguageCode) ?? "en";
 }
