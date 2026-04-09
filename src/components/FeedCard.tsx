@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { ActionBar } from "./ActionBar";
 import { VideoEmbed } from "./VideoEmbed";
 import { ReplicationBadge } from "./ReplicationBadge";
 import { CitationGraph } from "./CitationGraph";
+import { usePreferredLanguage } from "./LanguageSwitcher";
 import type { FeedCardData } from "@/types";
 
 interface FeedCardProps {
@@ -38,6 +40,46 @@ export function FeedCard({
 }: FeedCardProps) {
   const articleRef = useRef<HTMLElement>(null);
   const [isSimple, setIsSimple] = useState(false);
+  const { data: session } = useSession();
+  const [lang] = usePreferredLanguage();
+  const [translatedContent, setTranslatedContent] = useState<{
+    headline: string; hook: string; body: string; tldr: string;
+  } | null>(null);
+  const [translating, setTranslating] = useState(false);
+
+  useEffect(() => {
+    if (lang === "en") { setTranslatedContent(null); return; }
+    if (!session?.user) { setTranslatedContent(null); return; }
+
+    let cancelled = false;
+    setTranslating(true);
+    fetch("/api/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cardId: card.id, language: lang }),
+    })
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: { headline?: string; hook?: string; body?: string; tldr?: string } | null) => {
+        if (cancelled) return;
+        if (d?.headline) {
+          setTranslatedContent({
+            headline: d.headline,
+            hook: d.hook ?? card.hook,
+            body: d.body ?? card.body,
+            tldr: d.tldr ?? card.tldr,
+          });
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => { if (!cancelled) setTranslating(false); });
+
+    return () => { cancelled = true; };
+  }, [lang, card.id, session?.user]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const displayHeadline = translatedContent?.headline ?? card.headline;
+  const displayHook     = translatedContent?.hook     ?? card.hook;
+  const displayBody     = translatedContent?.body     ?? card.body;
+  const displayTldr     = translatedContent?.tldr     ?? card.tldr;
 
   return (
     <article
@@ -86,12 +128,20 @@ export function FeedCard({
           </div>
 
           {/* Headline */}
-          <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight tracking-tight">
-            {card.headline}
+          <h2
+            className="text-2xl sm:text-3xl font-bold text-white leading-tight tracking-tight"
+            style={{ opacity: translating ? 0.5 : 1, transition: "opacity 0.2s" }}
+          >
+            {displayHeadline}
           </h2>
 
           {/* Hook */}
-          <p className="text-white/75 text-base leading-relaxed">{card.hook}</p>
+          <p
+            className="text-white/75 text-base leading-relaxed"
+            style={{ opacity: translating ? 0.5 : 1, transition: "opacity 0.2s" }}
+          >
+            {displayHook}
+          </p>
 
           {/* Body / ELI5 */}
           {isSimple ? (
@@ -99,7 +149,12 @@ export function FeedCard({
               <p className="text-violet-200/80 text-sm leading-relaxed">{card.eli5Summary}</p>
             </div>
           ) : (
-            <p className="text-white/50 text-sm leading-relaxed line-clamp-4">{card.body}</p>
+            <p
+              className="text-white/50 text-sm leading-relaxed line-clamp-4"
+              style={{ opacity: translating ? 0.5 : 1, transition: "opacity 0.2s" }}
+            >
+              {displayBody}
+            </p>
           )}
         </div>
 
@@ -110,7 +165,12 @@ export function FeedCard({
             <p className="text-white/35 text-xs font-semibold uppercase tracking-widest mb-1">
               TL;DR
             </p>
-            <p className="text-white/85 text-sm font-medium leading-snug">{card.tldr}</p>
+            <p
+              className="text-white/85 text-sm font-medium leading-snug"
+              style={{ opacity: translating ? 0.5 : 1, transition: "opacity 0.2s" }}
+            >
+              {displayTldr}
+            </p>
           </div>
 
           {/* Citation graph */}

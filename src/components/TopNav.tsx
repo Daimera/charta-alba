@@ -98,7 +98,8 @@ export function TopNav() {
           filter: logoHovered
             ? "drop-shadow(0 0 12px rgba(137,207,240,0.8))"
             : "drop-shadow(0 0 4px rgba(137,207,240,0.4))",
-          transition: "filter 0.2s ease",
+          transform: logoHovered ? "scale(1.1)" : "scale(1)",
+          transition: "filter 0.2s ease, transform 0.2s ease",
         }}
       >
         <LogoMark size={36} color="#89CFF0" showGlow={false} />

@@ -8,6 +8,8 @@ import { TopNav } from "@/components/TopNav";
 import { Footer } from "@/components/Footer";
 import { LogoSplash } from "@/components/LogoSplash";
 import { Suspense } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -71,6 +73,8 @@ export default function RootLayout({
           {children}
           <Footer />
         </AuthProvider>
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
