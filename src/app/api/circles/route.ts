@@ -7,30 +7,41 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q")?.trim();
 
-  const rows = await db
-    .select({
-      id: circles.id,
-      name: circles.name,
-      description: circles.description,
-      topicTags: circles.topicTags,
-      avatarUrl: circles.avatarUrl,
-      isPublic: circles.isPublic,
-      ownerId: circles.ownerId,
-      memberCount: circles.memberCount,
-      createdAt: circles.createdAt,
-      ownerName: users.name,
-    })
-    .from(circles)
-    .leftJoin(users, eq(circles.ownerId, users.id))
-    .where(
-      q
-        ? or(ilike(circles.name, `%${q}%`), ilike(circles.description, `%${q}%`))
-        : eq(circles.isPublic, true)
-    )
-    .orderBy(desc(circles.createdAt))
-    .limit(50);
+  try {
+    const rows = await db
+      .select({
+        id: circles.id,
+        name: circles.name,
+        description: circles.description,
+        topicTags: circles.topicTags,
+        avatarUrl: circles.avatarUrl,
+        isPublic: circles.isPublic,
+        ownerId: circles.ownerId,
+        memberCount: circles.memberCount,
+        createdAt: circles.createdAt,
+        ownerName: users.name,
+      })
+      .from(circles)
+      .leftJoin(users, eq(circles.ownerId, users.id))
+      .where(
+        q
+          ? or(ilike(circles.name, `%${q}%`), ilike(circles.description, `%${q}%`))
+          : eq(circles.isPublic, true)
+      )
+      .orderBy(desc(circles.createdAt))
+      .limit(50);
 
-  return Response.json({ circles: rows });
+    return Response.json({ circles: rows });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    // Table not found — migration hasn't run yet
+    if (msg.includes("does not exist") || msg.includes("relation")) {
+      console.error("[api/circles GET] circles table missing — run migration 20260401000000_settings_circles_expansion.sql");
+      return Response.json({ circles: [], _migrationRequired: true });
+    }
+    console.error("[api/circles GET]", msg);
+    return Response.json({ circles: [] });
+  }
 }
 
 export async function POST(req: Request) {
@@ -60,25 +71,35 @@ export async function POST(req: Request) {
     .filter(Boolean)
     .slice(0, 5);
 
-  const [circle] = await db
-    .insert(circles)
-    .values({
-      name,
-      description: body.description?.trim() || null,
-      topicTags: tags,
-      avatarUrl: body.avatarUrl?.trim() || null,
-      isPublic: body.isPublic ?? true,
-      ownerId: session.user.id,
-      memberCount: 1,
-    })
-    .returning();
+  try {
+    const [circle] = await db
+      .insert(circles)
+      .values({
+        name,
+        description: body.description?.trim() || null,
+        topicTags: tags,
+        avatarUrl: body.avatarUrl?.trim() || null,
+        isPublic: body.isPublic ?? true,
+        ownerId: session.user.id,
+        memberCount: 1,
+      })
+      .returning();
 
-  // Add creator as owner member
-  await db.insert(circleMembers).values({
-    circleId: circle.id,
-    userId: session.user.id,
-    role: "owner",
-  });
+    // Add creator as owner member
+    await db.insert(circleMembers).values({
+      circleId: circle.id,
+      userId: session.user.id,
+      role: "owner",
+    });
 
-  return Response.json({ circle }, { status: 201 });
+    return Response.json({ circle }, { status: 201 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("does not exist") || msg.includes("relation")) {
+      console.error("[api/circles POST] circles table missing — run migration 20260401000000_settings_circles_expansion.sql");
+      return Response.json({ error: "Circles feature not yet enabled — database migration required." }, { status: 503 });
+    }
+    console.error("[api/circles POST]", msg);
+    return Response.json({ error: "Failed to create circle. Please try again." }, { status: 500 });
+  }
 }

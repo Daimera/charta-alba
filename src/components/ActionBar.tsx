@@ -200,7 +200,7 @@ export function ActionBar({
       {/* Compact pill rating */}
       <div className="relative flex flex-col items-center gap-1">
         {ratingExpanded && (
-          <div className="absolute bottom-full mb-2 flex gap-1 bg-black/85 backdrop-blur rounded-xl p-1.5">
+          <div className="absolute flex flex-col gap-1 bg-black/85 backdrop-blur rounded-xl p-1.5" style={{ right: "calc(100% + 8px)", top: "50%", transform: "translateY(-50%)" }}>
             {[1, 2, 3, 4, 5].map((n) => (
               <button
                 key={n}

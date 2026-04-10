@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { users, profiles } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 // Columns present in the very first schema migration — always safe to select.
 const BASE_PROFILE_SELECT = {
@@ -85,6 +85,14 @@ export async function GET() {
       // Auto-create a minimal profile row on first settings load
       await db.insert(profiles).values({ id: userId }).onConflictDoNothing();
       return Response.json({ user, profile: null });
+    }
+
+    // Debug: log preferred_language from DB (raw SQL, bypasses Drizzle schema state)
+    try {
+      const rows = await db.execute(sql`SELECT id, preferred_language FROM profiles LIMIT 5`);
+      console.log("[api/settings GET] preferred_language sample:", JSON.stringify(rows.rows ?? rows));
+    } catch (debugErr) {
+      console.warn("[api/settings GET] preferred_language debug query failed:", debugErr instanceof Error ? debugErr.message : debugErr);
     }
 
     if (profileBaseOnly) {

@@ -226,6 +226,23 @@ export function FeedCard({
       {/* Gradient overlay at top (nav clearance) */}
       <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
 
+      {/* Persistent read paper link — always visible, bottom-left */}
+      {card.arxivUrl && (
+        <a
+          href={card.arxivUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute bottom-4 left-4 z-10 flex items-center gap-1 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur border border-white/15 text-xs text-blue-400/90 hover:text-blue-400 hover:border-white/30 transition-all"
+        >
+          Read paper
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            <polyline points="15,3 21,3 21,9" />
+            <line x1="10" y1="14" x2="21" y2="3" />
+          </svg>
+        </a>
+      )}
+
       {/* Action bar */}
       <ActionBar
         cardId={card.id}

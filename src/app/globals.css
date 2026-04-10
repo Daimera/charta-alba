@@ -96,9 +96,17 @@
 /* Ask AI drawer — bg-[#0d0d1a] → white in light mode */
 [data-theme="light"] .bg-\[#0d0d1a\] {
   background-color: #ffffff !important;
+  border-color: rgba(99,102,241,0.25) !important;
 }
 [data-theme="light"] .bg-\[#0d0d1a\] .text-white,
 [data-theme="light"] .bg-\[#0d0d1a\] .text-white\/90 { color: #111111 !important; }
+[data-theme="light"] .bg-\[#0d0d1a\] .text-white\/80 { color: #222222 !important; }
+[data-theme="light"] .bg-\[#0d0d1a\] .text-white\/40 { color: rgba(0,0,0,0.45) !important; }
+[data-theme="light"] .bg-\[#0d0d1a\] .text-white\/25 { color: rgba(0,0,0,0.30) !important; }
+[data-theme="light"] .bg-\[#0d0d1a\] .bg-white\/8    { background-color: rgba(0,0,0,0.06) !important; }
+[data-theme="light"] .bg-\[#0d0d1a\] .bg-white\/6    { background-color: rgba(0,0,0,0.05) !important; border: 1px solid rgba(0,0,0,0.08); }
+[data-theme="light"] .bg-\[#0d0d1a\] .border-white\/8 { border-color: rgba(0,0,0,0.1) !important; }
+[data-theme="light"] .bg-\[#0d0d1a\] .placeholder-white\/30::placeholder { color: rgba(0,0,0,0.35) !important; }
 [data-theme="light"] .border-indigo-500\/20 { border-color: rgba(99,102,241,0.3) !important; }
 [data-theme="light"] .text-indigo-300\/60   { color: rgba(79,70,229,0.7) !important; }
 [data-theme="light"] .text-white\/40 { color: rgba(17,17,17,0.45) !important; }

@@ -254,6 +254,9 @@ export function TopNav() {
                       Profile
                     </DropdownLink>
                   )}
+                  <DropdownLink href="/saved" onClick={() => setDropdownOpen(false)}>
+                    Saved papers
+                  </DropdownLink>
                   <DropdownLink href="/settings" onClick={() => setDropdownOpen(false)}>
                     Settings
                   </DropdownLink>
