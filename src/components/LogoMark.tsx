@@ -1,3 +1,7 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
 export type LogoTier = "basic" | "pro" | "diamond";
 
 interface LogoMarkProps {
@@ -5,10 +9,16 @@ interface LogoMarkProps {
   tier?: LogoTier;
   showGlow?: boolean;
   glowColor?: string;
-  color?: string; // kept for call-site compat — ignored, PNGs are pre-colored
+  color?: string; // kept for call-site compat — ignored
 }
 
-const TIER_SRC: Record<LogoTier, string> = {
+// Light-mode uses the black silhouette; dark uses the blue logo
+const LIGHT_SRC: Record<LogoTier, string> = {
+  basic:   "/logo-black.png",
+  pro:     "/logo-gold.png",
+  diamond: "/logo-silver.png",
+};
+const DARK_SRC: Record<LogoTier, string> = {
   basic:   "/logo-blue.png",
   pro:     "/logo-gold.png",
   diamond: "/logo-silver.png",
@@ -25,7 +35,16 @@ const TIER_GLOW_BASE: Record<LogoTier, string> = {
   diamond: "drop-shadow(0 0 4px rgba(185,242,255,0.45))",
 };
 
-// Unique class prefix — avoids conflicts with any global CSS
+function isLightTheme() {
+  if (typeof document === "undefined") return false;
+  const t = document.documentElement.getAttribute("data-theme");
+  if (t === "light") return true;
+  if (t === "system") {
+    return window.matchMedia("(prefers-color-scheme: light)").matches;
+  }
+  return false;
+}
+
 const CLS = "lm-hover";
 
 export function LogoMark({
@@ -35,7 +54,18 @@ export function LogoMark({
   glowColor,
 }: LogoMarkProps) {
   const resolvedTier = tier ?? "basic";
-  const src = TIER_SRC[resolvedTier];
+  const [light, setLight] = useState(false);
+
+  // Detect theme on mount and watch for changes via MutationObserver
+  useEffect(() => {
+    setLight(isLightTheme());
+
+    const obs = new MutationObserver(() => setLight(isLightTheme()));
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => obs.disconnect();
+  }, []);
+
+  const src = light ? LIGHT_SRC[resolvedTier] : DARK_SRC[resolvedTier];
 
   const hoverFilter = glowColor
     ? `drop-shadow(0 0 10px ${glowColor}) brightness(1.2)`
@@ -44,8 +74,6 @@ export function LogoMark({
     ? (glowColor ? `drop-shadow(0 0 4px ${glowColor})` : TIER_GLOW_BASE[resolvedTier])
     : "none";
 
-  // Animation handled by globals.css (.lm-hover / .lm-hover:hover)
-  // --lm-hover-filter CSS custom property controls the hover glow colour per tier
   // eslint-disable-next-line @next/next/no-img-element
   return (
     <img
@@ -61,7 +89,7 @@ export function LogoMark({
         background: "none",
         backgroundColor: "transparent",
         flexShrink: 0,
-        filter: baseFilter,
+        filter: light ? "none" : baseFilter,
         ["--lm-hover-filter" as string]: hoverFilter,
       }}
     />

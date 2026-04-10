@@ -156,6 +156,14 @@ export function TopNav() {
         >
           Circles
         </Link>
+        <Link
+          href="/topics"
+          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            pathname.startsWith("/topics") ? "bg-white/12 text-white" : "text-white/50 hover:text-white hover:bg-white/8"
+          }`}
+        >
+          Topics
+        </Link>
       </div>
 
       {/* Search — only on feed page */}

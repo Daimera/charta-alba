@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 
 interface ClaimsModalProps {
+  cardId: string;
   paperId: string;
   paperTitle: string | null;
   onClose: () => void;
@@ -17,7 +18,7 @@ interface Claim {
   createdAt: string;
 }
 
-export function ClaimsModal({ paperId, paperTitle, onClose }: ClaimsModalProps) {
+export function ClaimsModal({ cardId, paperId: _paperId, paperTitle, onClose }: ClaimsModalProps) {
   const { data: session } = useSession();
   const [claims, setClaims] = useState<Claim[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,27 +26,44 @@ export function ClaimsModal({ paperId, paperTitle, onClose }: ClaimsModalProps) 
   const [orcidId, setOrcidId] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`/api/cards/${paperId}/claims`)
+    const ctrl = new AbortController();
+    fetch(`/api/cards/${cardId}/claims`, { signal: ctrl.signal })
       .then((r) => r.json())
-      .then((d) => setClaims(d.claims ?? []))
+      .then((d) => setClaims((d as { claims?: Claim[] }).claims ?? []))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [paperId]);
+    return () => ctrl.abort();
+  }, [cardId]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || submitting) return;
     setSubmitting(true);
+    setError(null);
+
+    const ctrl = new AbortController();
+    const timeout = setTimeout(() => ctrl.abort(), 10000);
+
     try {
-      const res = await fetch(`/api/cards/${paperId}/claims`, {
+      const res = await fetch(`/api/cards/${cardId}/claims`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim(), orcidId: orcidId.trim() || null }),
+        signal: ctrl.signal,
       });
-      if (res.ok) setSubmitted(true);
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        const d = await res.json() as { error?: string };
+        setError(d.error ?? "Submission failed. Please try again.");
+      }
+    } catch {
+      setError("Network error. Please try again.");
     } finally {
+      clearTimeout(timeout);
       setSubmitting(false);
     }
   };
@@ -144,6 +162,9 @@ export function ClaimsModal({ paperId, paperTitle, onClose }: ClaimsModalProps) 
                   className="w-full bg-white/8 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:ring-1 focus:ring-white/25"
                 />
               </div>
+              {error && (
+                <p className="text-red-400 text-xs">{error}</p>
+              )}
               {!session && (
                 <p className="text-white/40 text-xs">
                   <button

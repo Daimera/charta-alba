@@ -2,13 +2,13 @@
 
 import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { StarRating } from "./StarRating";
 
 interface ActionBarProps {
   cardId: string;
   initialLiked: boolean;
   initialLikeCount: number;
   initialBookmarked: boolean;
+  initialBookmarkCount: number;
   initialRating: number | null;
   commentCount: number;
   onLike: () => void;
@@ -23,6 +23,7 @@ export function ActionBar({
   initialLiked,
   initialLikeCount,
   initialBookmarked,
+  initialBookmarkCount,
   initialRating,
   commentCount,
   onLike,
@@ -35,7 +36,9 @@ export function ActionBar({
   const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [bookmarked, setBookmarked] = useState(initialBookmarked);
+  const [bookmarkCount, setBookmarkCount] = useState(initialBookmarkCount);
   const [rating, setRating] = useState<number | null>(initialRating);
+  const [ratingExpanded, setRatingExpanded] = useState(false);
   const [heartAnimating, setHeartAnimating] = useState(false);
   const [shareLabel, setShareLabel] = useState("Share");
   const likeInFlight = useRef(false);
@@ -74,6 +77,7 @@ export function ActionBar({
 
     const wasBookmarked = bookmarked;
     setBookmarked(!wasBookmarked);
+    setBookmarkCount((c) => (wasBookmarked ? c - 1 : c + 1));
 
     try {
       await fetch(`/api/cards/${cardId}/bookmark`, {
@@ -81,6 +85,7 @@ export function ActionBar({
       });
     } catch {
       setBookmarked(wasBookmarked);
+      setBookmarkCount((c) => (wasBookmarked ? c + 1 : c - 1));
     } finally {
       bookmarkInFlight.current = false;
     }
@@ -89,6 +94,7 @@ export function ActionBar({
   const handleRate = async (r: number) => {
     if (!session) return;
     setRating(r);
+    setRatingExpanded(false);
     try {
       await fetch(`/api/cards/${cardId}/rate`, {
         method: "POST",
@@ -152,7 +158,7 @@ export function ActionBar({
             <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
           </svg>
         </div>
-        <span className="text-white/70 text-xs">{bookmarked ? "Saved" : "Save"}</span>
+        <span className="text-white/70 text-xs tabular-nums">{bookmarkCount > 0 ? bookmarkCount : (bookmarked ? "Saved" : "Save")}</span>
       </button>
 
       {/* Collections */}
@@ -191,12 +197,38 @@ export function ActionBar({
         <span className="text-white/70 text-xs">{shareLabel}</span>
       </button>
 
-      {/* Star Rating */}
-      <div className="flex flex-col items-center gap-1">
-        <div className="w-11 h-11 rounded-full bg-black/40 flex items-center justify-center">
-          <StarRating value={rating} onChange={handleRate} />
-        </div>
-        <span className="text-white/70 text-xs">Rate</span>
+      {/* Compact pill rating */}
+      <div className="relative flex flex-col items-center gap-1">
+        {ratingExpanded && (
+          <div className="absolute bottom-full mb-2 flex gap-1 bg-black/85 backdrop-blur rounded-xl p-1.5">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <button
+                key={n}
+                onClick={() => handleRate(n)}
+                className={`w-7 h-7 rounded-full text-xs font-bold transition-colors ${
+                  rating === n
+                    ? "bg-yellow-400 text-black"
+                    : "bg-white/15 text-white/70 hover:bg-white/25"
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        )}
+        <button
+          onClick={() => setRatingExpanded((e) => !e)}
+          className="w-11 h-11 rounded-full bg-black/40 hover:bg-white/10 flex items-center justify-center transition-colors"
+        >
+          <span
+            className={`text-sm font-bold leading-none ${
+              rating ? "text-yellow-400" : "text-white/55"
+            }`}
+          >
+            {rating ? `${rating}★` : "★"}
+          </span>
+        </button>
+        <span className="text-white/70 text-xs">{rating ? "Rated" : "Rate"}</span>
       </div>
 
       {/* Comments */}
@@ -213,7 +245,7 @@ export function ActionBar({
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
         </div>
-        <span className="text-white/70 text-xs">{commentCount}</span>
+        <span className="text-white/70 text-xs tabular-nums">{commentCount}</span>
       </button>
 
       {/* Ask AI */}

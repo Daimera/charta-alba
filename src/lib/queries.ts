@@ -20,6 +20,9 @@ const feedSelect = {
   arxivUrl: papers.arxivUrl,
   paperTitle: papers.title,
   abstract: papers.abstract,
+  publishedAt: papers.publishedAt,
+  commentCount: sql<number>`(SELECT COUNT(*)::int FROM comments WHERE card_id = ${cards.id})`,
+  bookmarkCount: sql<number>`(SELECT COUNT(*)::int FROM bookmarks WHERE card_id = ${cards.id})`,
 };
 
 export function loadFeed(): Promise<FeedCardData[]> {

@@ -123,6 +123,9 @@ export interface FeedCardData {
   citations?: CitationLink[];
   /** ISO 639 language code of the original card content. Defaults to "en". */
   sourceLanguage?: string | null;
+  commentCount?: number;
+  bookmarkCount?: number;
+  publishedAt?: string | null;
 }
 
 export interface Collection {

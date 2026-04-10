@@ -12,14 +12,13 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FeedCard } from "./FeedCard";
 import { ProgressDots } from "./ProgressDots";
-import { TagFilterBar } from "./TagFilterBar";
 import { CommentsDrawer } from "./CommentsDrawer";
 import { AskAiDrawer } from "./AskAiDrawer";
 import { ClaimsModal } from "./ClaimsModal";
 import { CollectionsModal } from "./CollectionsModal";
-import { TrendingTopics } from "./TrendingTopics";
 import { LogoMark } from "./LogoMark";
 import { PersonalizationToast } from "./PersonalizationToast";
+import { RefreshBanner } from "./RefreshBanner";
 import type { FeedCardData, TrendingTag } from "@/types";
 
 interface FeedShellProps {
@@ -39,59 +38,34 @@ type DrawerState =
   | { type: "collections"; cardId: string };
 
 const TOAST_TRIGGER = 5;
-const STORAGE_KEY = "ca_tag_filter";
 
-function FeedShellInner({ cards, initialLikedIds, initialBookmarkedIds, trendingTags, loggedIn = true }: FeedShellProps) {
+function FeedShellInner({ cards, initialLikedIds, initialBookmarkedIds, loggedIn = true }: FeedShellProps) {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("q") ?? "";
-
-  const [activeTagFilter, setActiveTagFilter] = useState<string[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
-    } catch {
-      return [];
-    }
-  });
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [drawer, setDrawer] = useState<DrawerState | null>(null);
   const [totalLikes, setTotalLikes] = useState(0);
   const [showToast, setShowToast] = useState(false);
+  // Track comment counts locally so posting a comment increments without page reload
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>(() => {
+    const m: Record<string, number> = {};
+    for (const c of cards) m[c.id] = c.commentCount ?? 0;
+    return m;
+  });
   const toastShownRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Persist tag filter to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(activeTagFilter));
-    } catch {
-      // ignore
-    }
-  }, [activeTagFilter]);
-
-  // Collect all unique tags
-  const allTags = useMemo(() => {
-    const set = new Set<string>();
-    cards.forEach((c) => c.tags.forEach((t) => set.add(t)));
-    return Array.from(set).sort();
-  }, [cards]);
-
-  // Filter cards by search query + active tags
+  // Filter cards by search query
   const filteredCards = useMemo(() => {
     const q = searchQuery.toLowerCase();
-    return cards.filter((c) => {
-      const matchesSearch =
-        !q ||
-        c.headline.toLowerCase().includes(q) ||
-        c.hook.toLowerCase().includes(q) ||
-        c.tags.some((t) => t.toLowerCase().includes(q));
-      const matchesTags =
-        activeTagFilter.length === 0 ||
-        c.tags.some((t) => activeTagFilter.includes(t));
-      return matchesSearch && matchesTags;
-    });
-  }, [cards, searchQuery, activeTagFilter]);
+    if (!q) return cards;
+    return cards.filter((c) =>
+      c.headline.toLowerCase().includes(q) ||
+      c.hook.toLowerCase().includes(q) ||
+      c.tags.some((t) => t.toLowerCase().includes(q))
+    );
+  }, [cards, searchQuery]);
 
   // IntersectionObserver to track current card
   useEffect(() => {
@@ -127,29 +101,13 @@ function FeedShellInner({ cards, initialLikedIds, initialBookmarkedIds, trending
     });
   }, []);
 
-  const handleTagClick = useCallback(
-    (tag: string) => {
-      setActiveTagFilter((prev) =>
-        prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-      );
-    },
-    []
-  );
+  const handleCommentPosted = useCallback((cardId: string) => {
+    setCommentCounts((prev) => ({ ...prev, [cardId]: (prev[cardId] ?? 0) + 1 }));
+  }, []);
 
   return (
     <>
-      <TagFilterBar
-        tags={allTags}
-        active={activeTagFilter}
-        onChange={setActiveTagFilter}
-      />
-
-      {/* Trending topics — desktop sidebar + mobile strip */}
-      <TrendingTopics
-        tags={trendingTags}
-        activeTags={activeTagFilter}
-        onTagClick={handleTagClick}
-      />
+      <RefreshBanner />
 
       {/* Snap-scroll feed container */}
       <div
@@ -170,9 +128,9 @@ function FeedShellInner({ cards, initialLikedIds, initialBookmarkedIds, trending
                 initialLiked={initialLikedIds.includes(card.id)}
                 initialBookmarked={initialBookmarkedIds.includes(card.id)}
                 initialRating={null}
-                commentCount={0}
+                commentCount={commentCounts[card.id] ?? 0}
                 onLike={handleLike}
-                onTagClick={handleTagClick}
+                onTagClick={() => {/* tags removed from feed filter */}}
                 onOpenComments={() => setDrawer({ type: "comments", cardId: card.id })}
                 onOpenAskAI={() =>
                   setDrawer({ type: "ask-ai", cardId: card.id, headline: card.headline })
@@ -228,6 +186,7 @@ function FeedShellInner({ cards, initialLikedIds, initialBookmarkedIds, trending
         <CommentsDrawer
           cardId={drawer.cardId}
           onClose={() => setDrawer(null)}
+          onCommentPosted={() => handleCommentPosted(drawer.cardId)}
         />
       )}
       {drawer?.type === "ask-ai" && (
@@ -239,6 +198,7 @@ function FeedShellInner({ cards, initialLikedIds, initialBookmarkedIds, trending
       )}
       {drawer?.type === "claims" && (
         <ClaimsModal
+          cardId={drawer.cardId}
           paperId={drawer.paperId}
           paperTitle={drawer.paperTitle}
           onClose={() => setDrawer(null)}

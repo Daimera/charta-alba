@@ -97,8 +97,24 @@ export async function PATCH(req: Request) {
 
   console.log("[api/settings/profile] upserting fields:", Object.keys(profileUpdates), "for user:", userId);
 
-  // If only preferredLanguage is being saved (the most common failure case), use a
-  // raw SQL upsert that bypasses any Drizzle schema mapping issues entirely.
+  // ── feedAlgorithm-only fast path with raw SQL fallback ───────────────────
+  // SQL migration if this column is missing in Neon:
+  // ALTER TABLE profiles ADD COLUMN IF NOT EXISTS feed_algorithm text NOT NULL DEFAULT 'trending';
+  if (Object.keys(profileUpdates).length === 1 && profileUpdates.feedAlgorithm !== undefined) {
+    const algo = profileUpdates.feedAlgorithm as string;
+    try {
+      await db.insert(profiles).values({ id: userId, feedAlgorithm: algo })
+        .onConflictDoUpdate({ target: profiles.id, set: { feedAlgorithm: algo } });
+    } catch {
+      await db.execute(
+        sql`INSERT INTO profiles (id, feed_algorithm) VALUES (${userId}, ${algo})
+            ON CONFLICT (id) DO UPDATE SET feed_algorithm = ${algo}`
+      );
+    }
+    return Response.json({ ok: true });
+  }
+
+  // ── preferredLanguage-only fast path ─────────────────────────────────────
   if (
     Object.keys(profileUpdates).length === 1 &&
     profileUpdates.preferredLanguage !== undefined

@@ -9,6 +9,18 @@ import { CitationGraph } from "./CitationGraph";
 import { usePreferredLanguage } from "./LanguageSwitcher";
 import type { FeedCardData } from "@/types";
 
+function timeAgo(dateStr: string | null | undefined): string {
+  if (!dateStr) return "";
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 60) return m <= 1 ? "just now" : `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d}d ago`;
+  return `${Math.floor(d / 7)}w ago`;
+}
+
 interface FeedCardProps {
   card: FeedCardData;
   initialLiked: boolean;
@@ -182,9 +194,16 @@ export function FeedCard({
 
           {/* Footer */}
           <div className="flex items-center justify-between">
-            <span className="text-white/30 text-xs tabular-nums">
-              {card.readingTimeSeconds}s read
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-white/30 text-xs tabular-nums">
+                {card.readingTimeSeconds}s read
+              </span>
+              {(card.publishedAt ?? card.createdAt) && (
+                <span className="text-white/20 text-xs">
+                  · {timeAgo(card.publishedAt ?? card.createdAt)}
+                </span>
+              )}
+            </div>
             {card.arxivUrl && (
               <a
                 href={card.arxivUrl}
@@ -213,6 +232,7 @@ export function FeedCard({
         initialLiked={initialLiked}
         initialLikeCount={card.likeCount}
         initialBookmarked={initialBookmarked}
+        initialBookmarkCount={card.bookmarkCount ?? 0}
         initialRating={initialRating}
         commentCount={commentCount}
         onLike={onLike}

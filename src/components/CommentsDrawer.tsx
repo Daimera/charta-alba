@@ -8,6 +8,7 @@ import { TierBadge } from "@/components/TierBadge";
 interface CommentsDrawerProps {
   cardId: string;
   onClose: () => void;
+  onCommentPosted?: () => void;
 }
 
 function timeAgo(dateStr: string) {
@@ -68,7 +69,7 @@ function CommentRow({ comment, onReply, depth = 0 }: CommentRowProps) {
   );
 }
 
-export function CommentsDrawer({ cardId, onClose }: CommentsDrawerProps) {
+export function CommentsDrawer({ cardId, onClose, onCommentPosted }: CommentsDrawerProps) {
   const { data: session } = useSession();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -111,6 +112,7 @@ export function CommentsDrawer({ cardId, onClose }: CommentsDrawerProps) {
           );
         } else {
           setComments((prev) => [{ ...comment, replies: [] }, ...prev]);
+          onCommentPosted?.();
         }
         setText("");
         setReplyTo(null);
