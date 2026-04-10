@@ -145,26 +145,24 @@ export default function PersonalizationPage() {
               </option>
             ))}
           </select>
-          {langSaved ? (
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-400 shrink-0"><polyline points="20 6 9 17 4 12" /></svg>
-              <p className="text-white/70 text-sm flex-1">Language saved. Reload to apply changes.</p>
-              <button
-                type="button"
-                onClick={() => window.location.reload()}
-                className="px-3 py-1.5 rounded-lg bg-white text-black text-xs font-semibold hover:bg-white/90 transition-colors shrink-0"
-              >
-                Reload now
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-4">
-              <button type="submit" disabled={langLoading} className="px-4 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:bg-white/90 disabled:opacity-50 transition-colors">
-                {langLoading ? "Saving…" : "Save language"}
-              </button>
-              {langMsg && <Msg ok={langMsg.ok} text={langMsg.text} />}
-            </div>
-          )}
+          <div className="flex items-center gap-4">
+            <button type="submit" disabled={langLoading || langSaved} className="px-4 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:bg-white/90 disabled:opacity-50 transition-colors">
+              {langLoading ? "Saving…" : "Save language"}
+            </button>
+            {langSaved && (
+              <>
+                <span className="text-xs text-green-400">Saved. Reload to apply.</span>
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="px-3 py-1.5 rounded-lg border border-white/20 text-xs text-white/70 hover:text-white hover:border-white/40 transition-colors"
+                >
+                  Reload now
+                </button>
+              </>
+            )}
+            {langMsg && <Msg ok={langMsg.ok} text={langMsg.text} />}
+          </div>
         </form>
       </div>
 

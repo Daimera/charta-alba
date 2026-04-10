@@ -85,6 +85,71 @@
 /* Sidebar action buttons inside cards */
 [data-theme="light"] .text-white.drop-shadow-lg { color: #111111 !important; }
 
+/* ── Light-mode extended audit ───────────────────────────────────────────── */
+
+/* Additional text-white opacity fractions */
+[data-theme="light"] .text-white\/55 { color: rgba(17,17,17,0.55) !important; }
+[data-theme="light"] .text-white\/65 { color: rgba(17,17,17,0.65) !important; }
+[data-theme="light"] .text-white\/80 { color: rgba(17,17,17,0.80) !important; }
+
+/* Active nav item highlight */
+[data-theme="light"] .bg-white\/12 { background-color: rgba(0,0,0,0.09) !important; }
+
+/* Focus rings */
+[data-theme="light"] .focus\:ring-white\/25:focus { --tw-ring-color: rgba(0,0,0,0.20) !important; }
+[data-theme="light"] .focus\:ring-white\/30:focus { --tw-ring-color: rgba(0,0,0,0.25) !important; }
+[data-theme="light"] .focus\:bg-white\/10:focus   { background-color: rgba(0,0,0,0.07) !important; }
+[data-theme="light"] .focus\:bg-white\/15:focus   { background-color: rgba(0,0,0,0.09) !important; }
+
+/* Placeholder text in inputs — Tailwind generates ::placeholder selectors */
+[data-theme="light"] .placeholder-white\/35::placeholder { color: rgba(17,17,17,0.45) !important; }
+[data-theme="light"] .placeholder-white\/45::placeholder { color: rgba(17,17,17,0.50) !important; }
+[data-theme="light"] .placeholder-white\/55::placeholder { color: rgba(17,17,17,0.55) !important; }
+
+/* Input / select fields */
+[data-theme="light"] select { background-color: rgba(0,0,0,0.04) !important; color: #111111 !important; }
+[data-theme="light"] input[type="text"],
+[data-theme="light"] input[type="email"],
+[data-theme="light"] input[type="password"],
+[data-theme="light"] input[type="search"],
+[data-theme="light"] textarea {
+  color: #111111 !important;
+}
+
+/* Tag / topic pills — typically bg-white/8 border-white/12 text-white/60 */
+[data-theme="light"] .bg-white\/6  { background-color: rgba(0,0,0,0.06) !important; }
+[data-theme="light"] .border-white\/6  { border-color: rgba(0,0,0,0.06) !important; }
+
+/* Hover states */
+[data-theme="light"] .hover\:bg-white\/8:hover  { background-color: rgba(0,0,0,0.06) !important; }
+[data-theme="light"] .hover\:bg-white\/10:hover { background-color: rgba(0,0,0,0.07) !important; }
+[data-theme="light"] .hover\:bg-white\/15:hover { background-color: rgba(0,0,0,0.09) !important; }
+[data-theme="light"] .hover\:text-white:hover   { color: #111111 !important; }
+
+/* Amber points badge in navbar */
+[data-theme="light"] .bg-amber-500\/10 { background-color: rgba(245,158,11,0.12) !important; }
+[data-theme="light"] .border-amber-500\/20 { border-color: rgba(245,158,11,0.25) !important; }
+[data-theme="light"] .hover\:bg-amber-500\/15:hover { background-color: rgba(245,158,11,0.18) !important; }
+
+/* Skeleton / pulse placeholder */
+[data-theme="light"] .bg-white\/8 { background-color: rgba(0,0,0,0.06) !important; }
+
+/* Settings sidebar active item */
+[data-theme="light"] .bg-white\/5  { background-color: rgba(0,0,0,0.04) !important; }
+
+/* Divider lines */
+[data-theme="light"] .bg-white\/3  { background-color: rgba(0,0,0,0.03) !important; }
+
+/* Ring / border accent */
+[data-theme="light"] .ring-white\/20 { --tw-ring-color: rgba(0,0,0,0.12) !important; }
+[data-theme="light"] .ring-white\/40 { --tw-ring-color: rgba(0,0,0,0.22) !important; }
+[data-theme="light"] .hover\:ring-white\/40:hover { --tw-ring-color: rgba(0,0,0,0.22) !important; }
+
+/* Border additional fractions */
+[data-theme="light"] .border-white\/15 { border-color: rgba(0,0,0,0.12) !important; }
+[data-theme="light"] .border-white\/30 { border-color: rgba(0,0,0,0.24) !important; }
+[data-theme="light"] .border-white\/40 { border-color: rgba(0,0,0,0.30) !important; }
+
 /* System preference: honour OS setting when user picks "system" */
 [data-theme="system"] {
   color-scheme: light dark;

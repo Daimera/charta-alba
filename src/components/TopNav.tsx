@@ -12,7 +12,7 @@ export function TopNav() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [, startTransition] = useTransition();
 
   const [pointsBalance, setPointsBalance] = useState<number | null>(null);
@@ -166,13 +166,15 @@ export function TopNav() {
             placeholder="Search papers…"
             defaultValue={searchParams.get("q") ?? ""}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full bg-white/8 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white placeholder-white/35 focus:outline-none focus:ring-1 focus:ring-white/25 focus:bg-white/10 transition-colors"
+            className="w-full bg-white/12 border border-white/20 rounded-lg px-3 py-1.5 text-sm text-white placeholder-white/55 focus:outline-none focus:ring-1 focus:ring-white/30 focus:bg-white/15 transition-colors"
           />
         </div>
       )}
 
       {/* Auth */}
-      {session?.user ? (
+      {status === "loading" ? (
+        <div className="w-16 h-7 rounded-lg bg-white/8 animate-pulse shrink-0" />
+      ) : session?.user ? (
         <div className="flex items-center gap-2 shrink-0">
           {/* Points badge */}
           <Link
