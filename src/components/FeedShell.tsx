@@ -39,18 +39,18 @@ type DrawerState =
 
 const TOAST_TRIGGER = 5;
 
-function FeedShellInner({ cards, initialLikedIds, initialBookmarkedIds, loggedIn = true }: FeedShellProps) {
+function FeedShellInner({ cards: initialCards, initialLikedIds, initialBookmarkedIds, loggedIn = true }: FeedShellProps) {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("q") ?? "";
 
+  const [cards, setCards] = useState<FeedCardData[]>(initialCards);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [drawer, setDrawer] = useState<DrawerState | null>(null);
   const [totalLikes, setTotalLikes] = useState(0);
   const [showToast, setShowToast] = useState(false);
-  // Track comment counts locally so posting a comment increments without page reload
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>(() => {
     const m: Record<string, number> = {};
-    for (const c of cards) m[c.id] = c.commentCount ?? 0;
+    for (const c of initialCards) m[c.id] = c.commentCount ?? 0;
     return m;
   });
   const toastShownRef = useRef(false);
@@ -105,9 +105,30 @@ function FeedShellInner({ cards, initialLikedIds, initialBookmarkedIds, loggedIn
     setCommentCounts((prev) => ({ ...prev, [cardId]: (prev[cardId] ?? 0) + 1 }));
   }, []);
 
+  // Prepend new cards from RefreshBanner
+  const handleNewCards = useCallback((newCards: FeedCardData[]) => {
+    setCards((prev) => {
+      const existingIds = new Set(prev.map((c) => c.id));
+      const deduped = newCards.filter((c) => !existingIds.has(c.id));
+      return [...deduped, ...prev];
+    });
+    setCommentCounts((prev) => {
+      const m = { ...prev };
+      for (const c of newCards) m[c.id] = c.commentCount ?? 0;
+      return m;
+    });
+  }, []);
+
+  // Top card ID for polling
+  const topCardId = filteredCards[0]?.id ?? null;
+
   return (
     <>
-      <RefreshBanner />
+      <RefreshBanner
+        topCardId={topCardId}
+        onNewCards={handleNewCards}
+        containerRef={containerRef}
+      />
 
       {/* Snap-scroll feed container */}
       <div

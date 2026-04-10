@@ -21,6 +21,7 @@ const BASE_PROFILE_SELECT = {
   emailNewFollower:  profiles.emailNewFollower,
   emailReply:        profiles.emailReply,
   emailBreakthrough: profiles.emailBreakthrough,
+  preferredLanguage: profiles.preferredLanguage, // always included — critical for language sync
   createdAt:         profiles.createdAt,
 };
 
