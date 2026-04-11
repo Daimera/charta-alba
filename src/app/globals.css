@@ -309,8 +309,27 @@ html.font-xlarge { font-size: 21px; }
   animation: fadeIn 0.2s ease-out forwards;
 }
 
-/* ── LogoMark PNG hover animation ───────────────────────────────────────── */
-/* globals.css is never tree-shaken — this is the reliable home for logo CSS. */
+/* ── LogoMark — CSS-only, no JS theme switching ──────────────────────────── */
+#logomark-img {
+  display: block;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  will-change: filter, transform;
+  filter: drop-shadow(0 0 4px rgba(137,207,240,0.45));
+}
+[data-theme="light"] #logomark-img {
+  filter: brightness(0);
+}
+#logomark-img:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 10px #89CFF0) brightness(1.2);
+}
+[data-theme="light"] #logomark-img:hover {
+  transform: scale(1.1);
+  filter: brightness(0) drop-shadow(0 0 8px rgba(0,0,0,0.35));
+}
+
+/* Legacy .lm-hover kept for any other call sites */
 .lm-hover {
   display: block !important;
   background: none !important;

@@ -140,6 +140,7 @@ export default function ProfilePage() {
   const [followListLoading, setFollowListLoading] = useState(false);
   const [likedCards, setLikedCards] = useState<LikedCard[]>([]);
   const [likedLoading, setLikedLoading] = useState(false);
+  const [ownerStats, setOwnerStats] = useState<{ savedCount: number; likedCount: number; commentCount: number } | null>(null);
 
   useEffect(() => {
     if (!username) return;
@@ -247,6 +248,23 @@ export default function ProfilePage() {
 
   const isOwner = session?.user?.id === profile.id;
 
+  // Load owner stats once we know this is the owner
+  useEffect(() => {
+    if (!isOwner || ownerStats) return;
+    fetch("/api/settings")
+      .then(r => r.ok ? r.json() : null)
+      .then((d: { stats?: { savedCount?: number; likedCount?: number; commentCount?: number } } | null) => {
+        if (d?.stats) {
+          setOwnerStats({
+            savedCount: d.stats.savedCount ?? 0,
+            likedCount: d.stats.likedCount ?? 0,
+            commentCount: d.stats.commentCount ?? 0,
+          });
+        }
+      })
+      .catch(() => undefined);
+  }, [isOwner, ownerStats]);
+
   const tabs: { id: ProfileTab; label: string }[] = [
     { id: "papers",  label: "Papers" },
     { id: "videos",  label: "Videos" },
@@ -344,15 +362,55 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Owner analytics */}
-        {isOwner && !showAnalytics && (
-          <button
-            onClick={loadAnalytics}
-            disabled={analyticsLoading}
-            className="w-full text-sm text-white/40 hover:text-white border border-white/8 hover:border-white/20 px-4 py-2.5 rounded-xl transition-colors mb-6"
-          >
-            {analyticsLoading ? "Loading analytics…" : "View profile analytics ↗"}
-          </button>
+        {/* Owner private panel */}
+        {isOwner && (
+          <div className="mb-6 space-y-3">
+            {/* Your activity stats */}
+            {ownerStats && (
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { label: "Saved", value: ownerStats.savedCount, href: "/saved" },
+                  { label: "Liked", value: ownerStats.likedCount, href: null },
+                  { label: "Comments", value: ownerStats.commentCount, href: null },
+                ].map((s) => (
+                  s.href ? (
+                    <Link key={s.label} href={s.href} className="p-3 rounded-xl bg-white/4 border border-white/8 hover:bg-white/6 transition-colors text-center">
+                      <p className="text-white font-bold text-lg">{s.value.toLocaleString()}</p>
+                      <p className="text-white/35 text-xs mt-0.5">{s.label}</p>
+                    </Link>
+                  ) : (
+                    <div key={s.label} className="p-3 rounded-xl bg-white/4 border border-white/8 text-center">
+                      <p className="text-white font-bold text-lg">{s.value.toLocaleString()}</p>
+                      <p className="text-white/35 text-xs mt-0.5">{s.label}</p>
+                    </div>
+                  )
+                ))}
+              </div>
+            )}
+            {/* Quick links */}
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { href: "/settings/account",   label: "Account settings" },
+                { href: "/settings/security",  label: "Security" },
+                { href: "/developers/dashboard", label: "API keys" },
+                { href: "/collections",        label: "My collections" },
+              ].map(({ href, label }) => (
+                <Link key={href} href={href} className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/4 border border-white/8 hover:bg-white/6 transition-colors text-white/60 hover:text-white text-sm">
+                  {label} →
+                </Link>
+              ))}
+            </div>
+            {/* Analytics toggle */}
+            {!showAnalytics && (
+              <button
+                onClick={loadAnalytics}
+                disabled={analyticsLoading}
+                className="w-full text-sm text-white/40 hover:text-white border border-white/8 hover:border-white/20 px-4 py-2.5 rounded-xl transition-colors"
+              >
+                {analyticsLoading ? "Loading analytics…" : "View profile analytics ↗"}
+              </button>
+            )}
+          </div>
         )}
         {isOwner && showAnalytics && analytics && (
           <div className="mb-6">

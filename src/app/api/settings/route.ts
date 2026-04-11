@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { users, profiles } from "@/lib/db/schema";
+import { users, profiles, bookmarks, likes } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 
 // Columns present in the very first schema migration — always safe to select.
@@ -100,7 +100,26 @@ export async function GET() {
       console.warn("[api/settings GET] returning base profile — run missing Neon migrations to unlock all settings");
     }
 
-    return Response.json({ user, profile });
+    // Activity stats for private profile view
+    const [savedRow] = await db
+      .select({ count: sql<number>`COUNT(*)::int` })
+      .from(bookmarks)
+      .where(eq(bookmarks.userId, userId));
+    const [likedRow] = await db
+      .select({ count: sql<number>`COUNT(*)::int` })
+      .from(likes)
+      .where(eq(likes.userId, userId));
+    const commentResult = await db.execute(
+      sql`SELECT COUNT(*)::int AS count FROM comments WHERE user_id = ${userId}`
+    );
+    const commentRow = (commentResult.rows ?? [])[0] as { count?: number } | undefined;
+    const stats = {
+      savedCount: savedRow?.count ?? 0,
+      likedCount: likedRow?.count ?? 0,
+      commentCount: commentRow?.count ?? 0,
+    };
+
+    return Response.json({ user, profile, stats });
   } catch (err) {
     console.error("[api/settings GET]", err instanceof Error ? err.message : err);
     return Response.json({ error: "Failed to load settings" }, { status: 500 });

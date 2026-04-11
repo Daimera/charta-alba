@@ -121,34 +121,27 @@ export async function PATCH(req: Request) {
     profileUpdates.preferredLanguage !== undefined
   ) {
     const lang = profileUpdates.preferredLanguage as string;
-    try {
-      // Try Drizzle first — fast path
-      await db
-        .insert(profiles)
-        .values({ id: userId, preferredLanguage: lang })
-        .onConflictDoUpdate({ target: profiles.id, set: { preferredLanguage: lang } });
-      console.log("[api/settings/profile] preferredLanguage saved via Drizzle");
-    } catch (drizzleErr: unknown) {
-      const e = drizzleErr instanceof Error ? drizzleErr : new Error(String(drizzleErr));
-      console.error("[api/settings/profile] Drizzle language save failed:", {
-        message: e.message,
-        // @ts-ignore pg driver attaches .code
-        code:    (drizzleErr as Record<string, unknown>).code,
-        stack:   e.stack,
-      });
-      // Raw SQL fallback — works regardless of Drizzle schema state
-      console.log("[api/settings/profile] retrying preferredLanguage with raw SQL");
+    // Use direct UPDATE to avoid INSERT trigger interference.
+    // If no row exists yet, fall back to upsert.
+    const result = await db.execute(
+      sql`UPDATE profiles SET preferred_language = ${lang} WHERE id = ${userId}`
+    );
+    const rowsAffected = (result as { rowCount?: number; rowsAffected?: number }).rowCount
+      ?? (result as { rowCount?: number; rowsAffected?: number }).rowsAffected
+      ?? 0;
+    console.log("[api/settings/profile] UPDATE preferred_language rowsAffected:", rowsAffected);
+    if (rowsAffected === 0) {
+      // Profile row doesn't exist yet — insert it
       await db.execute(
-        sql`INSERT INTO profiles (id, preferred_language)
-            VALUES (${userId}, ${lang})
+        sql`INSERT INTO profiles (id, preferred_language) VALUES (${userId}, ${lang})
             ON CONFLICT (id) DO UPDATE SET preferred_language = ${lang}`
       );
-      console.log("[api/settings/profile] preferredLanguage saved via raw SQL");
-      const verify = await db.execute(
-        sql`SELECT preferred_language FROM profiles WHERE id = ${userId} LIMIT 1`
-      );
-      console.log("[api/settings/profile] verify after write:", JSON.stringify((verify as { rows?: unknown }).rows ?? verify));
+      console.log("[api/settings/profile] preferredLanguage inserted via upsert");
     }
+    const verify = await db.execute(
+      sql`SELECT preferred_language, id FROM profiles WHERE id = ${userId} LIMIT 1`
+    );
+    console.log("[api/settings/profile] verify after write:", JSON.stringify((verify as { rows?: unknown }).rows ?? verify));
     return Response.json({ ok: true });
   }
 

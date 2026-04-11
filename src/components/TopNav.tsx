@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useCallback, useTransition, useEffect, useRef, useState } from "react";
-import { setPreferredLanguage, type LanguageCode } from "@/components/LanguageSwitcher";
+import { setPreferredLanguage, usePreferredLanguage, type LanguageCode } from "@/components/LanguageSwitcher";
+import { t } from "@/lib/i18n";
 import { TierBadge } from "@/components/TierBadge";
 import { LogoMark } from "@/components/LogoMark";
 
@@ -20,6 +21,7 @@ export function TopNav() {
   const [username, setUsername] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [lang] = usePreferredLanguage();
 
   // Fetch points balance + tier
   useEffect(() => {
@@ -108,62 +110,25 @@ export function TopNav() {
 
       {/* Nav links */}
       <div className="flex items-center gap-1 mx-4">
-        <Link
-          href="/"
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            pathname === "/" ? "bg-white/12 text-white" : "text-white/50 hover:text-white hover:bg-white/8"
-          }`}
-        >
-          Feed
-        </Link>
-        <Link
-          href="/following"
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            pathname === "/following" ? "bg-white/12 text-white" : "text-white/50 hover:text-white hover:bg-white/8"
-          }`}
-        >
-          Following
-        </Link>
-        <Link
-          href="/top"
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            pathname === "/top" ? "bg-white/12 text-white" : "text-white/50 hover:text-white hover:bg-white/8"
-          }`}
-        >
-          Top
-        </Link>
-        <Link
-          href="/digest"
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            pathname === "/digest" ? "bg-white/12 text-white" : "text-white/50 hover:text-white hover:bg-white/8"
-          }`}
-        >
-          Digest
-        </Link>
-        <Link
-          href="/videos"
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            pathname === "/videos" ? "bg-white/12 text-white" : "text-white/50 hover:text-white hover:bg-white/8"
-          }`}
-        >
-          Videos
-        </Link>
-        <Link
-          href="/circles"
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            pathname.startsWith("/circles") ? "bg-white/12 text-white" : "text-white/50 hover:text-white hover:bg-white/8"
-          }`}
-        >
-          Circles
-        </Link>
-        <Link
-          href="/topics"
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            pathname.startsWith("/topics") ? "bg-white/12 text-white" : "text-white/50 hover:text-white hover:bg-white/8"
-          }`}
-        >
-          Topics
-        </Link>
+        {([
+          { href: "/",         label: t(lang, "nav.feed"),      active: pathname === "/" },
+          { href: "/following",label: t(lang, "nav.following"), active: pathname === "/following" },
+          { href: "/top",      label: t(lang, "nav.top"),       active: pathname === "/top" },
+          { href: "/digest",   label: t(lang, "nav.digest"),    active: pathname === "/digest" },
+          { href: "/videos",   label: t(lang, "nav.videos"),    active: pathname === "/videos" },
+          { href: "/circles",  label: t(lang, "nav.circles"),   active: pathname.startsWith("/circles") },
+          { href: "/topics",   label: t(lang, "nav.topics"),    active: pathname.startsWith("/topics") },
+        ] as const).map(({ href, label, active }) => (
+          <Link
+            key={href}
+            href={href}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              active ? "bg-white/12 text-white" : "text-white/50 hover:text-white hover:bg-white/8"
+            }`}
+          >
+            {label}
+          </Link>
+        ))}
       </div>
 
       {/* Search — only on feed page */}
@@ -171,7 +136,7 @@ export function TopNav() {
         <div className="flex-1 max-w-48 mx-2">
           <input
             type="search"
-            placeholder="Search papers…"
+            placeholder={t(lang, "feed.searchPlaceholder")}
             defaultValue={searchParams.get("q") ?? ""}
             onChange={(e) => handleSearch(e.target.value)}
             className="w-full bg-white/12 border border-white/20 rounded-lg px-3 py-1.5 text-sm text-white placeholder-white/55 focus:outline-none focus:ring-1 focus:ring-white/30 focus:bg-white/15 transition-colors"
@@ -251,20 +216,20 @@ export function TopNav() {
                   {/* Nav items */}
                   {username && (
                     <DropdownLink href={`/profile/${username}`} onClick={() => setDropdownOpen(false)}>
-                      Profile
+                      {t(lang, "menu.profile")}
                     </DropdownLink>
                   )}
                   <DropdownLink href="/saved" onClick={() => setDropdownOpen(false)}>
-                    Saved papers
+                    {t(lang, "menu.saved")}
                   </DropdownLink>
                   <DropdownLink href="/settings" onClick={() => setDropdownOpen(false)}>
-                    Settings
+                    {t(lang, "menu.settings")}
                   </DropdownLink>
                   <DropdownLink href="/points" onClick={() => setDropdownOpen(false)}>
-                    Points{pointsBalance != null ? ` (${pointsBalance.toLocaleString()})` : ""}
+                    {t(lang, "menu.points")}{pointsBalance != null ? ` (${pointsBalance.toLocaleString()})` : ""}
                   </DropdownLink>
                   <DropdownLink href="/developers/dashboard" onClick={() => setDropdownOpen(false)}>
-                    Developer
+                    {t(lang, "menu.developer")}
                   </DropdownLink>
 
                   {(session.user as { isFounder?: boolean }).isFounder && (
@@ -288,7 +253,7 @@ export function TopNav() {
                     onMouseEnter={(e) => { (e.currentTarget).style.background = "#1a1a1a"; }}
                     onMouseLeave={(e) => { (e.currentTarget).style.background = "none"; }}
                   >
-                    Sign out
+                    {t(lang, "auth.signOut")}
                   </button>
                 </div>
               )}
@@ -302,13 +267,13 @@ export function TopNav() {
             className="shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
             style={{ background: "#89CFF0", color: "#000" }}
           >
-            Create account
+            {t(lang, "auth.createAccount")}
           </Link>
           <Link
             href="/auth/signin"
             className="shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium text-white/80 hover:text-white transition-colors border border-white/25 hover:border-white/40"
           >
-            Sign in
+            {t(lang, "auth.signIn")}
           </Link>
         </div>
       )}
