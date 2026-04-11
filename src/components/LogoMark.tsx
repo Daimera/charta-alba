@@ -23,14 +23,35 @@ export function LogoMark({
   const resolvedTier = tier ?? "basic";
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      id="logomark-img"
-      src={TIER_PNG[resolvedTier]}
-      alt="Charta Alba"
-      width={size}
-      height={size}
-      style={{ width: size, height: size, display: "block", flexShrink: 0 }}
-    />
+    <div
+      style={{
+        width: size,
+        height: size,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "transparent",
+        overflow: "hidden",
+        flexShrink: 0,
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        id="logomark-img"
+        src={TIER_PNG[resolvedTier]}
+        alt="Charta Alba"
+        width={size}
+        height={size}
+        style={{
+          width: size,
+          height: size,
+          display: "block",
+          padding: 0,
+          margin: 0,
+          background: "transparent",
+          flexShrink: 0,
+        }}
+      />
+    </div>
   );
 }

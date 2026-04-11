@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 
 function timeAgo(dateStr: string | null | undefined): string {
@@ -27,19 +27,37 @@ interface SavedRow {
 
 export function SavedList({ initialRows }: { initialRows: SavedRow[] }) {
   const [rows, setRows] = useState(initialRows);
-  const [removing, setRemoving] = useState<Set<string>>(new Set());
+  // Track which cards are fading out (opacity 0) before DOM removal
+  const [fadingOut, setFadingOut] = useState<Set<string>>(new Set());
+  const inFlight = useRef<Set<string>>(new Set());
 
   async function handleUnsave(cardId: string) {
-    setRemoving((s) => new Set(s).add(cardId));
-    // Optimistic remove
-    setRows((prev) => prev.filter((r) => r.cardId !== cardId));
+    if (inFlight.current.has(cardId)) return;
+    inFlight.current.add(cardId);
+
+    // 1. Fade the row out visually (preserves height so no scroll jump)
+    setFadingOut((s) => new Set(s).add(cardId));
+
+    // 2. Fire the API in parallel
+    let ok = false;
     try {
-      await fetch(`/api/cards/${cardId}/bookmark`, { method: "DELETE" });
+      const res = await fetch(`/api/cards/${cardId}/bookmark`, { method: "DELETE" });
+      ok = res.ok;
     } catch {
-      // Restore on failure
-      setRows(initialRows);
-    } finally {
-      setRemoving((s) => { const n = new Set(s); n.delete(cardId); return n; });
+      ok = false;
+    }
+
+    if (ok) {
+      // 3. Remove from DOM after the fade transition (200ms)
+      setTimeout(() => {
+        setRows((prev) => prev.filter((r) => r.cardId !== cardId));
+        setFadingOut((s) => { const n = new Set(s); n.delete(cardId); return n; });
+        inFlight.current.delete(cardId);
+      }, 220);
+    } else {
+      // Revert fade on failure
+      setFadingOut((s) => { const n = new Set(s); n.delete(cardId); return n; });
+      inFlight.current.delete(cardId);
     }
   }
 
@@ -62,7 +80,16 @@ export function SavedList({ initialRows }: { initialRows: SavedRow[] }) {
   return (
     <div className="space-y-3">
       {rows.map((row) => (
-        <div key={row.cardId} className="p-4 rounded-2xl bg-white/4 border border-white/8 hover:bg-white/6 transition-colors">
+        <div
+          key={row.cardId}
+          style={{
+            opacity: fadingOut.has(row.cardId) ? 0 : 1,
+            transition: "opacity 0.2s ease",
+            // Keep height during fade so items below don't jump up
+            pointerEvents: fadingOut.has(row.cardId) ? "none" : undefined,
+          }}
+          className="p-4 rounded-2xl bg-white/4 border border-white/8 hover:bg-white/6 transition-colors"
+        >
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-white font-semibold text-sm leading-snug mb-1 line-clamp-2">{row.headline}</p>
@@ -99,16 +126,13 @@ export function SavedList({ initialRows }: { initialRows: SavedRow[] }) {
               {/* Unsave button */}
               <button
                 onClick={() => handleUnsave(row.cardId)}
-                disabled={removing.has(row.cardId)}
                 aria-label="Remove from saved"
-                className="px-3 py-1.5 rounded-lg bg-white/4 border border-white/8 text-xs text-white/35 hover:bg-red-500/15 hover:text-red-400 hover:border-red-500/25 transition-colors text-center disabled:opacity-40"
+                className="px-3 py-1.5 rounded-lg bg-white/4 border border-white/8 text-xs text-white/35 hover:bg-red-500/15 hover:text-red-400 hover:border-red-500/25 transition-colors text-center"
               >
-                {removing.has(row.cardId) ? "…" : (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mx-auto">
-                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                    <line x1="4" y1="4" x2="20" y2="20" />
-                  </svg>
-                )}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mx-auto">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                  <line x1="4" y1="4" x2="20" y2="20" />
+                </svg>
               </button>
             </div>
           </div>

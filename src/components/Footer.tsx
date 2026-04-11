@@ -6,7 +6,7 @@ export function Footer() {
       <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <p className="text-white/25 text-xs">
-            © 2026 Charta Alba. Research, Reels, Repeat.
+            © 2026 Charta Alba.
           </p>
           <p className="text-white/20 text-xs">
             Cookies: essential only &nbsp;·&nbsp; No advertising trackers

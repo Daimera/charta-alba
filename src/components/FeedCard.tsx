@@ -185,8 +185,25 @@ export function FeedCard({
           </div>
         </div>
 
-        {/* ── Sticky bottom bar: TL;DR + meta + Read paper ── */}
+        {/* ── Sticky bottom bar: Read paper → TL;DR → meta ── */}
         <div className="shrink-0 px-5 pr-16 pb-4 pt-3 border-t border-white/6">
+          {/* Read paper — full-width button at the top of the sticky bar */}
+          {card.arxivUrl && (
+            <a
+              href={card.arxivUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-blue-500/30 bg-blue-500/8 text-sm font-semibold text-blue-400 hover:bg-blue-500/18 hover:text-blue-300 transition-all mb-3"
+            >
+              Read paper
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15,3 21,3 21,9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </a>
+          )}
+
           {/* TL;DR */}
           <div className="rounded-xl bg-white/5 border border-white/8 px-4 py-2.5 mb-3">
             <p className="text-white/35 text-xs font-semibold uppercase tracking-widest mb-0.5">
@@ -201,29 +218,12 @@ export function FeedCard({
           </div>
 
           {/* Meta row: timestamp + read time */}
-          <div className="flex items-center gap-2 text-white/30 text-xs mb-3">
+          <div className="flex items-center gap-2 text-white/30 text-xs">
             <span className="tabular-nums">{card.readingTimeSeconds}s read</span>
             {(card.publishedAt ?? card.createdAt) && (
               <span>· {timeAgo(card.publishedAt ?? card.createdAt)}</span>
             )}
           </div>
-
-          {/* Read paper — full-width button at the very bottom */}
-          {card.arxivUrl && (
-            <a
-              href={card.arxivUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-blue-500/30 bg-blue-500/8 text-sm font-semibold text-blue-400 hover:bg-blue-500/18 hover:text-blue-300 transition-all"
-            >
-              Read paper
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                <polyline points="15,3 21,3 21,9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
-              </svg>
-            </a>
-          )}
         </div>
       </div>
 

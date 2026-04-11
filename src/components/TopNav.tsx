@@ -50,7 +50,9 @@ export function TopNav() {
         // DB is always the source of truth — always sync to module store + localStorage
         // so the user's saved language follows them across devices and page loads.
         const dbLang = d?.profile?.preferredLanguage;
-        if (dbLang) {
+        if (dbLang && dbLang !== "en") {
+          // Set data-language first — the MutationObserver in usePreferredLanguage picks it up
+          // and notifies all listeners. This also syncs localStorage for future page loads.
           setPreferredLanguage(dbLang as LanguageCode);
         }
       })
@@ -203,15 +205,27 @@ export function TopNav() {
                     boxShadow: "0 8px 24px rgba(0,0,0,0.6)",
                   }}
                 >
-                  {/* User info header */}
-                  <div style={{ padding: "12px 16px", borderBottom: "1px solid #222" }}>
+                  {/* User info header — clicking name goes to profile */}
+                  <Link
+                    href={username ? `/profile/${username}` : "/settings/profile"}
+                    onClick={() => setDropdownOpen(false)}
+                    style={{
+                      display: "block",
+                      padding: "12px 16px",
+                      borderBottom: "1px solid #222",
+                      textDecoration: "none",
+                      transition: "background 0.1s",
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "#1a1a1a"; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+                  >
                     <p style={{ color: "#fff", fontSize: "14px", fontWeight: 600, margin: 0, lineHeight: 1.3 }}>
                       {session.user.name ?? "User"}
                     </p>
                     <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px", margin: "2px 0 0", lineHeight: 1.3 }}>
-                      {session.user.email}
+                      {username ? `@${username}` : session.user.email}
                     </p>
-                  </div>
+                  </Link>
 
                   {/* Nav items */}
                   {username && (

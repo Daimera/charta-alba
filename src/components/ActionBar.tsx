@@ -80,10 +80,12 @@ export function ActionBar({
     setBookmarkCount((c) => (wasBookmarked ? c - 1 : c + 1));
 
     try {
-      await fetch(`/api/cards/${cardId}/bookmark`, {
+      const res = await fetch(`/api/cards/${cardId}/bookmark`, {
         method: wasBookmarked ? "DELETE" : "POST",
       });
+      if (!res.ok) throw new Error(`${res.status}`);
     } catch {
+      // Revert optimistic update on failure
       setBookmarked(wasBookmarked);
       setBookmarkCount((c) => (wasBookmarked ? c + 1 : c - 1));
     } finally {

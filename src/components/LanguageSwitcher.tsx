@@ -30,6 +30,10 @@ export type LanguageCode = (typeof SUPPORTED_LANGUAGES)[number]["code"];
 
 export function getStoredLanguage(): LanguageCode {
   if (typeof window === "undefined") return "en";
+  // data-language is set synchronously before paint by the inline layout script —
+  // it is the most reliable source of truth on initial render.
+  const fromAttr = document.documentElement.getAttribute("data-language") as LanguageCode | null;
+  if (fromAttr && fromAttr !== "en") return fromAttr;
   return (localStorage.getItem("preferredLanguage") as LanguageCode) ?? "en";
 }
 
@@ -44,7 +48,9 @@ export function getPreferredLanguage(): LanguageCode {
 export function setPreferredLanguage(lang: LanguageCode) {
   currentLanguage = lang;
   if (typeof window !== "undefined") {
+    // Sync all three together for instant, flash-free updates
     localStorage.setItem("preferredLanguage", lang);
+    document.documentElement.setAttribute("data-language", lang);
   }
   for (const fn of listeners) fn(lang);
 }
@@ -60,8 +66,29 @@ export function usePreferredLanguage(): [LanguageCode, (lang: LanguageCode) => v
   });
 
   useEffect(() => {
+    // Sync to latest stored value on mount (catches layout-script pre-paint value)
+    const stored = getStoredLanguage();
+    if (stored !== currentLanguage) {
+      currentLanguage = stored;
+      setLang(stored);
+    }
     listeners.add(setLang);
-    return () => { listeners.delete(setLang); };
+
+    // Watch data-language attribute for programmatic changes (e.g. TopNav DB hydration)
+    const obs = new MutationObserver(() => {
+      const attr = document.documentElement.getAttribute("data-language") as LanguageCode | null;
+      if (attr && attr !== currentLanguage) {
+        currentLanguage = attr;
+        setLang(attr);
+        for (const fn of listeners) if (fn !== setLang) fn(attr);
+      }
+    });
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-language"] });
+
+    return () => {
+      listeners.delete(setLang);
+      obs.disconnect();
+    };
   }, []);
 
   return [lang, setPreferredLanguage];

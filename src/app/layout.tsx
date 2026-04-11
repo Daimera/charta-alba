@@ -69,7 +69,9 @@ export default function RootLayout({
         var t=localStorage.getItem('ca-theme')||'dark';
         var f=localStorage.getItem('ca-font-size')||'default';
         var m=localStorage.getItem('ca-reduce-motion')==='true';
+        var l=localStorage.getItem('preferredLanguage')||'en';
         document.documentElement.setAttribute('data-theme',t);
+        document.documentElement.setAttribute('data-language',l);
         if(f==='large')document.documentElement.classList.add('font-large');
         if(f==='xlarge')document.documentElement.classList.add('font-xlarge');
         if(m)document.documentElement.classList.add('reduce-motion');
