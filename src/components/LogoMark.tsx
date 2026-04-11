@@ -31,7 +31,7 @@ export function LogoMark({
         alignItems: "center",
         justifyContent: "center",
         background: "transparent",
-        overflow: "hidden",
+        overflow: "visible",
         flexShrink: 0,
       }}
     >

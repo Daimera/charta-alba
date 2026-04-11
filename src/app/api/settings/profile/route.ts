@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { neon } from "@neondatabase/serverless";
 import { users, profiles } from "@/lib/db/schema";
 import { eq, and, ne, sql } from "drizzle-orm";
 import { isAllowedImageUrl } from "@/lib/validateUrl";
@@ -116,32 +117,24 @@ export async function PATCH(req: Request) {
   }
 
   // ── preferredLanguage-only fast path ─────────────────────────────────────
+  // Use raw neon() client directly — Drizzle's db.execute() result doesn't
+  // expose rowCount reliably, causing false "0 rows affected" checks.
   if (
     Object.keys(profileUpdates).length === 1 &&
     profileUpdates.preferredLanguage !== undefined
   ) {
     const lang = profileUpdates.preferredLanguage as string;
-    // Use direct UPDATE to avoid INSERT trigger interference.
-    // If no row exists yet, fall back to upsert.
-    const result = await db.execute(
-      sql`UPDATE profiles SET preferred_language = ${lang} WHERE id = ${userId}`
-    );
-    const rowsAffected = (result as { rowCount?: number; rowsAffected?: number }).rowCount
-      ?? (result as { rowCount?: number; rowsAffected?: number }).rowsAffected
-      ?? 0;
-    console.log("[api/settings/profile] UPDATE preferred_language rowsAffected:", rowsAffected);
-    if (rowsAffected === 0) {
-      // Profile row doesn't exist yet — insert it
-      await db.execute(
-        sql`INSERT INTO profiles (id, preferred_language) VALUES (${userId}, ${lang})
-            ON CONFLICT (id) DO UPDATE SET preferred_language = ${lang}`
-      );
-      console.log("[api/settings/profile] preferredLanguage inserted via upsert");
-    }
-    const verify = await db.execute(
-      sql`SELECT preferred_language, id FROM profiles WHERE id = ${userId} LIMIT 1`
-    );
-    console.log("[api/settings/profile] verify after write:", JSON.stringify((verify as { rows?: unknown }).rows ?? verify));
+    const rawSql = neon(process.env.DATABASE_URL!);
+    // Upsert: insert row (if missing) or update preferred_language in place
+    await rawSql`
+      INSERT INTO profiles (id, preferred_language)
+      VALUES (${userId}, ${lang})
+      ON CONFLICT (id) DO UPDATE SET preferred_language = ${lang}
+    `;
+    const verifyRows = await rawSql`
+      SELECT preferred_language, id FROM profiles WHERE id = ${userId} LIMIT 1
+    `;
+    console.log("[api/settings/profile] lang upserted to", lang, "verify:", JSON.stringify(verifyRows));
     return Response.json({ ok: true });
   }
 

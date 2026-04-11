@@ -15,12 +15,13 @@ interface Circle {
   memberCount: number;
   createdAt: string | null;
   ownerName: string | null;
+  userRole?: string;
 }
 
 function CircleAvatar({ circle }: { circle: Circle }) {
   if (circle.avatarUrl) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={circle.avatarUrl} alt={circle.name} className="w-12 h-12 rounded-xl object-cover" />;
+    return <img src={circle.avatarUrl} alt={circle.name} className="w-12 h-12 rounded-xl object-cover shrink-0" />;
   }
   const initials = circle.name.slice(0, 2).toUpperCase();
   const colors = ["bg-violet-500/30", "bg-blue-500/30", "bg-green-500/30", "bg-amber-500/30", "bg-red-500/30"];
@@ -28,6 +29,47 @@ function CircleAvatar({ circle }: { circle: Circle }) {
   return (
     <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
       {initials}
+    </div>
+  );
+}
+
+function CircleCard({
+  circle,
+  badge,
+  action,
+}: {
+  circle: Circle;
+  badge?: React.ReactNode;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/4 border border-white/8 hover:bg-white/6 hover:border-white/12 transition-colors">
+      <Link href={`/circles/${circle.id}`} className="flex items-start gap-4 flex-1 min-w-0">
+        <CircleAvatar circle={circle} />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="text-white font-semibold text-sm leading-tight truncate">{circle.name}</p>
+                {badge}
+              </div>
+              <p className="text-white/30 text-xs mt-0.5">{circle.memberCount} member{circle.memberCount !== 1 ? "s" : ""}</p>
+            </div>
+            {!circle.isPublic && (
+              <span className="text-xs text-white/30 bg-white/5 border border-white/10 px-2 py-0.5 rounded-full shrink-0">Private</span>
+            )}
+          </div>
+          {circle.description && <p className="text-white/50 text-xs mt-1.5 line-clamp-2">{circle.description}</p>}
+          {circle.topicTags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {circle.topicTags.slice(0, 4).map((t) => (
+                <span key={t} className="text-xs text-white/40 bg-white/5 px-2 py-0.5 rounded-full">{t}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      </Link>
+      {action && <div className="shrink-0 self-center">{action}</div>}
     </div>
   );
 }
@@ -101,33 +143,66 @@ function CreateCircleModal({ onClose, onCreated }: { onClose: () => void; onCrea
 }
 
 export default function CirclesPage() {
-  const { data: session } = useSession();
-  const [circles, setCircles] = useState<Circle[]>([]);
+  const { data: session, status } = useSession();
+  const [mine, setMine] = useState<Circle[]>([]);
+  const [discover, setDiscover] = useState<Circle[]>([]);
+  const [searchResults, setSearchResults] = useState<Circle[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+  const [joiningId, setJoiningId] = useState<string | null>(null);
 
-  const fetchCircles = useCallback((q?: string) => {
+  const fetchCircles = useCallback(() => {
     setLoading(true);
-    const url = q ? `/api/circles?q=${encodeURIComponent(q)}` : "/api/circles";
-    fetch(url)
+    fetch("/api/circles")
       .then((r) => r.json())
-      .then((d: { circles?: Circle[] }) => setCircles(d.circles ?? []))
-      .catch(() => setCircles([]))
+      .then((d: { mine?: Circle[]; discover?: Circle[]; circles?: Circle[] }) => {
+        if (d.mine !== undefined) {
+          setMine(d.mine);
+          setDiscover(d.discover ?? []);
+        } else {
+          // Unauthenticated — all in discover
+          setMine([]);
+          setDiscover(d.circles ?? []);
+        }
+      })
+      .catch(() => { setMine([]); setDiscover([]); })
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { fetchCircles(); }, [fetchCircles]);
+  useEffect(() => { fetchCircles(); }, [fetchCircles, status]);
 
+  // Debounced search
   useEffect(() => {
-    const t = setTimeout(() => fetchCircles(search || undefined), 300);
+    if (!search.trim()) { setSearchResults(null); return; }
+    const t = setTimeout(() => {
+      fetch(`/api/circles?q=${encodeURIComponent(search)}`)
+        .then((r) => r.json())
+        .then((d: { circles?: Circle[] }) => setSearchResults(d.circles ?? []))
+        .catch(() => setSearchResults([]));
+    }, 300);
     return () => clearTimeout(t);
-  }, [search, fetchCircles]);
+  }, [search]);
+
+  async function handleJoin(circleId: string) {
+    if (!session?.user) { signIn(); return; }
+    setJoiningId(circleId);
+    try {
+      const res = await fetch(`/api/circles/${circleId}/join`, { method: "POST" });
+      if (res.ok) {
+        fetchCircles();
+      }
+    } finally {
+      setJoiningId(null);
+    }
+  }
 
   function handleCreate() {
     if (!session?.user) { signIn(); return; }
     setShowCreate(true);
   }
+
+  const mineIds = new Set(mine.map((c) => c.id));
 
   return (
     <main className="min-h-dvh bg-[#0a0a0a] pt-14">
@@ -161,49 +236,112 @@ export default function CirclesPage() {
           />
         </div>
 
-        {/* List */}
         {loading ? (
           <div className="flex justify-center py-16">
             <div className="w-6 h-6 border-2 border-white/15 border-t-white/50 rounded-full animate-spin" />
           </div>
-        ) : circles.length === 0 ? (
-          <div className="text-center py-16 space-y-3">
-            <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mx-auto">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/25">
-                <circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" />
-              </svg>
-            </div>
-            <p className="text-white/30 text-sm">{search ? "No Circles match your search." : "No Circles yet — start one!"}</p>
-            <button onClick={handleCreate} className="px-4 py-2 rounded-lg bg-white/8 border border-white/10 text-sm text-white/60 hover:bg-white/12 transition-colors">
-              Create a Circle
-            </button>
+        ) : searchResults !== null ? (
+          /* Search results */
+          <div className="space-y-3">
+            {searchResults.length === 0 ? (
+              <p className="text-center text-white/30 text-sm py-12">No Circles match your search.</p>
+            ) : (
+              searchResults.map((c) => (
+                <CircleCard
+                  key={c.id}
+                  circle={c}
+                  action={
+                    !mineIds.has(c.id) && c.isPublic ? (
+                      <button
+                        onClick={() => handleJoin(c.id)}
+                        disabled={joiningId === c.id}
+                        className="px-3 py-1.5 rounded-lg bg-white/8 border border-white/12 text-xs text-white/70 hover:bg-white/14 hover:text-white transition-colors disabled:opacity-50"
+                      >
+                        {joiningId === c.id ? "…" : "Join"}
+                      </button>
+                    ) : undefined
+                  }
+                />
+              ))
+            )}
           </div>
         ) : (
-          <div className="space-y-3">
-            {circles.map((c) => (
-              <Link key={c.id} href={`/circles/${c.id}`} className="flex items-start gap-4 p-4 rounded-2xl bg-white/4 border border-white/8 hover:bg-white/6 hover:border-white/12 transition-colors">
-                <CircleAvatar circle={c} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <p className="text-white font-semibold text-sm leading-tight">{c.name}</p>
-                      <p className="text-white/30 text-xs mt-0.5">{c.memberCount} member{c.memberCount !== 1 ? "s" : ""}</p>
-                    </div>
-                    {!c.isPublic && (
-                      <span className="text-xs text-white/30 bg-white/5 border border-white/10 px-2 py-0.5 rounded-full shrink-0">Private</span>
-                    )}
+          <div className="space-y-8">
+            {/* Your Circles */}
+            {session?.user && (
+              <section>
+                <h2 className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-3">Your Circles</h2>
+                {mine.length === 0 ? (
+                  <div className="text-center py-8 rounded-2xl border border-white/6 bg-white/2">
+                    <p className="text-white/30 text-sm mb-3">You haven&apos;t joined any Circles yet.</p>
+                    <button onClick={handleCreate} className="px-4 py-2 rounded-lg bg-white/8 border border-white/10 text-sm text-white/60 hover:bg-white/12 transition-colors">
+                      Create your first Circle
+                    </button>
                   </div>
-                  {c.description && <p className="text-white/50 text-xs mt-1.5 line-clamp-2">{c.description}</p>}
-                  {c.topicTags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-2">
-                      {c.topicTags.slice(0, 4).map((t) => (
-                        <span key={t} className="text-xs text-white/40 bg-white/5 px-2 py-0.5 rounded-full">{t}</span>
-                      ))}
-                    </div>
+                ) : (
+                  <div className="space-y-3">
+                    {mine.map((c) => (
+                      <CircleCard
+                        key={c.id}
+                        circle={c}
+                        badge={
+                          c.userRole === "owner" ? (
+                            <span className="text-xs text-amber-400/80 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-full">Owner</span>
+                          ) : undefined
+                        }
+                        action={
+                          c.userRole === "owner" ? (
+                            <Link
+                              href={`/circles/${c.id}/manage`}
+                              className="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-400 hover:bg-amber-500/18 transition-colors"
+                            >
+                              Manage
+                            </Link>
+                          ) : undefined
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* Discover */}
+            <section>
+              <h2 className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-3">Discover</h2>
+              {discover.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-white/30 text-sm">
+                    {mine.length > 0 ? "You've joined all public Circles!" : "No public Circles yet — start one!"}
+                  </p>
+                  {mine.length === 0 && (
+                    <button onClick={handleCreate} className="mt-3 px-4 py-2 rounded-lg bg-white/8 border border-white/10 text-sm text-white/60 hover:bg-white/12 transition-colors">
+                      Create a Circle
+                    </button>
                   )}
                 </div>
-              </Link>
-            ))}
+              ) : (
+                <div className="space-y-3">
+                  {discover.map((c) => (
+                    <CircleCard
+                      key={c.id}
+                      circle={c}
+                      action={
+                        c.isPublic ? (
+                          <button
+                            onClick={() => handleJoin(c.id)}
+                            disabled={joiningId === c.id}
+                            className="px-3 py-1.5 rounded-lg bg-white/8 border border-white/12 text-xs text-white/70 hover:bg-white/14 hover:text-white transition-colors disabled:opacity-50"
+                          >
+                            {joiningId === c.id ? "…" : "Join"}
+                          </button>
+                        ) : undefined
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
         )}
       </div>
@@ -211,7 +349,9 @@ export default function CirclesPage() {
       {showCreate && (
         <CreateCircleModal
           onClose={() => setShowCreate(false)}
-          onCreated={(c) => setCircles((prev) => [c, ...prev])}
+          onCreated={(c) => {
+            setMine((prev) => [{ ...c, userRole: "owner" }, ...prev]);
+          }}
         />
       )}
     </main>

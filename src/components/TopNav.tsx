@@ -207,7 +207,7 @@ export function TopNav() {
                 >
                   {/* User info header — clicking name goes to profile */}
                   <Link
-                    href={username ? `/profile/${username}` : "/settings/profile"}
+                    href={username ? `/profile/${username}` : "/profile/me"}
                     onClick={() => setDropdownOpen(false)}
                     style={{
                       display: "block",

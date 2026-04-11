@@ -1,26 +1,71 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { circles, circleMembers, users } from "@/lib/db/schema";
-import { desc, eq, ilike, or, sql } from "drizzle-orm";
+import { desc, eq, ilike, or, and, notInArray, inArray } from "drizzle-orm";
+
+const circleSelect = {
+  id: circles.id,
+  name: circles.name,
+  description: circles.description,
+  topicTags: circles.topicTags,
+  avatarUrl: circles.avatarUrl,
+  isPublic: circles.isPublic,
+  ownerId: circles.ownerId,
+  memberCount: circles.memberCount,
+  createdAt: circles.createdAt,
+  ownerName: users.name,
+};
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q")?.trim();
+  const session = await auth();
+  const userId = session?.user?.id;
 
   try {
+    if (userId && !q) {
+      // Return { mine, discover } when logged in and not searching
+      const memberRows = await db
+        .select({ circleId: circleMembers.circleId, role: circleMembers.role })
+        .from(circleMembers)
+        .where(eq(circleMembers.userId, userId));
+
+      const myCircleIds = memberRows.map((r) => r.circleId);
+      const roleMap = new Map(memberRows.map((r) => [r.circleId, r.role]));
+
+      // Circles the user belongs to
+      const mine = myCircleIds.length > 0
+        ? await db
+            .select(circleSelect)
+            .from(circles)
+            .leftJoin(users, eq(circles.ownerId, users.id))
+            .where(inArray(circles.id, myCircleIds))
+            .orderBy(desc(circles.createdAt))
+        : [];
+
+      // Public circles not already joined
+      const discoverQuery = db
+        .select(circleSelect)
+        .from(circles)
+        .leftJoin(users, eq(circles.ownerId, users.id))
+        .orderBy(desc(circles.createdAt))
+        .limit(30);
+
+      const discover = myCircleIds.length > 0
+        ? await discoverQuery.where(
+            and(eq(circles.isPublic, true), notInArray(circles.id, myCircleIds))
+          )
+        : await discoverQuery.where(eq(circles.isPublic, true));
+
+      return Response.json({
+        mine: mine.map((c) => ({ ...c, userRole: roleMap.get(c.id) ?? "member" })),
+        discover,
+      });
+    }
+
+    // Unauthenticated or searching — return flat list
     const rows = await db
-      .select({
-        id: circles.id,
-        name: circles.name,
-        description: circles.description,
-        topicTags: circles.topicTags,
-        avatarUrl: circles.avatarUrl,
-        isPublic: circles.isPublic,
-        ownerId: circles.ownerId,
-        memberCount: circles.memberCount,
-        createdAt: circles.createdAt,
-        ownerName: users.name,
-      })
+      .select(circleSelect)
       .from(circles)
       .leftJoin(users, eq(circles.ownerId, users.id))
       .where(
@@ -34,13 +79,12 @@ export async function GET(req: Request) {
     return Response.json({ circles: rows });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    // Table not found — migration hasn't run yet
     if (msg.includes("does not exist") || msg.includes("relation")) {
       console.error("[api/circles GET] circles table missing — run migration 20260401000000_settings_circles_expansion.sql");
-      return Response.json({ circles: [], _migrationRequired: true });
+      return Response.json({ circles: [], mine: [], discover: [], _migrationRequired: true });
     }
     console.error("[api/circles GET]", msg);
-    return Response.json({ circles: [] });
+    return Response.json({ circles: [], mine: [], discover: [] });
   }
 }
 
