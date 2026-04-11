@@ -24,6 +24,7 @@ export async function PATCH(req: Request) {
     emailComments?: boolean;
     preferredLanguage?: string;
   };
+  console.log("[api/settings/profile] PATCH body keys:", Object.keys(body), "preferredLanguage:", body.preferredLanguage);
 
   // Update display name on users table
   if (body.name !== undefined) {
@@ -143,6 +144,10 @@ export async function PATCH(req: Request) {
             ON CONFLICT (id) DO UPDATE SET preferred_language = ${lang}`
       );
       console.log("[api/settings/profile] preferredLanguage saved via raw SQL");
+      const verify = await db.execute(
+        sql`SELECT preferred_language FROM profiles WHERE id = ${userId} LIMIT 1`
+      );
+      console.log("[api/settings/profile] verify after write:", JSON.stringify((verify as { rows?: unknown }).rows ?? verify));
     }
     return Response.json({ ok: true });
   }

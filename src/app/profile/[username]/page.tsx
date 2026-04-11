@@ -46,7 +46,16 @@ interface FollowUser {
   isFollowingBack: boolean;
 }
 
-type ProfileTab = "posts" | "liked" | "collections" | "circles" | "followers" | "following";
+type ProfileTab = "papers" | "videos" | "about" | "followers" | "following";
+
+interface LikedCard {
+  id: string;
+  headline: string;
+  hook: string;
+  tags: string[];
+  readingTimeSeconds: number;
+  arxivUrl: string | null;
+}
 
 function Avatar({ url, name, size = 80 }: { url: string | null; name: string | null; size?: number }) {
   const dim = `${size}px`;
@@ -123,12 +132,14 @@ export default function ProfilePage() {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
+  const [activeTab, setActiveTab] = useState<ProfileTab>("papers");
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [followerUsers, setFollowerUsers] = useState<FollowUser[]>([]);
   const [followingUsers, setFollowingUsers] = useState<FollowUser[]>([]);
   const [followListLoading, setFollowListLoading] = useState(false);
+  const [likedCards, setLikedCards] = useState<LikedCard[]>([]);
+  const [likedLoading, setLikedLoading] = useState(false);
 
   useEffect(() => {
     if (!username) return;
@@ -179,7 +190,17 @@ export default function ProfilePage() {
   useEffect(() => {
     if (activeTab === "followers") loadFollowList("followers");
     if (activeTab === "following") loadFollowList("following");
-  }, [activeTab, loadFollowList]);
+    if (activeTab === "papers" && likedCards.length === 0) {
+      setLikedLoading(true);
+      fetch(`/api/profiles/${username}/liked`)
+        .then((r) => r.ok ? r.json() : null)
+        .then((d: { cards: LikedCard[] } | null) => {
+          if (d?.cards) setLikedCards(d.cards);
+        })
+        .catch(() => undefined)
+        .finally(() => setLikedLoading(false));
+    }
+  }, [activeTab, loadFollowList, username]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadAnalytics() {
     setAnalyticsLoading(true);
@@ -227,12 +248,9 @@ export default function ProfilePage() {
   const isOwner = session?.user?.id === profile.id;
 
   const tabs: { id: ProfileTab; label: string }[] = [
-    { id: "posts", label: "Posts" },
-    { id: "liked", label: "Liked" },
-    { id: "collections", label: "Collections" },
-    { id: "circles", label: "Circles" },
-    { id: "followers", label: `Followers ${profile.followerCount > 0 ? `(${profile.followerCount})` : ""}` },
-    { id: "following", label: `Following ${profile.followingCount > 0 ? `(${profile.followingCount})` : ""}` },
+    { id: "papers",  label: "Papers" },
+    { id: "videos",  label: "Videos" },
+    { id: "about",   label: "About" },
   ];
 
   return (
@@ -375,12 +393,59 @@ export default function ProfilePage() {
             </div>
 
             {/* Tab content */}
-            {(activeTab === "posts" || activeTab === "liked" || activeTab === "collections" || activeTab === "circles") && (
-              <div className="text-center py-12 text-white/30 text-sm">
-                {activeTab === "posts" && "No posts yet."}
-                {activeTab === "liked" && "No public likes yet."}
-                {activeTab === "collections" && "No public collections yet."}
-                {activeTab === "circles" && "No circles yet."}
+            {activeTab === "papers" && (
+              likedLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="w-5 h-5 border-2 border-white/15 border-t-white/50 rounded-full animate-spin" />
+                </div>
+              ) : likedCards.length === 0 ? (
+                <p className="text-center text-white/30 text-sm py-12">No liked papers yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {likedCards.map((card) => (
+                    <div key={card.id} className="p-4 rounded-2xl bg-white/4 border border-white/8 hover:bg-white/6 transition-colors">
+                      <p className="text-white font-semibold text-sm leading-snug mb-1 line-clamp-2">{card.headline}</p>
+                      <p className="text-white/50 text-xs leading-relaxed line-clamp-2 mb-2">{card.hook}</p>
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {card.tags.slice(0, 4).map((tag) => (
+                          <span key={tag} className="text-xs text-white/35 bg-white/5 px-2 py-0.5 rounded-full">#{tag}</span>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-white/25 text-xs">{card.readingTimeSeconds}s read</span>
+                        {card.arxivUrl && (
+                          <a href={card.arxivUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400/70 hover:text-blue-400 transition-colors">
+                            Read paper ↗
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
+            )}
+
+            {activeTab === "videos" && (
+              <p className="text-center text-white/30 text-sm py-12">No videos yet.</p>
+            )}
+
+            {activeTab === "about" && (
+              <div className="space-y-4 py-2">
+                {profile.bio && (
+                  <div>
+                    <p className="text-white/35 text-xs uppercase tracking-wide mb-1">Bio</p>
+                    <p className="text-white/70 text-sm leading-relaxed">{profile.bio}</p>
+                  </div>
+                )}
+                {profile.joinedAt && (
+                  <div>
+                    <p className="text-white/35 text-xs uppercase tracking-wide mb-1">Member since</p>
+                    <p className="text-white/70 text-sm">{new Date(profile.joinedAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}</p>
+                  </div>
+                )}
+                {!profile.bio && !profile.joinedAt && (
+                  <p className="text-center text-white/30 text-sm py-12">No info yet.</p>
+                )}
               </div>
             )}
 

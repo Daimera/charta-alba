@@ -186,7 +186,7 @@ export function FeedCard({
         </div>
 
         {/* ── Sticky bottom bar: TL;DR + meta + Read paper ── */}
-        <div className="shrink-0 px-5 pr-16 pb-4 pt-3 border-t border-white/6 bg-[#0a0a0a]/95 backdrop-blur-sm">
+        <div className="shrink-0 px-5 pr-16 pb-4 pt-3 border-t border-white/6">
           {/* TL;DR */}
           <div className="rounded-xl bg-white/5 border border-white/8 px-4 py-2.5 mb-3">
             <p className="text-white/35 text-xs font-semibold uppercase tracking-widest mb-0.5">

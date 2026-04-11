@@ -12,18 +12,10 @@ interface LogoMarkProps {
   color?: string; // kept for call-site compat — ignored
 }
 
-// Per-tier foreground color (dark mode)
-const TIER_COLOR_DARK: Record<LogoTier, string> = {
-  basic:   "#89CFF0",
-  pro:     "#FFD700",
-  diamond: "#B9F2FF",
-};
-
-// Light mode: near-black
-const TIER_COLOR_LIGHT: Record<LogoTier, string> = {
-  basic:   "#111111",
-  pro:     "#8B6914",
-  diamond: "#2a4a5a",
+const TIER_PNG: Record<LogoTier, string> = {
+  basic:   "/logo-blue.png",
+  pro:     "/logo-gold.png",
+  diamond: "/logo-silver.png",
 };
 
 const TIER_GLOW_HOVER: Record<LogoTier, string> = {
@@ -63,55 +55,34 @@ export function LogoMark({
     return () => obs.disconnect();
   }, []);
 
-  const color = light ? TIER_COLOR_LIGHT[resolvedTier] : TIER_COLOR_DARK[resolvedTier];
-
   const hoverFilter = glowColor
     ? `drop-shadow(0 0 10px ${glowColor}) brightness(1.2)`
     : TIER_GLOW_HOVER[resolvedTier];
-  const baseFilter = showGlow && !light
-    ? (glowColor ? `drop-shadow(0 0 4px ${glowColor})` : TIER_GLOW_BASE[resolvedTier])
-    : "none";
+
+  const baseFilter = light
+    ? "brightness(0)"
+    : (showGlow
+        ? (glowColor ? `drop-shadow(0 0 4px ${glowColor})` : TIER_GLOW_BASE[resolvedTier])
+        : "none");
 
   return (
-    <svg
-      viewBox="0 0 100 105"
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={TIER_PNG[resolvedTier]}
+      alt="Charta Alba"
       width={size}
       height={size}
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
       className="lm-hover"
-      aria-label="Charta Alba"
-      role="img"
       style={{
+        width: size,
+        height: size,
         display: "block",
         flexShrink: 0,
-        color,
+        background: "none",
+        backgroundColor: "transparent",
         filter: baseFilter,
         ["--lm-hover-filter" as string]: hoverFilter,
       }}
-    >
-      {/*
-        Geometric star/shield silhouette with a diamond cutout.
-        fillRule="evenodd" creates the inner diamond hole.
-      */}
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        fill="currentColor"
-        d="
-          M50 2
-          L62 26 L91 15 L79 44 L88 70
-          C 83 82 71 88 61 80
-          C 57 76 54 69 52 62
-          L50 76
-          L48 62
-          C 46 69 43 76 39 80
-          C 29 88 17 82 12 70
-          L21 44 L9 15 L38 26
-          Z
-          M50 32 L62 50 L50 57 L38 50 Z
-        "
-      />
-    </svg>
+    />
   );
 }
