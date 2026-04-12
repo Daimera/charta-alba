@@ -5,6 +5,8 @@ import { useSession, signOut } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { PasswordStrengthField, isPasswordValid } from "@/components/PasswordStrengthField";
+import { usePreferredLanguage } from "@/components/LanguageSwitcher";
+import { t } from "@/lib/i18n";
 
 interface ProfileData {
   bio: string | null;
@@ -87,6 +89,7 @@ function Banner() {
 export default function AccountPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [lang] = usePreferredLanguage();
 
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -247,12 +250,12 @@ export default function AccountPage() {
       </Suspense>
 
       {/* Profile */}
-      <Card title="Profile information">
+      <Card title={t(lang, "settings.profileInfo")}>
         <form onSubmit={handleProfileSave} className="space-y-4">
-          <Field label="Display name">
+          <Field label={t(lang, "settings.displayName")}>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" autoComplete="name" className={inputCls} />
           </Field>
-          <Field label="Username">
+          <Field label={t(lang, "settings.username")}>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 text-sm">@</span>
               <input
@@ -267,7 +270,7 @@ export default function AccountPage() {
             </div>
             <p className="text-white/30 text-xs mt-1">3–20 characters, letters, numbers, underscores.</p>
           </Field>
-          <Field label="Phone number">
+          <Field label={t(lang, "settings.phone")}>
             <input
               type="tel"
               value={phone}
@@ -278,7 +281,7 @@ export default function AccountPage() {
             />
             <p className="text-white/30 text-xs mt-1">Used for sign in. Include country code.</p>
           </Field>
-          <Field label="Bio">
+          <Field label={t(lang, "settings.bio")}>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
@@ -288,12 +291,12 @@ export default function AccountPage() {
               className={`${inputCls} resize-none`}
             />
           </Field>
-          <Field label="Avatar URL">
+          <Field label={t(lang, "settings.avatarUrl")}>
             <input type="url" value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} placeholder="https://…" className={inputCls} />
           </Field>
           <div className="flex items-center gap-4">
             <button type="submit" disabled={profileLoading} className="px-4 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:bg-white/90 disabled:opacity-50 transition-colors">
-              {profileLoading ? "Saving…" : "Save profile"}
+              {profileLoading ? "Saving…" : t(lang, "settings.saveProfile")}
             </button>
             {profileMsg && <Msg ok={profileMsg.ok} text={profileMsg.text} />}
           </div>
@@ -301,7 +304,7 @@ export default function AccountPage() {
       </Card>
 
       {/* Account type */}
-      <Card title="Account type">
+      <Card title={t(lang, "settings.accountType")}>
         <div className="flex items-center justify-between py-1">
           <div>
             <p className="text-white text-sm font-medium">{isPublic ? "Public" : "Private"} account</p>
@@ -332,7 +335,7 @@ export default function AccountPage() {
       </Card>
 
       {/* Change email */}
-      <Card title="Change email">
+      <Card title={t(lang, "settings.changeEmail")}>
         <p className="text-white/40 text-sm mb-4">
           Current: <span className="text-white/70">{userData?.email}</span>
         </p>
@@ -353,7 +356,7 @@ export default function AccountPage() {
       </Card>
 
       {/* Download data */}
-      <Card title="Download your data">
+      <Card title={t(lang, "settings.downloadData")}>
         <p className="text-white/40 text-sm mb-3">Export all your posts, likes, and account data as a JSON archive.</p>
         <button disabled className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white/30 cursor-not-allowed">
           Coming soon
@@ -361,7 +364,7 @@ export default function AccountPage() {
       </Card>
 
       {/* Deactivate */}
-      <Card title="Deactivate account">
+      <Card title={t(lang, "settings.deactivate")}>
         <p className="text-white/40 text-sm mb-3">
           Your account will be hidden from feeds. You can reactivate by signing back in.
         </p>
@@ -438,7 +441,7 @@ export default function AccountPage() {
           onClick={() => signOut({ callbackUrl: "/" })}
           className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white/60 hover:bg-white/10 transition-colors"
         >
-          Sign out
+          {t(lang, "settings.signOut")}
         </button>
       </div>
     </div>

@@ -10,9 +10,22 @@ export type TranslationKey =
   | "common.save" | "common.cancel" | "common.back" | "common.search"
   // User menu
   | "menu.profile" | "menu.saved" | "menu.settings" | "menu.points" | "menu.developer"
-  // Settings labels
+  // Settings — section labels
   | "settings.language" | "settings.theme" | "settings.notifications" | "settings.privacy"
   | "settings.security" | "settings.account"
+  // Settings — profile fields
+  | "settings.profileInfo" | "settings.displayName" | "settings.username"
+  | "settings.bio" | "settings.phone" | "settings.avatarUrl" | "settings.saveProfile"
+  // Settings — account sections
+  | "settings.accountType" | "settings.changeEmail" | "settings.downloadData"
+  | "settings.deactivate" | "settings.deleteAccount" | "settings.signOut"
+  | "settings.sendVerification" | "settings.comingSoon"
+  // Settings — personalization
+  | "settings.feedAlgorithm" | "settings.prefLanguage" | "settings.interests"
+  // Settings — accessibility
+  | "settings.fontSize" | "settings.motion" | "settings.reduceAnimations"
+  | "settings.dark" | "settings.light" | "settings.system"
+  | "settings.fontDefault" | "settings.fontLarge" | "settings.fontXLarge"
   // Feed
   | "feed.searchPlaceholder" | "feed.newPapers" | "feed.readPaper";
 
@@ -27,6 +40,19 @@ const en: Translations = {
   "menu.points": "Points", "menu.developer": "Developer",
   "settings.language": "Language", "settings.theme": "Theme", "settings.notifications": "Notifications",
   "settings.privacy": "Privacy", "settings.security": "Security", "settings.account": "Account",
+  "settings.profileInfo": "Profile information", "settings.displayName": "Display name",
+  "settings.username": "Username", "settings.bio": "Bio", "settings.phone": "Phone number",
+  "settings.avatarUrl": "Avatar URL", "settings.saveProfile": "Save profile",
+  "settings.accountType": "Account type", "settings.changeEmail": "Change email",
+  "settings.downloadData": "Download your data", "settings.deactivate": "Deactivate account",
+  "settings.deleteAccount": "Delete account", "settings.signOut": "Sign out",
+  "settings.sendVerification": "Send verification", "settings.comingSoon": "Coming soon",
+  "settings.feedAlgorithm": "Feed algorithm", "settings.prefLanguage": "Preferred language",
+  "settings.interests": "Interests",
+  "settings.fontSize": "Font size", "settings.motion": "Motion",
+  "settings.reduceAnimations": "Reduce animations",
+  "settings.dark": "Dark", "settings.light": "Light", "settings.system": "System",
+  "settings.fontDefault": "Default", "settings.fontLarge": "Large", "settings.fontXLarge": "Extra Large",
   "feed.searchPlaceholder": "Search papers…", "feed.newPapers": "new paper", "feed.readPaper": "Read paper",
 };
 
@@ -39,6 +65,19 @@ const es: Translations = {
   "menu.points": "Puntos", "menu.developer": "Desarrollador",
   "settings.language": "Idioma", "settings.theme": "Tema", "settings.notifications": "Notificaciones",
   "settings.privacy": "Privacidad", "settings.security": "Seguridad", "settings.account": "Cuenta",
+  "settings.profileInfo": "Información de perfil", "settings.displayName": "Nombre",
+  "settings.username": "Usuario", "settings.bio": "Biografía", "settings.phone": "Teléfono",
+  "settings.avatarUrl": "URL de avatar", "settings.saveProfile": "Guardar perfil",
+  "settings.accountType": "Tipo de cuenta", "settings.changeEmail": "Cambiar correo",
+  "settings.downloadData": "Descargar mis datos", "settings.deactivate": "Desactivar cuenta",
+  "settings.deleteAccount": "Eliminar cuenta", "settings.signOut": "Cerrar sesión",
+  "settings.sendVerification": "Enviar verificación", "settings.comingSoon": "Próximamente",
+  "settings.feedAlgorithm": "Algoritmo del feed", "settings.prefLanguage": "Idioma preferido",
+  "settings.interests": "Intereses",
+  "settings.fontSize": "Tamaño de fuente", "settings.motion": "Movimiento",
+  "settings.reduceAnimations": "Reducir animaciones",
+  "settings.dark": "Oscuro", "settings.light": "Claro", "settings.system": "Sistema",
+  "settings.fontDefault": "Predeterminado", "settings.fontLarge": "Grande", "settings.fontXLarge": "Extra grande",
   "feed.searchPlaceholder": "Buscar artículos…", "feed.newPapers": "artículo nuevo", "feed.readPaper": "Leer artículo",
 };
 
@@ -51,6 +90,19 @@ const fr: Translations = {
   "menu.points": "Points", "menu.developer": "Développeur",
   "settings.language": "Langue", "settings.theme": "Thème", "settings.notifications": "Notifications",
   "settings.privacy": "Confidentialité", "settings.security": "Sécurité", "settings.account": "Compte",
+  "settings.profileInfo": "Informations du profil", "settings.displayName": "Nom affiché",
+  "settings.username": "Pseudonyme", "settings.bio": "Bio", "settings.phone": "Téléphone",
+  "settings.avatarUrl": "URL de l'avatar", "settings.saveProfile": "Enregistrer le profil",
+  "settings.accountType": "Type de compte", "settings.changeEmail": "Changer l'e-mail",
+  "settings.downloadData": "Télécharger mes données", "settings.deactivate": "Désactiver le compte",
+  "settings.deleteAccount": "Supprimer le compte", "settings.signOut": "Se déconnecter",
+  "settings.sendVerification": "Envoyer la vérification", "settings.comingSoon": "Bientôt disponible",
+  "settings.feedAlgorithm": "Algorithme du fil", "settings.prefLanguage": "Langue préférée",
+  "settings.interests": "Centres d'intérêt",
+  "settings.fontSize": "Taille de police", "settings.motion": "Animations",
+  "settings.reduceAnimations": "Réduire les animations",
+  "settings.dark": "Sombre", "settings.light": "Clair", "settings.system": "Système",
+  "settings.fontDefault": "Par défaut", "settings.fontLarge": "Grande", "settings.fontXLarge": "Très grande",
   "feed.searchPlaceholder": "Rechercher des articles…", "feed.newPapers": "nouvel article", "feed.readPaper": "Lire l'article",
 };
 
@@ -63,6 +115,19 @@ const de: Translations = {
   "menu.points": "Punkte", "menu.developer": "Entwickler",
   "settings.language": "Sprache", "settings.theme": "Design", "settings.notifications": "Benachrichtigungen",
   "settings.privacy": "Datenschutz", "settings.security": "Sicherheit", "settings.account": "Konto",
+  "settings.profileInfo": "Profilinformationen", "settings.displayName": "Anzeigename",
+  "settings.username": "Benutzername", "settings.bio": "Bio", "settings.phone": "Telefonnummer",
+  "settings.avatarUrl": "Avatar-URL", "settings.saveProfile": "Profil speichern",
+  "settings.accountType": "Kontotyp", "settings.changeEmail": "E-Mail ändern",
+  "settings.downloadData": "Daten herunterladen", "settings.deactivate": "Konto deaktivieren",
+  "settings.deleteAccount": "Konto löschen", "settings.signOut": "Abmelden",
+  "settings.sendVerification": "Bestätigung senden", "settings.comingSoon": "Demnächst verfügbar",
+  "settings.feedAlgorithm": "Feed-Algorithmus", "settings.prefLanguage": "Bevorzugte Sprache",
+  "settings.interests": "Interessen",
+  "settings.fontSize": "Schriftgröße", "settings.motion": "Bewegung",
+  "settings.reduceAnimations": "Animationen reduzieren",
+  "settings.dark": "Dunkel", "settings.light": "Hell", "settings.system": "System",
+  "settings.fontDefault": "Standard", "settings.fontLarge": "Groß", "settings.fontXLarge": "Sehr groß",
   "feed.searchPlaceholder": "Artikel suchen…", "feed.newPapers": "neuer Artikel", "feed.readPaper": "Artikel lesen",
 };
 
@@ -75,6 +140,19 @@ const pt: Translations = {
   "menu.points": "Pontos", "menu.developer": "Desenvolvedor",
   "settings.language": "Idioma", "settings.theme": "Tema", "settings.notifications": "Notificações",
   "settings.privacy": "Privacidade", "settings.security": "Segurança", "settings.account": "Conta",
+  "settings.profileInfo": "Informações do perfil", "settings.displayName": "Nome de exibição",
+  "settings.username": "Nome de usuário", "settings.bio": "Bio", "settings.phone": "Telefone",
+  "settings.avatarUrl": "URL do avatar", "settings.saveProfile": "Salvar perfil",
+  "settings.accountType": "Tipo de conta", "settings.changeEmail": "Alterar e-mail",
+  "settings.downloadData": "Baixar meus dados", "settings.deactivate": "Desativar conta",
+  "settings.deleteAccount": "Excluir conta", "settings.signOut": "Sair",
+  "settings.sendVerification": "Enviar verificação", "settings.comingSoon": "Em breve",
+  "settings.feedAlgorithm": "Algoritmo do feed", "settings.prefLanguage": "Idioma preferido",
+  "settings.interests": "Interesses",
+  "settings.fontSize": "Tamanho da fonte", "settings.motion": "Movimento",
+  "settings.reduceAnimations": "Reduzir animações",
+  "settings.dark": "Escuro", "settings.light": "Claro", "settings.system": "Sistema",
+  "settings.fontDefault": "Padrão", "settings.fontLarge": "Grande", "settings.fontXLarge": "Extra grande",
   "feed.searchPlaceholder": "Buscar artigos…", "feed.newPapers": "novo artigo", "feed.readPaper": "Ler artigo",
 };
 
@@ -87,6 +165,19 @@ const ar: Translations = {
   "menu.points": "النقاط", "menu.developer": "مطور",
   "settings.language": "اللغة", "settings.theme": "المظهر", "settings.notifications": "الإشعارات",
   "settings.privacy": "الخصوصية", "settings.security": "الأمان", "settings.account": "الحساب",
+  "settings.profileInfo": "معلومات الملف الشخصي", "settings.displayName": "الاسم المعروض",
+  "settings.username": "اسم المستخدم", "settings.bio": "نبذة", "settings.phone": "الهاتف",
+  "settings.avatarUrl": "رابط الصورة", "settings.saveProfile": "حفظ الملف",
+  "settings.accountType": "نوع الحساب", "settings.changeEmail": "تغيير البريد",
+  "settings.downloadData": "تنزيل بياناتي", "settings.deactivate": "تعطيل الحساب",
+  "settings.deleteAccount": "حذف الحساب", "settings.signOut": "تسجيل الخروج",
+  "settings.sendVerification": "إرسال تحقق", "settings.comingSoon": "قريباً",
+  "settings.feedAlgorithm": "خوارزمية الخلاصة", "settings.prefLanguage": "اللغة المفضلة",
+  "settings.interests": "الاهتمامات",
+  "settings.fontSize": "حجم الخط", "settings.motion": "الحركة",
+  "settings.reduceAnimations": "تقليل الحركة",
+  "settings.dark": "داكن", "settings.light": "فاتح", "settings.system": "النظام",
+  "settings.fontDefault": "افتراضي", "settings.fontLarge": "كبير", "settings.fontXLarge": "كبير جداً",
   "feed.searchPlaceholder": "ابحث عن أبحاث…", "feed.newPapers": "بحث جديد", "feed.readPaper": "قراءة البحث",
 };
 
@@ -99,6 +190,19 @@ const hi: Translations = {
   "menu.points": "पॉइंट्स", "menu.developer": "डेवलपर",
   "settings.language": "भाषा", "settings.theme": "थीम", "settings.notifications": "सूचनाएं",
   "settings.privacy": "गोपनीयता", "settings.security": "सुरक्षा", "settings.account": "खाता",
+  "settings.profileInfo": "प्रोफाइल जानकारी", "settings.displayName": "प्रदर्शन नाम",
+  "settings.username": "यूज़रनेम", "settings.bio": "बायो", "settings.phone": "फ़ोन नंबर",
+  "settings.avatarUrl": "अवतार URL", "settings.saveProfile": "प्रोफाइल सहेजें",
+  "settings.accountType": "खाता प्रकार", "settings.changeEmail": "ईमेल बदलें",
+  "settings.downloadData": "डेटा डाउनलोड करें", "settings.deactivate": "खाता निष्क्रिय करें",
+  "settings.deleteAccount": "खाता हटाएं", "settings.signOut": "साइन आउट",
+  "settings.sendVerification": "सत्यापन भेजें", "settings.comingSoon": "जल्द आ रहा है",
+  "settings.feedAlgorithm": "फ़ीड एल्गोरिदम", "settings.prefLanguage": "पसंदीदा भाषा",
+  "settings.interests": "रुचियाँ",
+  "settings.fontSize": "फ़ॉन्ट आकार", "settings.motion": "गति",
+  "settings.reduceAnimations": "एनिमेशन कम करें",
+  "settings.dark": "डार्क", "settings.light": "लाइट", "settings.system": "सिस्टम",
+  "settings.fontDefault": "डिफ़ॉल्ट", "settings.fontLarge": "बड़ा", "settings.fontXLarge": "बहुत बड़ा",
   "feed.searchPlaceholder": "पेपर खोजें…", "feed.newPapers": "नया पेपर", "feed.readPaper": "पेपर पढ़ें",
 };
 
@@ -111,6 +215,19 @@ const ja: Translations = {
   "menu.points": "ポイント", "menu.developer": "開発者",
   "settings.language": "言語", "settings.theme": "テーマ", "settings.notifications": "通知",
   "settings.privacy": "プライバシー", "settings.security": "セキュリティ", "settings.account": "アカウント",
+  "settings.profileInfo": "プロフィール情報", "settings.displayName": "表示名",
+  "settings.username": "ユーザー名", "settings.bio": "自己紹介", "settings.phone": "電話番号",
+  "settings.avatarUrl": "アバターURL", "settings.saveProfile": "プロフィールを保存",
+  "settings.accountType": "アカウントの種類", "settings.changeEmail": "メールを変更",
+  "settings.downloadData": "データをダウンロード", "settings.deactivate": "アカウントを無効化",
+  "settings.deleteAccount": "アカウントを削除", "settings.signOut": "ログアウト",
+  "settings.sendVerification": "確認を送信", "settings.comingSoon": "近日公開",
+  "settings.feedAlgorithm": "フィードアルゴリズム", "settings.prefLanguage": "言語設定",
+  "settings.interests": "興味・関心",
+  "settings.fontSize": "フォントサイズ", "settings.motion": "モーション",
+  "settings.reduceAnimations": "アニメーションを減らす",
+  "settings.dark": "ダーク", "settings.light": "ライト", "settings.system": "システム",
+  "settings.fontDefault": "標準", "settings.fontLarge": "大", "settings.fontXLarge": "特大",
   "feed.searchPlaceholder": "論文を検索…", "feed.newPapers": "件の新しい論文", "feed.readPaper": "論文を読む",
 };
 
@@ -123,6 +240,19 @@ const ko: Translations = {
   "menu.points": "포인트", "menu.developer": "개발자",
   "settings.language": "언어", "settings.theme": "테마", "settings.notifications": "알림",
   "settings.privacy": "개인정보", "settings.security": "보안", "settings.account": "계정",
+  "settings.profileInfo": "프로필 정보", "settings.displayName": "표시 이름",
+  "settings.username": "사용자 이름", "settings.bio": "소개", "settings.phone": "전화번호",
+  "settings.avatarUrl": "아바타 URL", "settings.saveProfile": "프로필 저장",
+  "settings.accountType": "계정 유형", "settings.changeEmail": "이메일 변경",
+  "settings.downloadData": "데이터 다운로드", "settings.deactivate": "계정 비활성화",
+  "settings.deleteAccount": "계정 삭제", "settings.signOut": "로그아웃",
+  "settings.sendVerification": "인증 전송", "settings.comingSoon": "곧 출시",
+  "settings.feedAlgorithm": "피드 알고리즘", "settings.prefLanguage": "선호 언어",
+  "settings.interests": "관심사",
+  "settings.fontSize": "글꼴 크기", "settings.motion": "모션",
+  "settings.reduceAnimations": "애니메이션 줄이기",
+  "settings.dark": "다크", "settings.light": "라이트", "settings.system": "시스템",
+  "settings.fontDefault": "기본", "settings.fontLarge": "크게", "settings.fontXLarge": "매우 크게",
   "feed.searchPlaceholder": "논문 검색…", "feed.newPapers": "개의 새 논문", "feed.readPaper": "논문 읽기",
 };
 
@@ -135,6 +265,19 @@ const zhCN: Translations = {
   "menu.points": "积分", "menu.developer": "开发者",
   "settings.language": "语言", "settings.theme": "主题", "settings.notifications": "通知",
   "settings.privacy": "隐私", "settings.security": "安全", "settings.account": "账号",
+  "settings.profileInfo": "个人资料", "settings.displayName": "显示名称",
+  "settings.username": "用户名", "settings.bio": "简介", "settings.phone": "手机号",
+  "settings.avatarUrl": "头像链接", "settings.saveProfile": "保存资料",
+  "settings.accountType": "账号类型", "settings.changeEmail": "更换邮箱",
+  "settings.downloadData": "下载数据", "settings.deactivate": "停用账号",
+  "settings.deleteAccount": "删除账号", "settings.signOut": "退出登录",
+  "settings.sendVerification": "发送验证", "settings.comingSoon": "即将推出",
+  "settings.feedAlgorithm": "信息流算法", "settings.prefLanguage": "首选语言",
+  "settings.interests": "兴趣",
+  "settings.fontSize": "字体大小", "settings.motion": "动效",
+  "settings.reduceAnimations": "减少动画",
+  "settings.dark": "深色", "settings.light": "浅色", "settings.system": "跟随系统",
+  "settings.fontDefault": "默认", "settings.fontLarge": "大", "settings.fontXLarge": "特大",
   "feed.searchPlaceholder": "搜索论文…", "feed.newPapers": "篇新论文", "feed.readPaper": "阅读论文",
 };
 
@@ -147,6 +290,19 @@ const zhTW: Translations = {
   "menu.points": "點數", "menu.developer": "開發者",
   "settings.language": "語言", "settings.theme": "主題", "settings.notifications": "通知",
   "settings.privacy": "隱私", "settings.security": "安全", "settings.account": "帳號",
+  "settings.profileInfo": "個人資料", "settings.displayName": "顯示名稱",
+  "settings.username": "用戶名", "settings.bio": "簡介", "settings.phone": "電話",
+  "settings.avatarUrl": "頭像連結", "settings.saveProfile": "儲存資料",
+  "settings.accountType": "帳號類型", "settings.changeEmail": "更換信箱",
+  "settings.downloadData": "下載資料", "settings.deactivate": "停用帳號",
+  "settings.deleteAccount": "刪除帳號", "settings.signOut": "登出",
+  "settings.sendVerification": "發送驗證", "settings.comingSoon": "即將推出",
+  "settings.feedAlgorithm": "動態演算法", "settings.prefLanguage": "偏好語言",
+  "settings.interests": "興趣",
+  "settings.fontSize": "字體大小", "settings.motion": "動效",
+  "settings.reduceAnimations": "減少動畫",
+  "settings.dark": "深色", "settings.light": "淺色", "settings.system": "跟隨系統",
+  "settings.fontDefault": "預設", "settings.fontLarge": "大", "settings.fontXLarge": "特大",
   "feed.searchPlaceholder": "搜尋論文…", "feed.newPapers": "篇新論文", "feed.readPaper": "閱讀論文",
 };
 
@@ -159,6 +315,19 @@ const ru: Translations = {
   "menu.points": "Очки", "menu.developer": "Разработчик",
   "settings.language": "Язык", "settings.theme": "Тема", "settings.notifications": "Уведомления",
   "settings.privacy": "Конфиденциальность", "settings.security": "Безопасность", "settings.account": "Аккаунт",
+  "settings.profileInfo": "Информация профиля", "settings.displayName": "Имя пользователя",
+  "settings.username": "Логин", "settings.bio": "О себе", "settings.phone": "Телефон",
+  "settings.avatarUrl": "URL аватара", "settings.saveProfile": "Сохранить профиль",
+  "settings.accountType": "Тип аккаунта", "settings.changeEmail": "Изменить e-mail",
+  "settings.downloadData": "Скачать данные", "settings.deactivate": "Деактивировать аккаунт",
+  "settings.deleteAccount": "Удалить аккаунт", "settings.signOut": "Выйти",
+  "settings.sendVerification": "Отправить подтверждение", "settings.comingSoon": "Скоро",
+  "settings.feedAlgorithm": "Алгоритм ленты", "settings.prefLanguage": "Язык интерфейса",
+  "settings.interests": "Интересы",
+  "settings.fontSize": "Размер шрифта", "settings.motion": "Анимации",
+  "settings.reduceAnimations": "Уменьшить анимации",
+  "settings.dark": "Тёмная", "settings.light": "Светлая", "settings.system": "Системная",
+  "settings.fontDefault": "Стандартный", "settings.fontLarge": "Большой", "settings.fontXLarge": "Очень большой",
   "feed.searchPlaceholder": "Поиск статей…", "feed.newPapers": "новая статья", "feed.readPaper": "Читать статью",
 };
 
@@ -171,6 +340,19 @@ const it: Translations = {
   "menu.points": "Punti", "menu.developer": "Sviluppatore",
   "settings.language": "Lingua", "settings.theme": "Tema", "settings.notifications": "Notifiche",
   "settings.privacy": "Privacy", "settings.security": "Sicurezza", "settings.account": "Account",
+  "settings.profileInfo": "Informazioni profilo", "settings.displayName": "Nome visualizzato",
+  "settings.username": "Nome utente", "settings.bio": "Bio", "settings.phone": "Telefono",
+  "settings.avatarUrl": "URL avatar", "settings.saveProfile": "Salva profilo",
+  "settings.accountType": "Tipo account", "settings.changeEmail": "Cambia e-mail",
+  "settings.downloadData": "Scarica dati", "settings.deactivate": "Disattiva account",
+  "settings.deleteAccount": "Elimina account", "settings.signOut": "Esci",
+  "settings.sendVerification": "Invia verifica", "settings.comingSoon": "Prossimamente",
+  "settings.feedAlgorithm": "Algoritmo feed", "settings.prefLanguage": "Lingua preferita",
+  "settings.interests": "Interessi",
+  "settings.fontSize": "Dimensione testo", "settings.motion": "Movimento",
+  "settings.reduceAnimations": "Riduci animazioni",
+  "settings.dark": "Scuro", "settings.light": "Chiaro", "settings.system": "Sistema",
+  "settings.fontDefault": "Predefinito", "settings.fontLarge": "Grande", "settings.fontXLarge": "Extra grande",
   "feed.searchPlaceholder": "Cerca articoli…", "feed.newPapers": "nuovo articolo", "feed.readPaper": "Leggi articolo",
 };
 
@@ -183,6 +365,19 @@ const nl: Translations = {
   "menu.points": "Punten", "menu.developer": "Ontwikkelaar",
   "settings.language": "Taal", "settings.theme": "Thema", "settings.notifications": "Meldingen",
   "settings.privacy": "Privacy", "settings.security": "Beveiliging", "settings.account": "Account",
+  "settings.profileInfo": "Profielinformatie", "settings.displayName": "Weergavenaam",
+  "settings.username": "Gebruikersnaam", "settings.bio": "Bio", "settings.phone": "Telefoonnummer",
+  "settings.avatarUrl": "Avatar URL", "settings.saveProfile": "Profiel opslaan",
+  "settings.accountType": "Accounttype", "settings.changeEmail": "E-mail wijzigen",
+  "settings.downloadData": "Gegevens downloaden", "settings.deactivate": "Account deactiveren",
+  "settings.deleteAccount": "Account verwijderen", "settings.signOut": "Uitloggen",
+  "settings.sendVerification": "Verificatie verzenden", "settings.comingSoon": "Binnenkort",
+  "settings.feedAlgorithm": "Feed-algoritme", "settings.prefLanguage": "Voorkeurstaal",
+  "settings.interests": "Interesses",
+  "settings.fontSize": "Lettergrootte", "settings.motion": "Beweging",
+  "settings.reduceAnimations": "Animaties verminderen",
+  "settings.dark": "Donker", "settings.light": "Licht", "settings.system": "Systeem",
+  "settings.fontDefault": "Standaard", "settings.fontLarge": "Groot", "settings.fontXLarge": "Extra groot",
   "feed.searchPlaceholder": "Artikelen zoeken…", "feed.newPapers": "nieuw artikel", "feed.readPaper": "Artikel lezen",
 };
 
@@ -195,6 +390,19 @@ const tr: Translations = {
   "menu.points": "Puan", "menu.developer": "Geliştirici",
   "settings.language": "Dil", "settings.theme": "Tema", "settings.notifications": "Bildirimler",
   "settings.privacy": "Gizlilik", "settings.security": "Güvenlik", "settings.account": "Hesap",
+  "settings.profileInfo": "Profil bilgileri", "settings.displayName": "Görünen ad",
+  "settings.username": "Kullanıcı adı", "settings.bio": "Bio", "settings.phone": "Telefon",
+  "settings.avatarUrl": "Avatar URL", "settings.saveProfile": "Profili kaydet",
+  "settings.accountType": "Hesap türü", "settings.changeEmail": "E-posta değiştir",
+  "settings.downloadData": "Verilerimi indir", "settings.deactivate": "Hesabı devre dışı bırak",
+  "settings.deleteAccount": "Hesabı sil", "settings.signOut": "Çıkış yap",
+  "settings.sendVerification": "Doğrulama gönder", "settings.comingSoon": "Yakında",
+  "settings.feedAlgorithm": "Akış algoritması", "settings.prefLanguage": "Tercih edilen dil",
+  "settings.interests": "İlgi alanları",
+  "settings.fontSize": "Yazı boyutu", "settings.motion": "Hareket",
+  "settings.reduceAnimations": "Animasyonları azalt",
+  "settings.dark": "Koyu", "settings.light": "Açık", "settings.system": "Sistem",
+  "settings.fontDefault": "Varsayılan", "settings.fontLarge": "Büyük", "settings.fontXLarge": "Çok büyük",
   "feed.searchPlaceholder": "Makale ara…", "feed.newPapers": "yeni makale", "feed.readPaper": "Makaleyi oku",
 };
 
@@ -207,6 +415,19 @@ const pl: Translations = {
   "menu.points": "Punkty", "menu.developer": "Deweloper",
   "settings.language": "Język", "settings.theme": "Motyw", "settings.notifications": "Powiadomienia",
   "settings.privacy": "Prywatność", "settings.security": "Bezpieczeństwo", "settings.account": "Konto",
+  "settings.profileInfo": "Informacje profilowe", "settings.displayName": "Nazwa wyświetlana",
+  "settings.username": "Nazwa użytkownika", "settings.bio": "Bio", "settings.phone": "Telefon",
+  "settings.avatarUrl": "URL avatara", "settings.saveProfile": "Zapisz profil",
+  "settings.accountType": "Typ konta", "settings.changeEmail": "Zmień e-mail",
+  "settings.downloadData": "Pobierz dane", "settings.deactivate": "Dezaktywuj konto",
+  "settings.deleteAccount": "Usuń konto", "settings.signOut": "Wyloguj się",
+  "settings.sendVerification": "Wyślij weryfikację", "settings.comingSoon": "Wkrótce",
+  "settings.feedAlgorithm": "Algorytm feedu", "settings.prefLanguage": "Preferowany język",
+  "settings.interests": "Zainteresowania",
+  "settings.fontSize": "Rozmiar czcionki", "settings.motion": "Animacje",
+  "settings.reduceAnimations": "Ogranicz animacje",
+  "settings.dark": "Ciemny", "settings.light": "Jasny", "settings.system": "Systemowy",
+  "settings.fontDefault": "Domyślny", "settings.fontLarge": "Duży", "settings.fontXLarge": "Bardzo duży",
   "feed.searchPlaceholder": "Szukaj artykułów…", "feed.newPapers": "nowy artykuł", "feed.readPaper": "Czytaj artykuł",
 };
 
@@ -219,6 +440,19 @@ const sv: Translations = {
   "menu.points": "Poäng", "menu.developer": "Utvecklare",
   "settings.language": "Språk", "settings.theme": "Tema", "settings.notifications": "Aviseringar",
   "settings.privacy": "Integritet", "settings.security": "Säkerhet", "settings.account": "Konto",
+  "settings.profileInfo": "Profilinformation", "settings.displayName": "Visningsnamn",
+  "settings.username": "Användarnamn", "settings.bio": "Bio", "settings.phone": "Telefon",
+  "settings.avatarUrl": "Avatar-URL", "settings.saveProfile": "Spara profil",
+  "settings.accountType": "Kontotyp", "settings.changeEmail": "Ändra e-post",
+  "settings.downloadData": "Ladda ner data", "settings.deactivate": "Avaktivera konto",
+  "settings.deleteAccount": "Radera konto", "settings.signOut": "Logga ut",
+  "settings.sendVerification": "Skicka verifiering", "settings.comingSoon": "Kommer snart",
+  "settings.feedAlgorithm": "Flödesalgoritm", "settings.prefLanguage": "Föredraget språk",
+  "settings.interests": "Intressen",
+  "settings.fontSize": "Textstorlek", "settings.motion": "Rörelse",
+  "settings.reduceAnimations": "Minska animationer",
+  "settings.dark": "Mörkt", "settings.light": "Ljust", "settings.system": "System",
+  "settings.fontDefault": "Standard", "settings.fontLarge": "Stor", "settings.fontXLarge": "Extra stor",
   "feed.searchPlaceholder": "Sök artiklar…", "feed.newPapers": "ny artikel", "feed.readPaper": "Läs artikel",
 };
 
@@ -231,6 +465,19 @@ const id: Translations = {
   "menu.points": "Poin", "menu.developer": "Pengembang",
   "settings.language": "Bahasa", "settings.theme": "Tema", "settings.notifications": "Notifikasi",
   "settings.privacy": "Privasi", "settings.security": "Keamanan", "settings.account": "Akun",
+  "settings.profileInfo": "Informasi profil", "settings.displayName": "Nama tampilan",
+  "settings.username": "Nama pengguna", "settings.bio": "Bio", "settings.phone": "Telepon",
+  "settings.avatarUrl": "URL avatar", "settings.saveProfile": "Simpan profil",
+  "settings.accountType": "Jenis akun", "settings.changeEmail": "Ubah email",
+  "settings.downloadData": "Unduh data", "settings.deactivate": "Nonaktifkan akun",
+  "settings.deleteAccount": "Hapus akun", "settings.signOut": "Keluar",
+  "settings.sendVerification": "Kirim verifikasi", "settings.comingSoon": "Segera hadir",
+  "settings.feedAlgorithm": "Algoritma feed", "settings.prefLanguage": "Bahasa pilihan",
+  "settings.interests": "Minat",
+  "settings.fontSize": "Ukuran font", "settings.motion": "Gerakan",
+  "settings.reduceAnimations": "Kurangi animasi",
+  "settings.dark": "Gelap", "settings.light": "Terang", "settings.system": "Sistem",
+  "settings.fontDefault": "Bawaan", "settings.fontLarge": "Besar", "settings.fontXLarge": "Sangat besar",
   "feed.searchPlaceholder": "Cari artikel…", "feed.newPapers": "artikel baru", "feed.readPaper": "Baca artikel",
 };
 
@@ -243,6 +490,19 @@ const vi: Translations = {
   "menu.points": "Điểm", "menu.developer": "Nhà phát triển",
   "settings.language": "Ngôn ngữ", "settings.theme": "Giao diện", "settings.notifications": "Thông báo",
   "settings.privacy": "Quyền riêng tư", "settings.security": "Bảo mật", "settings.account": "Tài khoản",
+  "settings.profileInfo": "Thông tin hồ sơ", "settings.displayName": "Tên hiển thị",
+  "settings.username": "Tên người dùng", "settings.bio": "Giới thiệu", "settings.phone": "Điện thoại",
+  "settings.avatarUrl": "URL ảnh đại diện", "settings.saveProfile": "Lưu hồ sơ",
+  "settings.accountType": "Loại tài khoản", "settings.changeEmail": "Đổi email",
+  "settings.downloadData": "Tải dữ liệu", "settings.deactivate": "Vô hiệu hóa tài khoản",
+  "settings.deleteAccount": "Xóa tài khoản", "settings.signOut": "Đăng xuất",
+  "settings.sendVerification": "Gửi xác minh", "settings.comingSoon": "Sắp ra mắt",
+  "settings.feedAlgorithm": "Thuật toán feed", "settings.prefLanguage": "Ngôn ngữ ưa thích",
+  "settings.interests": "Sở thích",
+  "settings.fontSize": "Cỡ chữ", "settings.motion": "Chuyển động",
+  "settings.reduceAnimations": "Giảm hiệu ứng",
+  "settings.dark": "Tối", "settings.light": "Sáng", "settings.system": "Hệ thống",
+  "settings.fontDefault": "Mặc định", "settings.fontLarge": "Lớn", "settings.fontXLarge": "Rất lớn",
   "feed.searchPlaceholder": "Tìm kiếm bài báo…", "feed.newPapers": "bài báo mới", "feed.readPaper": "Đọc bài báo",
 };
 
@@ -255,6 +515,19 @@ const th: Translations = {
   "menu.points": "คะแนน", "menu.developer": "นักพัฒนา",
   "settings.language": "ภาษา", "settings.theme": "ธีม", "settings.notifications": "การแจ้งเตือน",
   "settings.privacy": "ความเป็นส่วนตัว", "settings.security": "ความปลอดภัย", "settings.account": "บัญชี",
+  "settings.profileInfo": "ข้อมูลโปรไฟล์", "settings.displayName": "ชื่อที่แสดง",
+  "settings.username": "ชื่อผู้ใช้", "settings.bio": "แนะนำตัว", "settings.phone": "เบอร์โทร",
+  "settings.avatarUrl": "URL รูปโปรไฟล์", "settings.saveProfile": "บันทึกโปรไฟล์",
+  "settings.accountType": "ประเภทบัญชี", "settings.changeEmail": "เปลี่ยนอีเมล",
+  "settings.downloadData": "ดาวน์โหลดข้อมูล", "settings.deactivate": "ปิดใช้งานบัญชี",
+  "settings.deleteAccount": "ลบบัญชี", "settings.signOut": "ออกจากระบบ",
+  "settings.sendVerification": "ส่งการยืนยัน", "settings.comingSoon": "เร็วๆ นี้",
+  "settings.feedAlgorithm": "อัลกอริทึมฟีด", "settings.prefLanguage": "ภาษาที่ต้องการ",
+  "settings.interests": "ความสนใจ",
+  "settings.fontSize": "ขนาดตัวอักษร", "settings.motion": "การเคลื่อนไหว",
+  "settings.reduceAnimations": "ลดแอนิเมชัน",
+  "settings.dark": "มืด", "settings.light": "สว่าง", "settings.system": "ระบบ",
+  "settings.fontDefault": "ค่าเริ่มต้น", "settings.fontLarge": "ใหญ่", "settings.fontXLarge": "ใหญ่มาก",
   "feed.searchPlaceholder": "ค้นหาบทความ…", "feed.newPapers": "บทความใหม่", "feed.readPaper": "อ่านบทความ",
 };
 

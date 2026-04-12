@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePreferredLanguage } from "@/components/LanguageSwitcher";
+import { t } from "@/lib/i18n";
 
 type Theme = "dark" | "light" | "system";
 type FontSize = "default" | "large" | "xlarge";
@@ -79,6 +81,7 @@ function SaveRow({ onSave, saved, loading }: { onSave: () => void; saved: boolea
 }
 
 export default function AccessibilityPage() {
+  const [lang] = usePreferredLanguage();
   // Current applied values (what's in localStorage / on the DOM)
   const [theme, setTheme] = useState<Theme>("dark");
   const [fontSize, setFontSize] = useState<FontSize>("default");
@@ -161,13 +164,13 @@ export default function AccessibilityPage() {
       {/* Theme */}
       <div className="border-b border-white/8 pb-6 mb-6">
         <RadioGroup
-          label="Theme"
+          label={t(lang, "settings.theme")}
           value={pendingTheme}
           onChange={setPendingTheme}
           options={[
-            { value: "dark", label: "Dark", description: "Dark background — easier on the eyes at night." },
-            { value: "light", label: "Light", description: "Light background with dark text." },
-            { value: "system", label: "System", description: "Match your device's system preference." },
+            { value: "dark", label: t(lang, "settings.dark"), description: "Dark background — easier on the eyes at night." },
+            { value: "light", label: t(lang, "settings.light"), description: "Light background with dark text." },
+            { value: "system", label: t(lang, "settings.system"), description: "Match your device's system preference." },
           ]}
         />
         <SaveRow onSave={handleSaveTheme} saved={themeSaved} />
@@ -176,13 +179,13 @@ export default function AccessibilityPage() {
       {/* Font size */}
       <div className="border-b border-white/8 pb-6 mb-6">
         <RadioGroup
-          label="Font size"
+          label={t(lang, "settings.fontSize")}
           value={pendingFont}
           onChange={setPendingFont}
           options={[
-            { value: "default", label: "Default", description: "Standard reading size." },
-            { value: "large", label: "Large", description: "Slightly larger for easier reading." },
-            { value: "xlarge", label: "Extra Large", description: "Maximum size for accessibility." },
+            { value: "default", label: t(lang, "settings.fontDefault"), description: "Standard reading size." },
+            { value: "large", label: t(lang, "settings.fontLarge"), description: "Slightly larger for easier reading." },
+            { value: "xlarge", label: t(lang, "settings.fontXLarge"), description: "Maximum size for accessibility." },
           ]}
         />
         <SaveRow onSave={handleSaveFont} saved={fontSaved} />
@@ -190,9 +193,9 @@ export default function AccessibilityPage() {
 
       {/* Motion */}
       <div className="border-b border-white/8 pb-6 mb-6">
-        <h2 className="text-white font-semibold text-sm mb-3">Motion</h2>
+        <h2 className="text-white font-semibold text-sm mb-3">{t(lang, "settings.motion")}</h2>
         <Toggle
-          label="Reduce animations"
+          label={t(lang, "settings.reduceAnimations")}
           description="Minimises transitions and motion effects throughout the app."
           checked={pendingMotion}
           onChange={setPendingMotion}
@@ -202,7 +205,7 @@ export default function AccessibilityPage() {
 
       {/* Language */}
       <div>
-        <h2 className="text-white font-semibold text-sm mb-3">Language</h2>
+        <h2 className="text-white font-semibold text-sm mb-3">{t(lang, "settings.language")}</h2>
         <div className="flex items-center justify-between p-3.5 rounded-xl bg-white/4 border border-white/8">
           <div>
             <p className="text-white text-sm font-medium">English</p>

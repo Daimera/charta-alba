@@ -275,30 +275,60 @@ export default function ProfilePage() {
     <main className="min-h-dvh bg-[#0a0a0a] pt-14" id="main-content">
       <div className="max-w-2xl mx-auto px-4 py-8">
 
-        {/* Profile header */}
-        <div className="flex items-start gap-5 mb-6">
-          <Avatar url={profile.avatarUrl} name={profile.displayName ?? profile.username} size={80} />
+        {/* Profile header — Instagram-style */}
+        <div className="flex items-start gap-4 mb-6">
+          <Avatar url={profile.avatarUrl} name={profile.displayName ?? profile.username} size={88} />
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-white text-xl font-bold">
-                {profile.displayName ?? profile.username}
-              </h1>
-              <TierBadge tier={profile.subscriptionTier} />
-              {profile.isOrcidVerified && (
-                <span className="px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 text-xs font-medium border border-green-500/20">
-                  ✓ ORCID
-                </span>
-              )}
+            {/* Name row + action button top-right */}
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-white text-lg font-bold leading-tight">
+                    {profile.displayName ?? profile.username}
+                  </h1>
+                  <TierBadge tier={profile.subscriptionTier} />
+                  {profile.isOrcidVerified && (
+                    <span className="px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 text-xs font-medium border border-green-500/20">
+                      ✓ ORCID
+                    </span>
+                  )}
+                </div>
+                {profile.username && (
+                  <p className="text-white/40 text-xs mt-0.5">@{profile.username}</p>
+                )}
+              </div>
+              {/* Follow / Edit button — top right */}
+              <div className="shrink-0">
+                {isOwner ? (
+                  <Link
+                    href="/settings/profile"
+                    className="px-3 py-1.5 rounded-lg border border-white/20 text-white/70 text-xs font-medium hover:bg-white/8 transition-colors whitespace-nowrap"
+                  >
+                    Edit profile
+                  </Link>
+                ) : (
+                  <button
+                    onClick={toggleFollow}
+                    disabled={followLoading}
+                    aria-label={isFollowing ? "Unfollow" : "Follow"}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                      isFollowing
+                        ? "bg-white/10 text-white/60 hover:bg-red-500/20 hover:text-red-400 border border-white/10"
+                        : "bg-white text-black hover:bg-white/90"
+                    }`}
+                  >
+                    {followLoading ? "…" : isFollowing ? "Following" : "Follow"}
+                  </button>
+                )}
+              </div>
             </div>
-            {profile.username && (
-              <p className="text-white/45 text-sm">@{profile.username}</p>
-            )}
-            {profile.bio && (
-              <p className="text-white/65 text-sm mt-2 leading-relaxed">{profile.bio}</p>
-            )}
 
-            {/* Stats row */}
-            <div className="flex items-center gap-5 mt-3">
+            {/* Stats row: Papers | Followers | Following */}
+            <div className="flex items-center gap-4 mb-2">
+              <div className="text-center">
+                <p className="text-white font-semibold text-sm">{likedCards.length > 0 ? likedCards.length.toLocaleString() : "–"}</p>
+                <p className="text-white/35 text-xs">papers</p>
+              </div>
               <button
                 onClick={() => setActiveTab("followers")}
                 className="text-center hover:opacity-80 transition-opacity"
@@ -313,52 +343,28 @@ export default function ProfilePage() {
                 <p className="text-white font-semibold text-sm">{profile.followingCount.toLocaleString()}</p>
                 <p className="text-white/35 text-xs">following</p>
               </button>
-              {profile.totalViews > 0 && (
-                <div className="text-center">
-                  <p className="text-white font-semibold text-sm">{profile.totalViews.toLocaleString()}</p>
-                  <p className="text-white/35 text-xs">profile views</p>
-                </div>
-              )}
             </div>
 
+            {/* Bio */}
+            {profile.bio && (
+              <p className="text-white/65 text-sm leading-relaxed">{profile.bio}</p>
+            )}
+
             {profile.joinedAt && (
-              <p className="text-white/25 text-xs mt-2">
-                Member since {new Date(profile.joinedAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+              <p className="text-white/25 text-xs mt-1.5">
+                Joined {new Date(profile.joinedAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
               </p>
             )}
 
-            {/* Action buttons */}
-            <div className="flex items-center gap-2 mt-3">
-              {isOwner ? (
-                <>
-                  <Link
-                    href="/settings/profile"
-                    className="px-4 py-1.5 rounded-lg border border-white/20 text-white/80 text-sm font-medium hover:bg-white/8 transition-colors"
-                  >
-                    Edit Profile
-                  </Link>
-                  <Link
-                    href="/creator"
-                    className="px-4 py-1.5 rounded-lg border border-white/20 text-white/80 text-sm font-medium hover:bg-white/8 transition-colors"
-                  >
-                    Creator Dashboard
-                  </Link>
-                </>
-              ) : (
-                <button
-                  onClick={toggleFollow}
-                  disabled={followLoading}
-                  aria-label={isFollowing ? "Unfollow" : "Follow"}
-                  className={`px-5 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                    isFollowing
-                      ? "bg-white/10 text-white/70 hover:bg-red-500/20 hover:text-red-400 border border-white/10"
-                      : "bg-white text-black hover:bg-white/90"
-                  }`}
-                >
-                  {followLoading ? "…" : isFollowing ? "Following" : "Follow"}
-                </button>
-              )}
-            </div>
+            {/* Owner extra links */}
+            {isOwner && (
+              <Link
+                href="/creator"
+                className="inline-block mt-2 text-xs text-white/35 hover:text-white/60 transition-colors"
+              >
+                Creator dashboard →
+              </Link>
+            )}
           </div>
         </div>
 
@@ -459,25 +465,23 @@ export default function ProfilePage() {
               ) : likedCards.length === 0 ? (
                 <p className="text-center text-white/30 text-sm py-12">No liked papers yet.</p>
               ) : (
-                <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-2">
                   {likedCards.map((card) => (
-                    <div key={card.id} className="p-4 rounded-2xl bg-white/4 border border-white/8 hover:bg-white/6 transition-colors">
-                      <p className="text-white font-semibold text-sm leading-snug mb-1 line-clamp-2">{card.headline}</p>
-                      <p className="text-white/50 text-xs leading-relaxed line-clamp-2 mb-2">{card.hook}</p>
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {card.tags.slice(0, 4).map((tag) => (
-                          <span key={tag} className="text-xs text-white/35 bg-white/5 px-2 py-0.5 rounded-full">#{tag}</span>
+                    <Link key={card.id} href={`/paper/${card.id}`} className="p-3 rounded-2xl bg-white/4 border border-white/8 hover:bg-white/6 transition-colors flex flex-col gap-1.5">
+                      <p className="text-white font-semibold text-xs leading-snug line-clamp-3">{card.headline}</p>
+                      <p className="text-white/45 text-xs leading-relaxed line-clamp-2 flex-1">{card.hook}</p>
+                      <div className="flex flex-wrap gap-1 mt-auto">
+                        {card.tags.slice(0, 2).map((tag) => (
+                          <span key={tag} className="text-xs text-white/30 bg-white/5 px-1.5 py-0.5 rounded-full">#{tag}</span>
                         ))}
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-white/25 text-xs">{card.readingTimeSeconds}s read</span>
+                      <div className="flex items-center justify-between mt-0.5">
+                        <span className="text-white/20 text-xs">{card.readingTimeSeconds}s read</span>
                         {card.arxivUrl && (
-                          <a href={card.arxivUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400/70 hover:text-blue-400 transition-colors">
-                            Read paper ↗
-                          </a>
+                          <span className="text-xs text-blue-400/50">↗</span>
                         )}
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               )

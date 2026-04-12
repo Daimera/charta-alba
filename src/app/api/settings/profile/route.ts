@@ -125,16 +125,28 @@ export async function PATCH(req: Request) {
   ) {
     const lang = profileUpdates.preferredLanguage as string;
     const rawSql = neon(process.env.DATABASE_URL!);
-    // Upsert: insert row (if missing) or update preferred_language in place
-    await rawSql`
-      INSERT INTO profiles (id, preferred_language)
-      VALUES (${userId}, ${lang})
-      ON CONFLICT (id) DO UPDATE SET preferred_language = ${lang}
-    `;
-    const verifyRows = await rawSql`
-      SELECT preferred_language, id FROM profiles WHERE id = ${userId} LIMIT 1
-    `;
-    console.log("[api/settings/profile] lang upserted to", lang, "verify:", JSON.stringify(verifyRows));
+
+    // Try UPDATE WHERE id first (profiles.id = users.id)
+    const result = await rawSql`UPDATE profiles SET preferred_language = ${lang} WHERE id = ${userId} RETURNING preferred_language, id`;
+    console.log("[PATCH verify]", JSON.stringify(result));
+
+    if (result.length === 0) {
+      // Fallback: some schemas use user_id FK instead of id PK
+      const result2 = await rawSql`UPDATE profiles SET preferred_language = ${lang} WHERE user_id = ${userId} RETURNING preferred_language, id`;
+      console.log("[PATCH verify user_id]", JSON.stringify(result2));
+
+      if (result2.length === 0) {
+        // Row missing — insert
+        await rawSql`
+          INSERT INTO profiles (id, preferred_language)
+          VALUES (${userId}, ${lang})
+          ON CONFLICT (id) DO UPDATE SET preferred_language = ${lang}
+        `;
+        const ins = await rawSql`SELECT preferred_language, id FROM profiles WHERE id = ${userId} LIMIT 1`;
+        console.log("[PATCH verify after insert]", JSON.stringify(ins));
+      }
+    }
+
     return Response.json({ ok: true });
   }
 

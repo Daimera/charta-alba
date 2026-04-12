@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { circles, circleMembers, users } from "@/lib/db/schema";
+import { circles, circleMembers, users, profiles } from "@/lib/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 
 export async function GET(
@@ -14,12 +14,16 @@ export async function GET(
       id: circleMembers.id,
       userId: circleMembers.userId,
       role: circleMembers.role,
+      joinedAt: circleMembers.joinedAt,
       name: users.name,
       image: users.image,
+      username: profiles.username,
     })
     .from(circleMembers)
     .leftJoin(users, eq(circleMembers.userId, users.id))
+    .leftJoin(profiles, eq(profiles.id, circleMembers.userId))
     .where(eq(circleMembers.circleId, id))
+    .orderBy(circleMembers.joinedAt)
     .limit(100);
 
   return Response.json({ members });

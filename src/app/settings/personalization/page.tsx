@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { SUPPORTED_LANGUAGES, setPreferredLanguage, getStoredLanguage, type LanguageCode } from "@/components/LanguageSwitcher";
+import { SUPPORTED_LANGUAGES, setPreferredLanguage, getStoredLanguage, usePreferredLanguage, type LanguageCode } from "@/components/LanguageSwitcher";
+import { t } from "@/lib/i18n";
 
 function Msg({ ok, text }: { ok: boolean; text: string }) {
   return <span className={`text-xs ${ok ? "text-green-400" : "text-red-400"}`}>{text}</span>;
@@ -32,6 +33,7 @@ export default function PersonalizationPage() {
   const [langLoading, setLangLoading] = useState(false);
   const [langMsg, setLangMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [langSaved, setLangSaved] = useState(false);
+  const [uiLang] = usePreferredLanguage();
 
   useEffect(() => {
     if (status === "unauthenticated") { router.push("/auth/signin"); return; }
@@ -99,7 +101,7 @@ export default function PersonalizationPage() {
 
       {/* Feed algorithm */}
       <div className="border-b border-white/8 pb-6 mb-6">
-        <h2 className="text-white font-semibold text-sm mb-1">Feed algorithm</h2>
+        <h2 className="text-white font-semibold text-sm mb-1">{t(uiLang, "settings.feedAlgorithm")}</h2>
         <p className="text-white/40 text-xs mb-4">Control how your main feed is ordered.</p>
         <form onSubmit={handleSave} className="space-y-5">
           <div className="space-y-2">
@@ -131,7 +133,7 @@ export default function PersonalizationPage() {
 
       {/* Preferred language */}
       <div className="border-b border-white/8 pb-6 mb-6">
-        <h2 className="text-white font-semibold text-sm mb-1">Preferred language</h2>
+        <h2 className="text-white font-semibold text-sm mb-1">{t(uiLang, "settings.prefLanguage")}</h2>
         <p className="text-white/40 text-xs mb-4">Paper cards will be translated into your chosen language. Saved to your profile so it follows you across devices.</p>
         <form onSubmit={handleLanguageSave} className="space-y-4">
           <select
@@ -168,7 +170,7 @@ export default function PersonalizationPage() {
 
       {/* Interests */}
       <div className="border-b border-white/8 pb-6 mb-6">
-        <h2 className="text-white font-semibold text-sm mb-1">Interests</h2>
+        <h2 className="text-white font-semibold text-sm mb-1">{t(uiLang, "settings.interests")}</h2>
         <p className="text-white/40 text-xs mb-4">Select topics to tune your feed. Use the follows system on individual tags for now.</p>
         <div className="p-4 rounded-xl bg-white/4 border border-white/8 text-center">
           <p className="text-white/40 text-sm">Topic interest picker coming soon.</p>
