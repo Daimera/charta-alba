@@ -1,16 +1,16 @@
 /**
  * Fraud & quality detection for research papers.
- * Runs Claude-based analysis to flag problematic content.
+ * Runs Gemini-based analysis to flag problematic content.
  * Results stored on the cards table (fraud_risk_score, fraud_flags).
  */
 
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { z } from "zod";
 import { db } from "./db";
 import { cards, papers } from "./db/schema";
-import { eq, sql, and, isNull } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
-const client = new Anthropic();
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY!);
 
 const FraudResultSchema = z.object({
   riskScore: z.number().int().min(0).max(100),
@@ -32,10 +32,9 @@ export async function checkFraud(input: {
   headline: string;
   body: string;
 }): Promise<FraudCheckResult> {
-  const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 512,
-    system: `You are a scientific integrity checker. Analyze this research summary for red flags:
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    systemInstruction: `You are a scientific integrity checker. Analyze this research summary for red flags:
 1. Extraordinary claims without evidence
 2. Missing methodology
 3. Conflicts of interest signals
@@ -50,15 +49,12 @@ Return ONLY valid JSON (no markdown fences):
   "recommendation": "publish"|"review"|"reject",
   "explanation": "brief explanation max 200 chars"
 }`,
-    messages: [
-      {
-        role: "user",
-        content: `Title: ${input.title}\n\nAbstract: ${input.abstract.slice(0, 1000)}\n\nSummary: ${input.headline}. ${input.body.slice(0, 500)}`,
-      },
-    ],
   });
 
-  const text = message.content[0].type === "text" ? message.content[0].text : "";
+  const prompt = `Title: ${input.title}\n\nAbstract: ${input.abstract.slice(0, 1000)}\n\nSummary: ${input.headline}. ${input.body.slice(0, 500)}`;
+  const result = await model.generateContent(prompt);
+  const text = result.response.text();
+
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error("No JSON in fraud check response");
 
@@ -72,22 +68,16 @@ export async function generateSemanticFingerprint(input: {
   title: string;
   abstract: string;
 }): Promise<string> {
-  const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 200,
-    messages: [
-      {
-        role: "user",
-        content: `Summarize the core contribution of this research paper in EXACTLY 100 words. Be precise and capture the unique methodology and findings.
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  const result = await model.generateContent(
+    `Summarize the core contribution of this research paper in EXACTLY 100 words. Be precise and capture the unique methodology and findings.
 
 Title: ${input.title}
-Abstract: ${input.abstract.slice(0, 1000)}`,
-      },
-    ],
-  });
+Abstract: ${input.abstract.slice(0, 1000)}`
+  );
 
-  const text = message.content[0].type === "text" ? message.content[0].text : "";
-  return text.trim().slice(0, 1000);
+  return result.response.text().trim().slice(0, 1000);
 }
 
 /**
@@ -116,7 +106,7 @@ export async function runFraudCheckForCard(cardId: string): Promise<FraudCheckRe
 
   if (!paper) return null;
 
-  const [result, fingerprint] = await Promise.all([
+  const [fraudResult, fingerprint] = await Promise.all([
     checkFraud({
       title: paper.title,
       abstract: paper.abstract,
@@ -127,13 +117,13 @@ export async function runFraudCheckForCard(cardId: string): Promise<FraudCheckRe
   ]);
 
   await db.update(cards).set({
-    fraudRiskScore:    result.riskScore,
-    fraudFlags:        result.flags,
-    fraudCheckedAt:    new Date().toISOString(),
+    fraudRiskScore:      fraudResult.riskScore,
+    fraudFlags:          fraudResult.flags,
+    fraudCheckedAt:      new Date().toISOString(),
     semanticFingerprint: fingerprint,
   }).where(eq(cards.id, cardId));
 
-  return result;
+  return fraudResult;
 }
 
 /**

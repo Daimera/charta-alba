@@ -4,8 +4,10 @@ import { translations, cards } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
 import { checkRateLimit, getIpFromRequest } from "@/lib/rate-limit";
 import { assertUUID } from "@/lib/sanitize";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { z } from "zod";
+
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY!);
 
 const SUPPORTED_LANGUAGES: Record<string, string> = {
   en: "English",
@@ -117,17 +119,11 @@ export async function POST(req: Request) {
       return Response.json({ error: "Card not found" }, { status: 404 });
     }
 
-    // Translate with Claude
-    const client = new Anthropic();
+    // Translate with Gemini
     const langName = SUPPORTED_LANGUAGES[language];
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const message = await client.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 2048,
-      messages: [
-        {
-          role: "user",
-          content: `Translate the following research paper explainer card content into ${langName}.
+    const prompt = `Translate the following research paper explainer card content into ${langName}.
 Return ONLY valid JSON with keys: headline, hook, body, tldr.
 Preserve the tone (accessible, engaging, non-technical). Do not add or remove information.
 
@@ -137,17 +133,15 @@ ${JSON.stringify({
   hook: card.hook,
   body: card.body,
   tldr: card.tldr,
-})}`,
-        },
-      ],
-    });
+})}`;
 
-    const rawText = message.content[0].type === "text" ? message.content[0].text : "";
+    const aiResult = await model.generateContent(prompt);
+    const rawText = aiResult.response.text();
 
     // Extract JSON from response (handle potential markdown code blocks)
     const jsonMatch = rawText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error("[api/translate] No JSON in Claude response:", rawText);
+      console.error("[api/translate] No JSON in Gemini response:", rawText);
       return Response.json({ error: "Translation failed" }, { status: 502 });
     }
 
@@ -157,7 +151,7 @@ ${JSON.stringify({
       return Response.json({ error: "Translation validation failed" }, { status: 502 });
     }
 
-    const result = parsed.data;
+    const translationResult = parsed.data;
 
     // Cache the translation
     await db
@@ -166,23 +160,23 @@ ${JSON.stringify({
         contentType: "card",
         contentId: cardId,
         languageCode: language,
-        translatedHeadline: result.headline,
-        translatedHook: result.hook,
-        translatedBody: result.body,
-        translatedTldr: result.tldr,
+        translatedHeadline: translationResult.headline,
+        translatedHook: translationResult.hook,
+        translatedBody: translationResult.body,
+        translatedTldr: translationResult.tldr,
       })
       .onConflictDoUpdate({
         target: [translations.contentType, translations.contentId, translations.languageCode],
         set: {
-          translatedHeadline: result.headline,
-          translatedHook: result.hook,
-          translatedBody: result.body,
-          translatedTldr: result.tldr,
+          translatedHeadline: translationResult.headline,
+          translatedHook: translationResult.hook,
+          translatedBody: translationResult.body,
+          translatedTldr: translationResult.tldr,
           lastUsedAt: new Date().toISOString(),
         },
       });
 
-    return Response.json({ ...result, cached: false });
+    return Response.json({ ...translationResult, cached: false });
   } catch (err) {
     console.error("[api/translate]", err);
     return Response.json({ error: "Something went wrong" }, { status: 500 });

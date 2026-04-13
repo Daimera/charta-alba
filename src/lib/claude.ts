@@ -1,8 +1,8 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { z } from "zod";
 import type { CardGenerationInput, CardGenerationOutput } from "@/types";
 
-const client = new Anthropic(); // reads ANTHROPIC_API_KEY from env
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY!);
 
 const CardSchema = z.object({
   headline: z.string().max(80),
@@ -36,27 +36,27 @@ Abstract: ${input.abstract}
 Authors: ${input.authors.slice(0, 5).join(", ")}
 Categories: ${input.categories.join(", ")}`;
 
-  const message = await client.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 512,
-    system: SYSTEM_PROMPT,
-    messages: [{ role: "user", content: userMessage }],
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    systemInstruction: SYSTEM_PROMPT,
   });
 
-  const text =
-    message.content[0].type === "text" ? message.content[0].text : "";
+  const result = await model.generateContent(userMessage);
+  const text = result.response.text();
 
   let parsed: unknown;
   try {
-    parsed = JSON.parse(text);
+    // Strip potential markdown fences
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    parsed = JSON.parse(jsonMatch ? jsonMatch[0] : text);
   } catch {
-    throw new Error(`Claude returned non-JSON: ${text.slice(0, 200)}`);
+    throw new Error(`Gemini returned non-JSON: ${text.slice(0, 200)}`);
   }
 
-  const result = CardSchema.safeParse(parsed);
-  if (!result.success) {
-    throw new Error(`Claude output failed validation: ${result.error.message}`);
+  const validated = CardSchema.safeParse(parsed);
+  if (!validated.success) {
+    throw new Error(`Gemini output failed validation: ${validated.error.message}`);
   }
 
-  return result.data;
+  return validated.data;
 }

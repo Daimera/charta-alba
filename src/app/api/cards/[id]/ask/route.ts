@@ -2,9 +2,9 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { cards, papers } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const client = new Anthropic();
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY!);
 
 // In-memory rate limit: 5 requests per user per minute
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -66,15 +66,13 @@ Abstract: ${result.abstract ?? "Not available"}
 
 Answer questions clearly and concisely. Keep answers under 200 words. Avoid excessive jargon — explain as if talking to a curious non-expert.`;
 
-  const message = await client.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 512,
-    system: systemPrompt,
-    messages: [{ role: "user", content: question.trim() }],
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    systemInstruction: systemPrompt,
   });
 
-  const answer =
-    message.content[0].type === "text" ? message.content[0].text : "";
+  const aiResult = await model.generateContent(question.trim());
+  const answer = aiResult.response.text();
 
   return Response.json({ answer });
 }
