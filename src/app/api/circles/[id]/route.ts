@@ -13,39 +13,44 @@ export async function GET(
   const uuidErr = assertUUID(id);
   if (uuidErr) return uuidErr;
 
-  const [circle] = await db
-    .select({
-      id: circles.id,
-      name: circles.name,
-      description: circles.description,
-      topicTags: circles.topicTags,
-      avatarUrl: circles.avatarUrl,
-      isPublic: circles.isPublic,
-      ownerId: circles.ownerId,
-      memberCount: circles.memberCount,
-      createdAt: circles.createdAt,
-      ownerName: users.name,
-    })
-    .from(circles)
-    .leftJoin(users, eq(circles.ownerId, users.id))
-    .where(eq(circles.id, id))
-    .limit(1);
-
-  if (!circle) {
-    return Response.json({ error: "Circle not found" }, { status: 404 });
-  }
-
-  let membership: { role: string } | null = null;
-  if (session?.user?.id) {
-    const [member] = await db
-      .select({ role: circleMembers.role })
-      .from(circleMembers)
-      .where(and(eq(circleMembers.circleId, id), eq(circleMembers.userId, session.user.id)))
+  try {
+    const [circle] = await db
+      .select({
+        id: circles.id,
+        name: circles.name,
+        description: circles.description,
+        topicTags: circles.topicTags,
+        avatarUrl: circles.avatarUrl,
+        isPublic: circles.isPublic,
+        ownerId: circles.ownerId,
+        memberCount: circles.memberCount,
+        createdAt: circles.createdAt,
+        ownerName: users.name,
+      })
+      .from(circles)
+      .leftJoin(users, eq(circles.ownerId, users.id))
+      .where(eq(circles.id, id))
       .limit(1);
-    membership = member ?? null;
-  }
 
-  return Response.json({ circle, membership });
+    if (!circle) {
+      return Response.json({ error: "Circle not found" }, { status: 404 });
+    }
+
+    let membership: { role: string } | null = null;
+    if (session?.user?.id) {
+      const [member] = await db
+        .select({ role: circleMembers.role })
+        .from(circleMembers)
+        .where(and(eq(circleMembers.circleId, id), eq(circleMembers.userId, session.user.id)))
+        .limit(1);
+      membership = member ?? null;
+    }
+
+    return Response.json({ circle, membership });
+  } catch (err) {
+    console.error("[api/circles/[id] GET]", err instanceof Error ? err.message : err);
+    return Response.json({ error: "Failed to load circle" }, { status: 500 });
+  }
 }
 
 export async function PATCH(

@@ -22,7 +22,7 @@ interface Member {
   id: string;
   userId: string;
   role: string;
-  joinedAt: string | null;
+  createdAt: string | null;
   name: string | null;
   image: string | null;
   username: string | null;
@@ -399,7 +399,7 @@ export default function CirclePage() {
                             : "bg-white/5 text-white/40 border border-white/10"
                         }`}>{m.role}</span>
                       )}
-                      <p className="text-white/20 text-xs">{timeAgo(m.joinedAt)}</p>
+                      <p className="text-white/20 text-xs">{timeAgo(m.createdAt)}</p>
                     </div>
                   </div>
                 ))}

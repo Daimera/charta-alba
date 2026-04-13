@@ -14,7 +14,7 @@ export async function GET(
       id: circleMembers.id,
       userId: circleMembers.userId,
       role: circleMembers.role,
-      joinedAt: circleMembers.joinedAt,
+      joinedAt: circleMembers.createdAt,
       name: users.name,
       image: users.image,
       username: profiles.username,
@@ -23,7 +23,7 @@ export async function GET(
     .leftJoin(users, eq(circleMembers.userId, users.id))
     .leftJoin(profiles, eq(profiles.id, circleMembers.userId))
     .where(eq(circleMembers.circleId, id))
-    .orderBy(circleMembers.joinedAt)
+    .orderBy(circleMembers.createdAt)
     .limit(100);
 
   return Response.json({ members });

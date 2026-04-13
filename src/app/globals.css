@@ -329,18 +329,52 @@ html.font-xlarge { font-size: 21px; }
   filter: brightness(0) drop-shadow(0 0 8px rgba(0,0,0,0.35));
 }
 
-/* Legacy .lm-hover kept for any other call sites */
+/* LogoMark — CSS mask div with animated hover */
 .lm-hover {
   display: block !important;
-  background: none !important;
-  background-color: transparent !important;
-  transition: filter 0.2s ease, transform 0.2s ease !important;
-  will-change: filter, transform;
   flex-shrink: 0;
+  /* Transition on the BASE element so mouseout animates back smoothly */
+  transition: transform 0.2s ease, filter 0.2s ease !important;
+  will-change: transform, filter;
 }
 .lm-hover:hover {
-  transform: scale(1.1) !important;
-  filter: var(--lm-hover-filter, drop-shadow(0 0 10px rgba(137,207,240,0.9)) brightness(1.2)) !important;
+  transform: scale(1.08) !important;
+  filter: var(--lm-hover-filter, brightness(1.3)) !important;
+}
+
+/* ── Saved modal — light mode overrides ─────────────────────────────────── */
+[data-theme="light"] .saved-modal {
+  color: #111;
+}
+[data-theme="light"] .saved-modal-backdrop {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(8px);
+}
+[data-theme="light"] .saved-modal-headline {
+  color: #0a0a0a !important;
+}
+[data-theme="light"] .saved-modal-text {
+  color: #333 !important;
+}
+[data-theme="light"] .saved-modal-muted {
+  color: #777 !important;
+}
+[data-theme="light"] .saved-modal-tag {
+  background: rgba(0, 0, 0, 0.08) !important;
+  color: #444 !important;
+}
+[data-theme="light"] .saved-modal-card {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+[data-theme="light"] .saved-modal-btn {
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  color: #555 !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+[data-theme="light"] .saved-modal-btn:hover {
+  background: rgba(0, 0, 0, 0.08) !important;
+  color: #111 !important;
 }
 
 /* ── Reduce-motion class (set by Accessibility page toggle) ─────────────── */

@@ -41,13 +41,20 @@ function CardModal({
   const row = rows[index];
   if (!row) return null;
 
+  // Build a "View" URL that passes the full saved list so paper page can show nav
+  const listParam = rows.map((r) => r.cardId).join(",");
+  const viewUrl = `/paper/${row.cardId}?src=saved&idx=${index}&list=${encodeURIComponent(listParam)}`;
+
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex flex-col"
+      className="saved-modal fixed inset-0 z-50 flex flex-col"
       onClick={onClose}
     >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/90 backdrop-blur-sm saved-modal-backdrop" />
+
       <div
-        className="flex-1 overflow-y-auto px-5 pt-16 pb-8 max-w-2xl mx-auto w-full"
+        className="relative flex-1 overflow-y-auto px-5 pt-16 pb-8 max-w-2xl mx-auto w-full"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Navigation bar */}
@@ -55,7 +62,7 @@ function CardModal({
           <button
             onClick={() => onNav(index - 1)}
             disabled={index === 0}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/12 text-xs text-white/55 hover:bg-white/8 hover:text-white disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+            className="saved-modal-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/12 text-xs text-white/55 hover:bg-white/8 hover:text-white disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
             Prev
@@ -63,7 +70,7 @@ function CardModal({
 
           <button
             onClick={() => { onUnsave(row.cardId); onNav(Math.min(index, rows.length - 2)); }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/12 text-xs text-white/55 hover:bg-red-500/15 hover:text-red-400 hover:border-red-500/25 transition-colors"
+            className="saved-modal-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/12 text-xs text-white/55 hover:bg-red-500/15 hover:text-red-400 hover:border-red-500/25 transition-colors"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
@@ -75,7 +82,7 @@ function CardModal({
           <button
             onClick={() => onNav(index + 1)}
             disabled={index === rows.length - 1}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/12 text-xs text-white/55 hover:bg-white/8 hover:text-white disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+            className="saved-modal-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/12 text-xs text-white/55 hover:bg-white/8 hover:text-white disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
           >
             Next
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
@@ -83,32 +90,32 @@ function CardModal({
         </div>
 
         {/* Paper count */}
-        <p className="text-white/25 text-xs text-center mb-5">{index + 1} of {rows.length}</p>
+        <p className="saved-modal-muted text-white/25 text-xs text-center mb-5">{index + 1} of {rows.length}</p>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-1.5 mb-4">
           {row.tags.map((tag) => (
-            <span key={tag} className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-white/8 text-white/50">#{tag}</span>
+            <span key={tag} className="saved-modal-tag text-xs font-medium px-2.5 py-0.5 rounded-full bg-white/8 text-white/50">#{tag}</span>
           ))}
         </div>
 
         {/* Headline */}
-        <h2 className="text-2xl font-bold text-white leading-tight tracking-tight mb-4">{row.headline}</h2>
+        <h2 className="saved-modal-headline text-2xl font-bold text-white leading-tight tracking-tight mb-4">{row.headline}</h2>
 
         {/* Hook */}
-        <p className="text-white/75 text-base leading-relaxed mb-6">{row.hook}</p>
+        <p className="saved-modal-text text-white/75 text-base leading-relaxed mb-6">{row.hook}</p>
 
-        {/* TL;DR placeholder */}
-        <div className="rounded-xl bg-white/5 border border-white/8 px-4 py-2.5 mb-4">
-          <p className="text-white/35 text-xs font-semibold uppercase tracking-widest mb-0.5">Saved</p>
-          <p className="text-white/60 text-sm">{timeAgo(row.savedAt)}</p>
+        {/* Saved info */}
+        <div className="saved-modal-card rounded-xl bg-white/5 border border-white/8 px-4 py-2.5 mb-4">
+          <p className="saved-modal-muted text-white/35 text-xs font-semibold uppercase tracking-widest mb-0.5">Saved</p>
+          <p className="saved-modal-text text-white/60 text-sm">{timeAgo(row.savedAt)}</p>
         </div>
 
         {/* Links */}
         <div className="flex items-center gap-3 mt-4">
           <Link
-            href={`/paper/${row.cardId}`}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/15 bg-white/5 text-sm font-semibold text-white/70 hover:bg-white/10 hover:text-white transition-all"
+            href={viewUrl}
+            className="saved-modal-btn flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/15 bg-white/5 text-sm font-semibold text-white/70 hover:bg-white/10 hover:text-white transition-all"
             onClick={onClose}
           >
             View card
@@ -129,7 +136,7 @@ function CardModal({
       {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+        className="saved-modal-btn absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
         aria-label="Close"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -188,6 +195,8 @@ export function SavedList({ initialRows }: { initialRows: SavedRow[] }) {
     );
   }
 
+  const listParam = encodeURIComponent(rows.map((r) => r.cardId).join(","));
+
   return (
     <>
       <div className="space-y-3">
@@ -220,7 +229,7 @@ export function SavedList({ initialRows }: { initialRows: SavedRow[] }) {
               </div>
               <div className="flex flex-col gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                 <Link
-                  href={`/paper/${row.cardId}`}
+                  href={`/paper/${row.cardId}?src=saved&idx=${idx}&list=${listParam}`}
                   className="px-3 py-1.5 rounded-lg bg-white/8 border border-white/10 text-xs text-white/60 hover:bg-white/12 hover:text-white/80 transition-colors text-center"
                 >
                   View

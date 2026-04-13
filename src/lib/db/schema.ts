@@ -443,7 +443,7 @@ export const circleMembers = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     role: text("role").notNull().default("member"),
-    joinedAt: timestamp("joined_at", { withTimezone: true, mode: "string" }).defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
   },
   (t) => [unique("circle_members_circle_user_unique").on(t.circleId, t.userId)]
 );

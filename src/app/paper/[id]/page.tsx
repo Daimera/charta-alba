@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Suspense } from "react";
 import { getCardWithPaper } from "@/lib/queries";
+import { SavedNav } from "./SavedNav";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -44,6 +46,10 @@ export default async function PaperPage({ params }: Props) {
 
   return (
     <main className="min-h-dvh bg-[#0a0a0a] pt-14">
+      {/* Sticky nav bar when arriving from /saved */}
+      <Suspense>
+        <SavedNav cardId={id} />
+      </Suspense>
       <div className="max-w-lg mx-auto px-5 py-8">
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-4">
