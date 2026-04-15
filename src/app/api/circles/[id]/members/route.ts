@@ -30,7 +30,7 @@ export async function GET(
 }
 
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
@@ -41,18 +41,31 @@ export async function POST(
   const { id } = await params;
   const [circle] = await db.select().from(circles).where(eq(circles.id, id)).limit(1);
   if (!circle) return Response.json({ error: "Circle not found" }, { status: 404 });
-  if (!circle.isPublic) return Response.json({ error: "Private circles require an invitation" }, { status: 403 });
+
+  // Owner-add path: owner can directly add any user by id
+  let body: { inviteUserId?: string } = {};
+  try { body = await req.json() as { inviteUserId?: string }; } catch { /* empty body = self-join */ }
+
+  const targetUserId = body.inviteUserId ?? session.user.id;
+  const isOwnerAdding = body.inviteUserId && circle.ownerId === session.user.id;
+
+  if (targetUserId !== session.user.id && !isOwnerAdding) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (!circle.isPublic && targetUserId === session.user.id) {
+    return Response.json({ error: "Private circles require an invitation" }, { status: 403 });
+  }
 
   const [existing] = await db
     .select({ id: circleMembers.id })
     .from(circleMembers)
-    .where(and(eq(circleMembers.circleId, id), eq(circleMembers.userId, session.user.id)))
+    .where(and(eq(circleMembers.circleId, id), eq(circleMembers.userId, targetUserId)))
     .limit(1);
 
   if (!existing) {
     await db
       .insert(circleMembers)
-      .values({ circleId: id, userId: session.user.id, role: "member" })
+      .values({ circleId: id, userId: targetUserId, role: "member" })
       .onConflictDoNothing();
 
     await db
