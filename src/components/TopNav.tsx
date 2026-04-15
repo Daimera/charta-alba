@@ -228,11 +228,9 @@ export function TopNav() {
                   </Link>
 
                   {/* Nav items */}
-                  {username && (
-                    <DropdownLink href={`/profile/${username}`} onClick={() => setDropdownOpen(false)}>
-                      {t(lang, "menu.profile")}
-                    </DropdownLink>
-                  )}
+                  <DropdownLink href={username ? `/profile/${username}` : "/profile/me"} onClick={() => setDropdownOpen(false)}>
+                    {t(lang, "menu.profile")}
+                  </DropdownLink>
                   <DropdownLink href="/saved" onClick={() => setDropdownOpen(false)}>
                     {t(lang, "menu.saved")}
                   </DropdownLink>

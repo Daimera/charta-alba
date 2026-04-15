@@ -61,7 +61,7 @@ export function SavedNav({ cardId }: SavedNavProps) {
   }
 
   return (
-    <div className="sticky top-14 z-40 bg-[#0a0a0a]/95 backdrop-blur-sm border-b border-white/8 px-4 py-2.5">
+    <div className="saved-nav-bar sticky top-14 z-40 bg-[#0a0a0a]/95 backdrop-blur-sm border-b border-white/8 px-4 py-2.5">
       <div className="max-w-lg mx-auto flex items-center justify-between gap-3">
         {/* Back to saved */}
         <a

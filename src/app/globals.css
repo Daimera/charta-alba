@@ -329,17 +329,40 @@ html.font-xlarge { font-size: 21px; }
   filter: brightness(0) drop-shadow(0 0 8px rgba(0,0,0,0.35));
 }
 
-/* LogoMark — CSS mask div with animated hover */
-.lm-hover {
-  display: block !important;
+/* LogoMark — plain img with animated hover */
+img#logomark-img {
+  background: transparent !important;
+  display: block;
+  object-fit: contain;
   flex-shrink: 0;
-  /* Transition on the BASE element so mouseout animates back smoothly */
-  transition: transform 0.2s ease, filter 0.2s ease !important;
-  will-change: transform, filter;
+  /* Transition on BASE element so mouseout animates back */
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
-.lm-hover:hover {
-  transform: scale(1.08) !important;
-  filter: var(--lm-hover-filter, brightness(1.3)) !important;
+img#logomark-img:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px #89CFF0) brightness(1.2);
+}
+[data-theme="light"] img#logomark-img {
+  filter: brightness(0.05);
+}
+[data-theme="light"] img#logomark-img:hover {
+  transform: scale(1.1);
+  filter: brightness(0.2) drop-shadow(0 0 8px #333);
+}
+
+/* ── Saved nav bar — light mode overrides ───────────────────────────────── */
+[data-theme="light"] .saved-nav-bar {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e5e5e5 !important;
+}
+[data-theme="light"] .saved-nav-bar button,
+[data-theme="light"] .saved-nav-bar span,
+[data-theme="light"] .saved-nav-bar a {
+  color: #111111 !important;
+  border-color: rgba(0,0,0,0.15) !important;
+}
+[data-theme="light"] .saved-nav-bar button:hover {
+  background: rgba(0,0,0,0.06) !important;
 }
 
 /* ── Saved modal — light mode overrides ─────────────────────────────────── */

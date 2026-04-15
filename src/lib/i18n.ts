@@ -27,7 +27,16 @@ export type TranslationKey =
   | "settings.dark" | "settings.light" | "settings.system"
   | "settings.fontDefault" | "settings.fontLarge" | "settings.fontXLarge"
   // Feed
-  | "feed.searchPlaceholder" | "feed.newPapers" | "feed.readPaper";
+  | "feed.searchPlaceholder" | "feed.newPapers" | "feed.readPaper"
+  // Card labels
+  | "card.tldr" | "card.relatedPapers" | "card.replicated" | "card.disputed"
+  | "card.peerReviewed" | "card.simple" | "card.technical" | "card.readPaper"
+  | "card.askAI" | "card.claim" | "card.rate" | "card.save" | "card.collect" | "card.share"
+  // Footer
+  | "footer.help" | "footer.developers" | "footer.privacy" | "footer.terms"
+  | "footer.accessibility" | "footer.doNotSell" | "footer.contact"
+  // Data / about section
+  | "data.noSell" | "data.freeToUse";
 
 type Translations = Record<TranslationKey, string>;
 
@@ -54,6 +63,14 @@ const en: Translations = {
   "settings.dark": "Dark", "settings.light": "Light", "settings.system": "System",
   "settings.fontDefault": "Default", "settings.fontLarge": "Large", "settings.fontXLarge": "Extra Large",
   "feed.searchPlaceholder": "Search papers…", "feed.newPapers": "new paper", "feed.readPaper": "Read paper",
+  "card.tldr": "TL;DR", "card.relatedPapers": "Related Papers", "card.replicated": "Replicated",
+  "card.disputed": "Disputed", "card.peerReviewed": "Peer Reviewed", "card.simple": "Simple",
+  "card.technical": "Technical", "card.readPaper": "Read paper", "card.askAI": "Ask AI",
+  "card.claim": "Claim", "card.rate": "Rate", "card.save": "Save", "card.collect": "Collect", "card.share": "Share",
+  "footer.help": "Help", "footer.developers": "Developers", "footer.privacy": "Privacy",
+  "footer.terms": "Terms", "footer.accessibility": "Accessibility",
+  "footer.doNotSell": "Do Not Sell", "footer.contact": "Contact",
+  "data.noSell": "We don't sell your data", "data.freeToUse": "Free to use",
 };
 
 const es: Translations = {
@@ -79,6 +96,14 @@ const es: Translations = {
   "settings.dark": "Oscuro", "settings.light": "Claro", "settings.system": "Sistema",
   "settings.fontDefault": "Predeterminado", "settings.fontLarge": "Grande", "settings.fontXLarge": "Extra grande",
   "feed.searchPlaceholder": "Buscar artículos…", "feed.newPapers": "artículo nuevo", "feed.readPaper": "Leer artículo",
+  "card.tldr": "TL;DR", "card.relatedPapers": "Artículos relacionados", "card.replicated": "Replicado",
+  "card.disputed": "Disputado", "card.peerReviewed": "Revisado por pares", "card.simple": "Simple",
+  "card.technical": "Técnico", "card.readPaper": "Leer artículo", "card.askAI": "Preguntar IA",
+  "card.claim": "Reclamar", "card.rate": "Valorar", "card.save": "Guardar", "card.collect": "Coleccionar", "card.share": "Compartir",
+  "footer.help": "Ayuda", "footer.developers": "Desarrolladores", "footer.privacy": "Privacidad",
+  "footer.terms": "Términos", "footer.accessibility": "Accesibilidad",
+  "footer.doNotSell": "No vender", "footer.contact": "Contacto",
+  "data.noSell": "No vendemos tus datos", "data.freeToUse": "Gratis",
 };
 
 const fr: Translations = {
@@ -104,6 +129,14 @@ const fr: Translations = {
   "settings.dark": "Sombre", "settings.light": "Clair", "settings.system": "Système",
   "settings.fontDefault": "Par défaut", "settings.fontLarge": "Grande", "settings.fontXLarge": "Très grande",
   "feed.searchPlaceholder": "Rechercher des articles…", "feed.newPapers": "nouvel article", "feed.readPaper": "Lire l'article",
+  "card.tldr": "TL;DR", "card.relatedPapers": "Articles liés", "card.replicated": "Répliqué",
+  "card.disputed": "Contesté", "card.peerReviewed": "Révisé par les pairs", "card.simple": "Simple",
+  "card.technical": "Technique", "card.readPaper": "Lire l'article", "card.askAI": "Demander à l'IA",
+  "card.claim": "Revendiquer", "card.rate": "Évaluer", "card.save": "Sauvegarder", "card.collect": "Collecter", "card.share": "Partager",
+  "footer.help": "Aide", "footer.developers": "Développeurs", "footer.privacy": "Confidentialité",
+  "footer.terms": "Conditions", "footer.accessibility": "Accessibilité",
+  "footer.doNotSell": "Ne pas vendre", "footer.contact": "Contact",
+  "data.noSell": "Nous ne vendons pas vos données", "data.freeToUse": "Gratuit",
 };
 
 const de: Translations = {
@@ -129,6 +162,14 @@ const de: Translations = {
   "settings.dark": "Dunkel", "settings.light": "Hell", "settings.system": "System",
   "settings.fontDefault": "Standard", "settings.fontLarge": "Groß", "settings.fontXLarge": "Sehr groß",
   "feed.searchPlaceholder": "Artikel suchen…", "feed.newPapers": "neuer Artikel", "feed.readPaper": "Artikel lesen",
+  "card.tldr": "TL;DR", "card.relatedPapers": "Verwandte Artikel", "card.replicated": "Repliziert",
+  "card.disputed": "Umstritten", "card.peerReviewed": "Begutachtet", "card.simple": "Einfach",
+  "card.technical": "Technisch", "card.readPaper": "Artikel lesen", "card.askAI": "KI fragen",
+  "card.claim": "Beanspruchen", "card.rate": "Bewerten", "card.save": "Speichern", "card.collect": "Sammeln", "card.share": "Teilen",
+  "footer.help": "Hilfe", "footer.developers": "Entwickler", "footer.privacy": "Datenschutz",
+  "footer.terms": "Nutzungsbedingungen", "footer.accessibility": "Barrierefreiheit",
+  "footer.doNotSell": "Nicht verkaufen", "footer.contact": "Kontakt",
+  "data.noSell": "Wir verkaufen keine Daten", "data.freeToUse": "Kostenlos",
 };
 
 const pt: Translations = {
@@ -154,6 +195,14 @@ const pt: Translations = {
   "settings.dark": "Escuro", "settings.light": "Claro", "settings.system": "Sistema",
   "settings.fontDefault": "Padrão", "settings.fontLarge": "Grande", "settings.fontXLarge": "Extra grande",
   "feed.searchPlaceholder": "Buscar artigos…", "feed.newPapers": "novo artigo", "feed.readPaper": "Ler artigo",
+  "card.tldr": "TL;DR", "card.relatedPapers": "Artigos relacionados", "card.replicated": "Replicado",
+  "card.disputed": "Disputado", "card.peerReviewed": "Revisão por pares", "card.simple": "Simples",
+  "card.technical": "Técnico", "card.readPaper": "Ler artigo", "card.askAI": "Perguntar IA",
+  "card.claim": "Reivindicar", "card.rate": "Avaliar", "card.save": "Salvar", "card.collect": "Coletar", "card.share": "Compartilhar",
+  "footer.help": "Ajuda", "footer.developers": "Desenvolvedores", "footer.privacy": "Privacidade",
+  "footer.terms": "Termos", "footer.accessibility": "Acessibilidade",
+  "footer.doNotSell": "Não vender", "footer.contact": "Contato",
+  "data.noSell": "Não vendemos seus dados", "data.freeToUse": "Gratuito",
 };
 
 const ar: Translations = {
@@ -179,6 +228,14 @@ const ar: Translations = {
   "settings.dark": "داكن", "settings.light": "فاتح", "settings.system": "النظام",
   "settings.fontDefault": "افتراضي", "settings.fontLarge": "كبير", "settings.fontXLarge": "كبير جداً",
   "feed.searchPlaceholder": "ابحث عن أبحاث…", "feed.newPapers": "بحث جديد", "feed.readPaper": "قراءة البحث",
+  "card.tldr": "TL;DR", "card.relatedPapers": "أبحاث ذات صلة", "card.replicated": "مُكرَّر",
+  "card.disputed": "مُختلَف عليه", "card.peerReviewed": "مُراجَع", "card.simple": "بسيط",
+  "card.technical": "تقني", "card.readPaper": "قراءة البحث", "card.askAI": "سؤال الذكاء",
+  "card.claim": "مطالبة", "card.rate": "تقييم", "card.save": "حفظ", "card.collect": "جمع", "card.share": "مشاركة",
+  "footer.help": "مساعدة", "footer.developers": "المطورون", "footer.privacy": "الخصوصية",
+  "footer.terms": "الشروط", "footer.accessibility": "إمكانية الوصول",
+  "footer.doNotSell": "عدم البيع", "footer.contact": "اتصل بنا",
+  "data.noSell": "لا نبيع بياناتك", "data.freeToUse": "مجاني",
 };
 
 const hi: Translations = {
@@ -204,6 +261,14 @@ const hi: Translations = {
   "settings.dark": "डार्क", "settings.light": "लाइट", "settings.system": "सिस्टम",
   "settings.fontDefault": "डिफ़ॉल्ट", "settings.fontLarge": "बड़ा", "settings.fontXLarge": "बहुत बड़ा",
   "feed.searchPlaceholder": "पेपर खोजें…", "feed.newPapers": "नया पेपर", "feed.readPaper": "पेपर पढ़ें",
+  "card.tldr": "TL;DR", "card.relatedPapers": "संबंधित पेपर", "card.replicated": "दोहराया गया",
+  "card.disputed": "विवादित", "card.peerReviewed": "सहकर्मी-समीक्षित", "card.simple": "सरल",
+  "card.technical": "तकनीकी", "card.readPaper": "पेपर पढ़ें", "card.askAI": "AI से पूछें",
+  "card.claim": "दावा", "card.rate": "रेट करें", "card.save": "सहेजें", "card.collect": "संग्रह", "card.share": "साझा करें",
+  "footer.help": "सहायता", "footer.developers": "डेवलपर्स", "footer.privacy": "गोपनीयता",
+  "footer.terms": "नियम", "footer.accessibility": "अभिगम्यता",
+  "footer.doNotSell": "न बेचें", "footer.contact": "संपर्क",
+  "data.noSell": "हम आपका डेटा नहीं बेचते", "data.freeToUse": "निःशुल्क",
 };
 
 const ja: Translations = {
@@ -229,6 +294,14 @@ const ja: Translations = {
   "settings.dark": "ダーク", "settings.light": "ライト", "settings.system": "システム",
   "settings.fontDefault": "標準", "settings.fontLarge": "大", "settings.fontXLarge": "特大",
   "feed.searchPlaceholder": "論文を検索…", "feed.newPapers": "件の新しい論文", "feed.readPaper": "論文を読む",
+  "card.tldr": "TL;DR", "card.relatedPapers": "関連論文", "card.replicated": "再現済み",
+  "card.disputed": "異議あり", "card.peerReviewed": "査読済み", "card.simple": "シンプル",
+  "card.technical": "技術的", "card.readPaper": "論文を読む", "card.askAI": "AIに質問",
+  "card.claim": "主張", "card.rate": "評価", "card.save": "保存", "card.collect": "コレクト", "card.share": "シェア",
+  "footer.help": "ヘルプ", "footer.developers": "開発者", "footer.privacy": "プライバシー",
+  "footer.terms": "利用規約", "footer.accessibility": "アクセシビリティ",
+  "footer.doNotSell": "販売しない", "footer.contact": "お問い合わせ",
+  "data.noSell": "データを販売しません", "data.freeToUse": "無料",
 };
 
 const ko: Translations = {
@@ -254,6 +327,14 @@ const ko: Translations = {
   "settings.dark": "다크", "settings.light": "라이트", "settings.system": "시스템",
   "settings.fontDefault": "기본", "settings.fontLarge": "크게", "settings.fontXLarge": "매우 크게",
   "feed.searchPlaceholder": "논문 검색…", "feed.newPapers": "개의 새 논문", "feed.readPaper": "논문 읽기",
+  "card.tldr": "TL;DR", "card.relatedPapers": "관련 논문", "card.replicated": "복제됨",
+  "card.disputed": "논쟁 중", "card.peerReviewed": "동료 검토", "card.simple": "간단",
+  "card.technical": "기술적", "card.readPaper": "논문 읽기", "card.askAI": "AI에게 물어보기",
+  "card.claim": "주장", "card.rate": "평가", "card.save": "저장", "card.collect": "수집", "card.share": "공유",
+  "footer.help": "도움말", "footer.developers": "개발자", "footer.privacy": "개인정보",
+  "footer.terms": "이용약관", "footer.accessibility": "접근성",
+  "footer.doNotSell": "판매 금지", "footer.contact": "문의",
+  "data.noSell": "데이터를 판매하지 않습니다", "data.freeToUse": "무료",
 };
 
 const zhCN: Translations = {
@@ -279,6 +360,14 @@ const zhCN: Translations = {
   "settings.dark": "深色", "settings.light": "浅色", "settings.system": "跟随系统",
   "settings.fontDefault": "默认", "settings.fontLarge": "大", "settings.fontXLarge": "特大",
   "feed.searchPlaceholder": "搜索论文…", "feed.newPapers": "篇新论文", "feed.readPaper": "阅读论文",
+  "card.tldr": "TL;DR", "card.relatedPapers": "相关论文", "card.replicated": "已复现",
+  "card.disputed": "有争议", "card.peerReviewed": "同行评审", "card.simple": "简单",
+  "card.technical": "技术性", "card.readPaper": "阅读论文", "card.askAI": "问AI",
+  "card.claim": "声明", "card.rate": "评分", "card.save": "保存", "card.collect": "收藏", "card.share": "分享",
+  "footer.help": "帮助", "footer.developers": "开发者", "footer.privacy": "隐私",
+  "footer.terms": "条款", "footer.accessibility": "无障碍",
+  "footer.doNotSell": "不出售", "footer.contact": "联系",
+  "data.noSell": "我们不出售您的数据", "data.freeToUse": "免费",
 };
 
 const zhTW: Translations = {
@@ -304,6 +393,14 @@ const zhTW: Translations = {
   "settings.dark": "深色", "settings.light": "淺色", "settings.system": "跟隨系統",
   "settings.fontDefault": "預設", "settings.fontLarge": "大", "settings.fontXLarge": "特大",
   "feed.searchPlaceholder": "搜尋論文…", "feed.newPapers": "篇新論文", "feed.readPaper": "閱讀論文",
+  "card.tldr": "TL;DR", "card.relatedPapers": "相關論文", "card.replicated": "已複現",
+  "card.disputed": "有爭議", "card.peerReviewed": "同行評審", "card.simple": "簡單",
+  "card.technical": "技術性", "card.readPaper": "閱讀論文", "card.askAI": "問AI",
+  "card.claim": "聲明", "card.rate": "評分", "card.save": "儲存", "card.collect": "收藏", "card.share": "分享",
+  "footer.help": "說明", "footer.developers": "開發者", "footer.privacy": "隱私",
+  "footer.terms": "條款", "footer.accessibility": "無障礙",
+  "footer.doNotSell": "不出售", "footer.contact": "聯繫",
+  "data.noSell": "我們不出售您的資料", "data.freeToUse": "免費",
 };
 
 const ru: Translations = {
@@ -329,6 +426,14 @@ const ru: Translations = {
   "settings.dark": "Тёмная", "settings.light": "Светлая", "settings.system": "Системная",
   "settings.fontDefault": "Стандартный", "settings.fontLarge": "Большой", "settings.fontXLarge": "Очень большой",
   "feed.searchPlaceholder": "Поиск статей…", "feed.newPapers": "новая статья", "feed.readPaper": "Читать статью",
+  "card.tldr": "TL;DR", "card.relatedPapers": "Похожие статьи", "card.replicated": "Воспроизведено",
+  "card.disputed": "Оспорено", "card.peerReviewed": "Рецензировано", "card.simple": "Просто",
+  "card.technical": "Технически", "card.readPaper": "Читать статью", "card.askAI": "Спросить ИИ",
+  "card.claim": "Заявить", "card.rate": "Оценить", "card.save": "Сохранить", "card.collect": "Собрать", "card.share": "Поделиться",
+  "footer.help": "Помощь", "footer.developers": "Разработчики", "footer.privacy": "Конфиденциальность",
+  "footer.terms": "Условия", "footer.accessibility": "Доступность",
+  "footer.doNotSell": "Не продавать", "footer.contact": "Связаться",
+  "data.noSell": "Мы не продаём ваши данные", "data.freeToUse": "Бесплатно",
 };
 
 const it: Translations = {
@@ -354,6 +459,14 @@ const it: Translations = {
   "settings.dark": "Scuro", "settings.light": "Chiaro", "settings.system": "Sistema",
   "settings.fontDefault": "Predefinito", "settings.fontLarge": "Grande", "settings.fontXLarge": "Extra grande",
   "feed.searchPlaceholder": "Cerca articoli…", "feed.newPapers": "nuovo articolo", "feed.readPaper": "Leggi articolo",
+  "card.tldr": "TL;DR", "card.relatedPapers": "Articoli correlati", "card.replicated": "Replicato",
+  "card.disputed": "Contestato", "card.peerReviewed": "Peer reviewed", "card.simple": "Semplice",
+  "card.technical": "Tecnico", "card.readPaper": "Leggi articolo", "card.askAI": "Chiedi all'IA",
+  "card.claim": "Rivendicare", "card.rate": "Valuta", "card.save": "Salva", "card.collect": "Colleziona", "card.share": "Condividi",
+  "footer.help": "Aiuto", "footer.developers": "Sviluppatori", "footer.privacy": "Privacy",
+  "footer.terms": "Termini", "footer.accessibility": "Accessibilità",
+  "footer.doNotSell": "Non vendere", "footer.contact": "Contatto",
+  "data.noSell": "Non vendiamo i tuoi dati", "data.freeToUse": "Gratuito",
 };
 
 const nl: Translations = {
@@ -379,6 +492,14 @@ const nl: Translations = {
   "settings.dark": "Donker", "settings.light": "Licht", "settings.system": "Systeem",
   "settings.fontDefault": "Standaard", "settings.fontLarge": "Groot", "settings.fontXLarge": "Extra groot",
   "feed.searchPlaceholder": "Artikelen zoeken…", "feed.newPapers": "nieuw artikel", "feed.readPaper": "Artikel lezen",
+  "card.tldr": "TL;DR", "card.relatedPapers": "Gerelateerde artikelen", "card.replicated": "Gerepliceerd",
+  "card.disputed": "Betwist", "card.peerReviewed": "Peer reviewed", "card.simple": "Eenvoudig",
+  "card.technical": "Technisch", "card.readPaper": "Artikel lezen", "card.askAI": "Vraag AI",
+  "card.claim": "Claimen", "card.rate": "Beoordelen", "card.save": "Opslaan", "card.collect": "Verzamelen", "card.share": "Delen",
+  "footer.help": "Help", "footer.developers": "Ontwikkelaars", "footer.privacy": "Privacy",
+  "footer.terms": "Voorwaarden", "footer.accessibility": "Toegankelijkheid",
+  "footer.doNotSell": "Niet verkopen", "footer.contact": "Contact",
+  "data.noSell": "We verkopen uw data niet", "data.freeToUse": "Gratis",
 };
 
 const tr: Translations = {
@@ -404,6 +525,14 @@ const tr: Translations = {
   "settings.dark": "Koyu", "settings.light": "Açık", "settings.system": "Sistem",
   "settings.fontDefault": "Varsayılan", "settings.fontLarge": "Büyük", "settings.fontXLarge": "Çok büyük",
   "feed.searchPlaceholder": "Makale ara…", "feed.newPapers": "yeni makale", "feed.readPaper": "Makaleyi oku",
+  "card.tldr": "TL;DR", "card.relatedPapers": "İlgili makaleler", "card.replicated": "Çoğaltıldı",
+  "card.disputed": "Tartışmalı", "card.peerReviewed": "Hakemli", "card.simple": "Basit",
+  "card.technical": "Teknik", "card.readPaper": "Makaleyi oku", "card.askAI": "AI'ya sor",
+  "card.claim": "İddia et", "card.rate": "Değerlendir", "card.save": "Kaydet", "card.collect": "Topla", "card.share": "Paylaş",
+  "footer.help": "Yardım", "footer.developers": "Geliştiriciler", "footer.privacy": "Gizlilik",
+  "footer.terms": "Koşullar", "footer.accessibility": "Erişilebilirlik",
+  "footer.doNotSell": "Satma", "footer.contact": "İletişim",
+  "data.noSell": "Verilerinizi satmıyoruz", "data.freeToUse": "Ücretsiz",
 };
 
 const pl: Translations = {
@@ -429,6 +558,14 @@ const pl: Translations = {
   "settings.dark": "Ciemny", "settings.light": "Jasny", "settings.system": "Systemowy",
   "settings.fontDefault": "Domyślny", "settings.fontLarge": "Duży", "settings.fontXLarge": "Bardzo duży",
   "feed.searchPlaceholder": "Szukaj artykułów…", "feed.newPapers": "nowy artykuł", "feed.readPaper": "Czytaj artykuł",
+  "card.tldr": "TL;DR", "card.relatedPapers": "Powiązane artykuły", "card.replicated": "Zreplikowane",
+  "card.disputed": "Sporne", "card.peerReviewed": "Recenzowane", "card.simple": "Proste",
+  "card.technical": "Techniczne", "card.readPaper": "Czytaj artykuł", "card.askAI": "Zapytaj AI",
+  "card.claim": "Rościć", "card.rate": "Oceń", "card.save": "Zapisz", "card.collect": "Zbierz", "card.share": "Udostępnij",
+  "footer.help": "Pomoc", "footer.developers": "Deweloperzy", "footer.privacy": "Prywatność",
+  "footer.terms": "Warunki", "footer.accessibility": "Dostępność",
+  "footer.doNotSell": "Nie sprzedawaj", "footer.contact": "Kontakt",
+  "data.noSell": "Nie sprzedajemy danych", "data.freeToUse": "Bezpłatne",
 };
 
 const sv: Translations = {
@@ -454,6 +591,14 @@ const sv: Translations = {
   "settings.dark": "Mörkt", "settings.light": "Ljust", "settings.system": "System",
   "settings.fontDefault": "Standard", "settings.fontLarge": "Stor", "settings.fontXLarge": "Extra stor",
   "feed.searchPlaceholder": "Sök artiklar…", "feed.newPapers": "ny artikel", "feed.readPaper": "Läs artikel",
+  "card.tldr": "TL;DR", "card.relatedPapers": "Relaterade artiklar", "card.replicated": "Replikerad",
+  "card.disputed": "Omtvistad", "card.peerReviewed": "Peer-granskad", "card.simple": "Enkel",
+  "card.technical": "Teknisk", "card.readPaper": "Läs artikel", "card.askAI": "Fråga AI",
+  "card.claim": "Gör anspråk", "card.rate": "Betygsätt", "card.save": "Spara", "card.collect": "Samla", "card.share": "Dela",
+  "footer.help": "Hjälp", "footer.developers": "Utvecklare", "footer.privacy": "Integritet",
+  "footer.terms": "Villkor", "footer.accessibility": "Tillgänglighet",
+  "footer.doNotSell": "Sälj inte", "footer.contact": "Kontakt",
+  "data.noSell": "Vi säljer inte din data", "data.freeToUse": "Gratis",
 };
 
 const id: Translations = {
@@ -479,6 +624,14 @@ const id: Translations = {
   "settings.dark": "Gelap", "settings.light": "Terang", "settings.system": "Sistem",
   "settings.fontDefault": "Bawaan", "settings.fontLarge": "Besar", "settings.fontXLarge": "Sangat besar",
   "feed.searchPlaceholder": "Cari artikel…", "feed.newPapers": "artikel baru", "feed.readPaper": "Baca artikel",
+  "card.tldr": "TL;DR", "card.relatedPapers": "Artikel terkait", "card.replicated": "Direplikasi",
+  "card.disputed": "Diperdebatkan", "card.peerReviewed": "Ditinjau rekan", "card.simple": "Sederhana",
+  "card.technical": "Teknis", "card.readPaper": "Baca artikel", "card.askAI": "Tanya AI",
+  "card.claim": "Klaim", "card.rate": "Nilai", "card.save": "Simpan", "card.collect": "Kumpulkan", "card.share": "Bagikan",
+  "footer.help": "Bantuan", "footer.developers": "Pengembang", "footer.privacy": "Privasi",
+  "footer.terms": "Syarat", "footer.accessibility": "Aksesibilitas",
+  "footer.doNotSell": "Jangan dijual", "footer.contact": "Kontak",
+  "data.noSell": "Kami tidak menjual data Anda", "data.freeToUse": "Gratis",
 };
 
 const vi: Translations = {
@@ -504,6 +657,14 @@ const vi: Translations = {
   "settings.dark": "Tối", "settings.light": "Sáng", "settings.system": "Hệ thống",
   "settings.fontDefault": "Mặc định", "settings.fontLarge": "Lớn", "settings.fontXLarge": "Rất lớn",
   "feed.searchPlaceholder": "Tìm kiếm bài báo…", "feed.newPapers": "bài báo mới", "feed.readPaper": "Đọc bài báo",
+  "card.tldr": "TL;DR", "card.relatedPapers": "Bài liên quan", "card.replicated": "Đã sao chép",
+  "card.disputed": "Tranh cãi", "card.peerReviewed": "Đã bình duyệt", "card.simple": "Đơn giản",
+  "card.technical": "Kỹ thuật", "card.readPaper": "Đọc bài báo", "card.askAI": "Hỏi AI",
+  "card.claim": "Yêu cầu", "card.rate": "Đánh giá", "card.save": "Lưu", "card.collect": "Thu thập", "card.share": "Chia sẻ",
+  "footer.help": "Trợ giúp", "footer.developers": "Nhà phát triển", "footer.privacy": "Quyền riêng tư",
+  "footer.terms": "Điều khoản", "footer.accessibility": "Khả năng tiếp cận",
+  "footer.doNotSell": "Không bán", "footer.contact": "Liên hệ",
+  "data.noSell": "Chúng tôi không bán dữ liệu", "data.freeToUse": "Miễn phí",
 };
 
 const th: Translations = {
@@ -529,6 +690,14 @@ const th: Translations = {
   "settings.dark": "มืด", "settings.light": "สว่าง", "settings.system": "ระบบ",
   "settings.fontDefault": "ค่าเริ่มต้น", "settings.fontLarge": "ใหญ่", "settings.fontXLarge": "ใหญ่มาก",
   "feed.searchPlaceholder": "ค้นหาบทความ…", "feed.newPapers": "บทความใหม่", "feed.readPaper": "อ่านบทความ",
+  "card.tldr": "TL;DR", "card.relatedPapers": "บทความที่เกี่ยวข้อง", "card.replicated": "ทำซ้ำแล้ว",
+  "card.disputed": "มีข้อโต้แย้ง", "card.peerReviewed": "ผ่านการตรวจสอบ", "card.simple": "เรียบง่าย",
+  "card.technical": "เชิงเทคนิค", "card.readPaper": "อ่านบทความ", "card.askAI": "ถาม AI",
+  "card.claim": "อ้างสิทธิ์", "card.rate": "ให้คะแนน", "card.save": "บันทึก", "card.collect": "สะสม", "card.share": "แชร์",
+  "footer.help": "ช่วยเหลือ", "footer.developers": "นักพัฒนา", "footer.privacy": "ความเป็นส่วนตัว",
+  "footer.terms": "เงื่อนไข", "footer.accessibility": "การเข้าถึง",
+  "footer.doNotSell": "ไม่ขายข้อมูล", "footer.contact": "ติดต่อ",
+  "data.noSell": "เราไม่ขายข้อมูลของคุณ", "data.freeToUse": "ฟรี",
 };
 
 export const translations: Record<LanguageCode, Translations> = {
